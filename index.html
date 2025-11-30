@@ -33,10 +33,10 @@
 
     /* ANIMACIONES */
     .calendar-grid { 
-      opacity: 1; 
+      opacity: 1;
       transition: opacity 0.3s ease, transform 0.3s ease; 
       /* Importante para el swipe */
-      touch-action: pan-y; 
+      touch-action: pan-y;
     }
     .calendar-grid.fading { opacity: 0; transform: scale(0.98); }
     
@@ -45,7 +45,8 @@
 
     /* TOASTS */
     .toast-container {
-      position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+      position: fixed;
+      bottom: 20px; left: 50%; transform: translateX(-50%);
       z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none;
     }
     .toast {
@@ -60,15 +61,18 @@
 
     /* LOGIN */
     .login-wrapper {
-      min-height: 100vh; display:flex; align-items:center; justify-content:center;
+      min-height: 100vh; display:flex;
+      align-items:center; justify-content:center;
       padding:20px; background: radial-gradient(circle at top, #ede9fe, #f3f4fb);
     }
     .login-card {
-      background:#fff; max-width:380px; width:100%; border-radius:28px;
+      background:#fff;
+      max-width:380px; width:100%; border-radius:28px;
       box-shadow:0 25px 50px rgba(15,23,42,0.18); padding:40px 32px;
     }
     .login-title {
-      font-size:1.5rem; font-weight:700; margin-bottom:8px;
+      font-size:1.5rem;
+      font-weight:700; margin-bottom:8px;
       display:flex; align-items:center; gap:12px; color:var(--accent-color);
     }
     .login-subtitle { font-size:0.95rem; color:var(--text-muted); margin-bottom:28px; }
@@ -76,12 +80,14 @@
     .login-field label { font-size:0.9rem; font-weight:500; color:#4b5563; margin-bottom:6px; display:block; }
     .login-field input {
       width:100%; padding:15px; font-size:1rem; border-radius:14px;
-      border:1px solid #d1d5db; transition:border-color .2s, box-shadow .2s;
+      border:1px solid #d1d5db;
+      transition:border-color .2s, box-shadow .2s;
     }
     .login-field input:focus { outline:none; border-color:var(--accent-color); box-shadow:0 0 0 3px rgba(124,58,237,.15); }
     .login-btn {
       margin:16px 0 8px; width:100%; padding:17px; font-size:1.15rem;
-      font-weight:600; border-radius:20px; background:var(--accent-color); color:white; border:none; cursor:pointer;
+      font-weight:600; border-radius:20px; background:var(--accent-color);
+      color:white; border:none; cursor:pointer;
       transition:background .3s, transform .2s;
     }
     .login-btn:hover { background:#6d28d9; }
@@ -89,14 +95,16 @@
 
     /* TOPBAR */
     .topbar {
-      padding:14px 18px; border-radius:24px; background:#fff;
+      padding:14px 18px; border-radius:24px;
+      background:#fff;
       box-shadow:var(--shadow-soft); margin-bottom:20px;
       display:flex; align-items:center; justify-content:space-between;
     }
     .logo-icon { width:40px; height:40px; font-size:24px; border-radius:12px; background:var(--accent-soft); display:flex; align-items:center; justify-content:center; }
     .app-name { font-size:1.2rem; font-weight:700; }
     .status-pill {
-      margin-top:4px; display:inline-flex; align-items:center; gap:6px;
+      margin-top:4px;
+      display:inline-flex; align-items:center; gap:6px;
       padding:4px 10px; border-radius:999px; font-size:0.75rem; font-weight:500;
       background:#e5e7eb; color:#374151;
     }
@@ -267,7 +275,6 @@
     messagingSenderId: "1038952432258",
     appId: "1:1038952432258:web:7608d6a48d8ad8308a6a9b"
   };
-
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
   const auth = firebase.auth();
@@ -285,10 +292,9 @@
   let overrides = {};
   let pendingRequests = [];
   let historyRequests = [];
-
   const monthNames = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
   const weekDayNames = ["Lun","Mar","Mié","Jue","Vie","Sáb","Dom"];
-  const BASE_MONDAY = new Date(2026, 0, 5, 12, 0, 0); 
+  const BASE_MONDAY = new Date(2026, 0, 5, 12, 0, 0);
 
   // HELPERS
   function showToast(msg, type = 'success') {
@@ -358,7 +364,6 @@
 
         const tbody = document.createElement("tbody");
         let dayCounter = 1; let finished = false;
-
         while(!finished) {
           const tr = document.createElement("tr");
           for(let i = 0; i < 7; i++) {
@@ -374,26 +379,29 @@
               if(final === "madre") td.classList.add("day-mother");
               if(override) td.classList.add("day-overridden");
 
-              const spanNum = document.createElement("span"); spanNum.className = "day-number"; spanNum.textContent = dayCounter; td.appendChild(spanNum);
+              const spanNum = document.createElement("span"); spanNum.className = "day-number"; spanNum.textContent = dayCounter;
+              td.appendChild(spanNum);
               
               // ICONO MARCA DE AGUA
-              const ownerIcon = document.createElement("div"); ownerIcon.className = "owner-icon";
+              const ownerIcon = document.createElement("div");
+              ownerIcon.className = "owner-icon";
               ownerIcon.textContent = final === "madre" ? "👩" : "👨"; td.appendChild(ownerIcon);
-
               if(currentYear === today.getFullYear() && mIndex === today.getMonth() && dayCounter === today.getDate()){
-                const todayMark = document.createElement("div"); todayMark.className = "today-marker"; td.appendChild(todayMark);
+                const todayMark = document.createElement("div");
+                todayMark.className = "today-marker"; td.appendChild(todayMark);
               }
               td.title = `${dateKey}: ${final}`;
               tr.appendChild(td); dayCounter++;
             } else {
-              td.style.background = "transparent"; tr.appendChild(td);
+              td.style.background = "transparent";
+              tr.appendChild(td);
             }
           }
-          tbody.appendChild(tr); if(dayCounter > daysInMonth) finished = true;
+          tbody.appendChild(tr);
+          if(dayCounter > daysInMonth) finished = true;
         }
         table.appendChild(tbody); monthDiv.appendChild(table); grid.appendChild(monthDiv);
       });
-
       requestAnimationFrame(() => {
         grid.classList.remove('fading');
         const cells = grid.querySelectorAll('.day-cell');
@@ -436,18 +444,15 @@
   let touchStartY = 0;
   let touchEndX = 0;
   let touchEndY = 0;
-
   gridElement.addEventListener('touchstart', e => {
     touchStartX = e.changedTouches[0].screenX;
     touchStartY = e.changedTouches[0].screenY;
   }, {passive: true});
-
   gridElement.addEventListener('touchend', e => {
     touchEndX = e.changedTouches[0].screenX;
     touchEndY = e.changedTouches[0].screenY;
     handleSwipe();
   }, {passive: true});
-
   function handleSwipe() {
     const xDiff = touchStartX - touchEndX;
     const yDiff = touchStartY - touchEndY;
@@ -509,19 +514,55 @@
   document.getElementById("year-select").addEventListener("change", (e) => { currentYear = parseInt(e.target.value); renderCalendar(); });
   document.getElementById("prev-period").addEventListener("click", () => { currentMonth--; if(currentMonth < 0) { currentMonth = 11; currentYear--; document.getElementById("year-select").value = currentYear; } renderCalendar(); });
   document.getElementById("next-period").addEventListener("click", () => { currentMonth++; if(currentMonth > 11) { currentMonth = 0; currentYear++; document.getElementById("year-select").value = currentYear; } renderCalendar(); });
+
+  // ---------------------------------------------------------
+  // MODIFICACIÓN: ENVÍO DE SOLICITUD + NOTIFICACIÓN TELEGRAM
+  // ---------------------------------------------------------
   document.getElementById("request-form").addEventListener("submit", async (e) => {
     e.preventDefault();
     if (!currentUser || !currentRole) return;
+
+    // CONFIGURACIÓN DE TELEGRAM
+    const TELEGRAM_TOKEN = "8556115664:AAGG4iOFmY7s75GX5BOJsgBJIb0E4FXRVZU";
+    const TELEGRAM_CHAT_ID = "-5043560391"; 
+
+    // Datos del formulario
+    const startDate = document.getElementById("start-date").value;
+    const endDate = document.getElementById("end-date").value;
+    const reason = document.getElementById("reason").value.trim();
+    const who = currentRole === "padre" ? "👨 El Padre" : "👩 La Madre";
+
     try {
+      // 1. Guardar en Firebase (Base de datos original)
       await db.collection("requests").add({
         requesterUid: currentUser.uid, requesterRole: currentRole,
-        startDate: document.getElementById("start-date").value, endDate: document.getElementById("end-date").value, reason: document.getElementById("reason").value.trim(),
+        startDate: startDate, endDate: endDate, reason: reason,
         status: "pendiente", createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
-      showToast("Solicitud enviada"); e.target.reset();
-    } catch (err) { showToast("Error al enviar", "error"); }
+
+      // 2. Enviar a Telegram
+      const text = `📅 *Nueva Solicitud de Custodia*\n\nSolicita: *${who}*\nDesde: ${startDate}\nHasta: ${endDate}\nMotivo: _${reason}_\n\nRevisa la app para gestionar.`;
+      
+      // Llamada a la API de Telegram (sin await para no bloquear)
+      fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          chat_id: TELEGRAM_CHAT_ID,
+          text: text,
+          parse_mode: 'Markdown'
+        })
+      }).then(res => {
+          if(!res.ok) console.error("Error Telegram:", res.status);
+      }).catch(err => console.error("Error red Telegram:", err));
+
+      showToast("Solicitud enviada y notificada"); e.target.reset();
+    } catch (err) { 
+        console.error(err);
+        showToast("Error al enviar", "error"); 
+    }
   });
-  
+
   document.addEventListener("DOMContentLoaded", () => {
     const sd = document.getElementById("start-date"), ed = document.getElementById("end-date");
     if(sd && ed) { sd.min = GLOBAL_MIN_DATE; sd.max = GLOBAL_MAX_DATE; ed.min = GLOBAL_MIN_DATE; ed.max = GLOBAL_MAX_DATE; }

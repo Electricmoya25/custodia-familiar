@@ -7,8 +7,12 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' x='0.1em' font-size='80'%3E%F0%9F%93%85%3C/text%3E%3C/svg%3E">
   <style>
     :root {
-      --mother-color: #fecaca;  /* rojo pastel = Madre */
-      --father-color: #dbeafe;  /* azul pastel = Padre */
+      /* Colores pastel definidos */
+      --mother-color: #fce7f3; /* Rosa suave */
+      --father-color: #dbeafe; /* Azul suave */
+      --mother-text: #be185d;
+      --father-text: #1e40af;
+      
       --accent-color: #7c3aed;
       --accent-soft: #ede9fe;
       --text-main: #111827;
@@ -19,7 +23,9 @@
       --success: #10b981;
       --error: #ef4444;
     }
+
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    
     body {
       margin: 0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -27,34 +33,27 @@
       color: var(--text-main);
       padding-bottom: 50px;
     }
+    
     .hidden { display: none !important; }
 
-    /* ANIMACIONES SUAVES */
-    .calendar-grid {
-      opacity: 1;
-      transition: opacity 0.45s ease;
-    }
-    .calendar-grid.fading {
-      opacity: 0;
-    }
+    /* --- ANIMACIONES --- */
+    .calendar-grid { opacity: 1; transition: opacity 0.3s ease; }
+    .calendar-grid.fading { opacity: 0; }
+    
     .day-cell {
-      opacity: 0;
-      transform: translateY(20px);
-      transition: opacity 0.6s ease, transform 0.6s ease, background-color 0.4s ease;
+      opacity: 0; transform: translateY(10px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
     }
-    .day-cell.animated {
-      opacity: 1;
-      transform: translateY(0);
-    }
+    .day-cell.animated { opacity: 1; transform: translateY(0); }
 
-    /* TOASTS */
+    /* --- TOAST NOTIFICATIONS --- */
     .toast-container {
       position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
       z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none;
     }
     .toast {
-      background: #333; color: #fff; padding: 14px 28px; border-radius: 50px;
-      font-size: 0.95rem; font-weight: 600; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      background: #333; color: #fff; padding: 12px 24px; border-radius: 50px;
+      font-size: 0.9rem; font-weight: 600; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
       opacity: 0; transform: translateY(20px); transition: all 0.4s ease;
       display: flex; align-items: center; gap: 10px;
     }
@@ -62,379 +61,233 @@
     .toast.success { background: var(--success); }
     .toast.error { background: var(--error); }
 
-    /* LOGIN */
+    /* --- LOGIN --- */
     .login-wrapper {
       min-height: 100vh; display:flex; align-items:center; justify-content:center;
       padding:20px; background: radial-gradient(circle at top, #ede9fe, #f3f4fb);
     }
     .login-card {
-      background:#fff; max-width:380px; width:100%; border-radius:28px;
-      box-shadow:0 25px 50px rgba(15,23,42,0.18); padding:40px 32px;
+      background:#fff; max-width:380px; width:100%; border-radius:24px;
+      box-shadow:0 20px 45px rgba(15,23,42,0.15); padding:32px;
     }
     .login-title {
-      font-size:1.5rem; font-weight:700; margin-bottom:8px;
-      display:flex; align-items:center; gap:12px; color:var(--accent-color);
+      font-size:1.4rem; font-weight:700; margin-bottom:8px;
+      color:var(--accent-color); display:flex; align-items:center; gap:8px;
     }
-    .login-subtitle { font-size:0.95rem; color:var(--text-muted); margin-bottom:28px; }
-
-    .login-field { margin-bottom:16px; }
-    .login-field label { font-size:0.9rem; font-weight:500; color:#4b5563; margin-bottom:6px; display:block; }
+    .login-field { margin-bottom:14px; }
+    .login-field label { font-size:0.85rem; font-weight:500; color:#4b5563; display:block; margin-bottom:4px; }
     .login-field input {
-      width:100%; padding:15px; font-size:1rem; border-radius:14px;
-      border:1px solid #d1d5db; transition:border-color .2s, box-shadow .2s;
+      width:100%; padding:12px; border-radius:10px; border:1px solid #d1d5db;
+      font-size:0.95rem; outline:none; transition:border-color 0.2s;
     }
-    .login-field input:focus { outline:none; border-color:var(--accent-color); box-shadow:0 0 0 3px rgba(124,58,237,.15); }
-    .login-btn {
-      margin:16px 0 8px; width:100%; padding:17px; font-size:1.15rem;
-      font-weight:600; border-radius:20px; background:var(--accent-color); color:white; border:none; cursor:pointer;
-      transition:background .3s, transform .2s;
-    }
-    .login-btn:hover { background:#6d28d9; }
-    .login-btn:disabled { opacity:0.6; cursor:not-allowed; }
-    .login-error { color:#dc2626; font-size:0.9rem; margin-top:8px; text-align:center; min-height:1.2em; }
-
-    /* TOPBAR */
-    .topbar {
-      padding:14px 18px; border-radius:24px; background:#fff;
-      box-shadow:var(--shadow-soft); margin-bottom:20px;
-      display:flex; align-items:center; justify-content:space-between;
-    }
-    .logo-icon { width:40px; height:40px; font-size:24px; border-radius:12px; background:var(--accent-soft); display:flex; align-items:center; justify-content:center; }
-    .app-name { font-size:1.2rem; font-weight:700; }
-
-    .status-pill {
-      margin-top:4px;
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-      padding:4px 10px;
-      border-radius:999px;
-      font-size:0.75rem;
-      font-weight:500;
-      background:#e5e7eb;
-      color:#374151;
-    }
-    .status-dot {
-      width:8px;
-      height:8px;
-      border-radius:50%;
-      background:#9ca3af;
-    }
-    .status-online { background:#dcfce7; color:#166534; }
-    .status-online .status-dot { background:#22c55e; }
-    .status-connecting { background:#fef3c7; color:#92400e; }
-    .status-connecting .status-dot { background:#facc15; }
-    .status-error { background:#fee2e2; color:#b91c1c; }
-    .status-error .status-dot { background:#ef4444; }
-
-    .year-select {
-      padding:8px 10px;
-      border-radius:999px;
-      border:1px solid #e5e7eb;
-      background:#fff;
-      font-size:0.9rem;
-    }
-    .user-info {
-      display:flex;
-      align-items:center;
-      gap:10px;
-      margin-left:16px;
-    }
-    .user-role-label {
-      font-size:0.9rem;
-      font-weight:600;
-      color:#374151;
-    }
-    .logout-btn {
-      padding:6px 10px;
-      font-size:0.8rem;
-      border-radius:999px;
-      border:1px solid #e5e7eb;
-      background:#fff;
-      cursor:pointer;
-    }
-
-    .layout {
-      padding:16px;
-      display:grid;
-      grid-template-columns:2fr 1fr;
-      gap:16px;
-    }
-    @media (max-width:900px){
-      .layout {
-        grid-template-columns:1fr;
-      }
-    }
-
-    .side-panel .card {
-      background:#fff;
-      border-radius:20px;
-      box-shadow:var(--shadow-soft);
-      padding:14px 16px;
-    }
-    .panel-title {
-      margin:0 0 10px;
-      font-size:1rem;
-      font-weight:600;
-    }
-    .panel-title.active {
-      color:var(--accent-color);
-    }
-    .card-content {
-      font-size:0.9rem;
-    }
-    .field-group {
-      margin-bottom:12px;
-    }
-    .field-group label {
-      display:block;
-      margin-bottom:4px;
-      font-size:0.85rem;
-      font-weight:500;
-      color:#4b5563;
-    }
-    .field-group input,
-    .field-group textarea {
-      width:100%;
-      padding:8px 10px;
-      border-radius:10px;
-      border:1px solid #d1d5db;
-      font-size:0.9rem;
-    }
-    .field-group textarea {
-      min-height:60px;
-      resize:vertical;
-    }
+    .login-field input:focus { border-color:var(--accent-color); box-shadow:0 0 0 3px rgba(124,58,237,0.1); }
+    
     .primary-btn {
-      display:inline-block;
-      margin-top:8px;
-      padding:10px 14px;
-      border-radius:999px;
-      border:none;
-      background:var(--accent-color);
-      color:#fff;
-      font-size:0.9rem;
-      font-weight:600;
-      cursor:pointer;
+      width:100%; padding:14px; border-radius:12px; border:none;
+      background:var(--accent-color); color:white; font-weight:600; cursor:pointer;
+      font-size:1rem; transition:background 0.2s;
     }
-    .helper-text {
-      font-size:0.8rem;
-      color:#6b7280;
-    }
-    .requests-list {
-      max-height:260px;
-      overflow:auto;
-      border-radius:12px;
-      border:1px solid #e5e7eb;
-      padding:8px;
-    }
-    .request-item {
-      border-radius:10px;
-      border:1px solid #e5e7eb;
-      padding:8px 10px;
-      margin-bottom:8px;
-      font-size:0.8rem;
-    }
+    .primary-btn:hover { background:#6d28d9; }
+    .primary-btn:disabled { opacity:0.6; cursor:not-allowed; }
+    .login-error { color:#dc2626; font-size:0.85rem; margin-top:10px; text-align:center; min-height:1.2em; }
 
-    /* CALENDARIO */
-    .calendar-wrapper {
-      background:var(--card-bg); border-radius:28px; padding:16px 12px;
-      box-shadow:var(--shadow-soft);
+    /* --- TOPBAR --- */
+    .topbar {
+      padding:12px 16px; border-radius:20px; background:#fff;
+      box-shadow:var(--shadow-soft); margin-bottom:16px;
+      display:flex; align-items:center; justify-content:space-between; flex-wrap: wrap; gap: 10px;
     }
-    .calendar-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+    .topbar-left { display:flex; align-items:center; gap:10px; }
+    .logo-icon { width:36px; height:36px; border-radius:10px; background:var(--accent-soft); display:flex; align-items:center; justify-content:center; font-size:20px; }
+    .app-name { font-weight:700; font-size:1.1rem; }
+    
+    .status-pill {
+      font-size:0.75rem; padding:4px 10px; border-radius:20px; background:#f3f4f6; color:#6b7280;
+      display:inline-flex; align-items:center; gap:6px; font-weight:500;
+    }
+    .status-dot { width:6px; height:6px; border-radius:50%; background:#9ca3af; }
+    .status-online { background:#dcfce7; color:#166534; } .status-online .status-dot { background:#22c55e; }
+    .status-connecting { background:#fef3c7; color:#92400e; } .status-connecting .status-dot { background:#facc15; }
+    .status-error { background:#fee2e2; color:#b91c1c; } .status-error .status-dot { background:#ef4444; }
+
+    .topbar-right { display:flex; align-items:center; gap:8px; }
+    .year-select { padding:6px 12px; border-radius:20px; border:1px solid #e5e7eb; background:#fff; font-size:0.9rem; cursor:pointer; }
+    .logout-btn { padding:6px 12px; border-radius:20px; border:1px solid #e5e7eb; background:#fff; font-size:0.8rem; cursor:pointer; color: #ef4444; }
+
+    /* --- LAYOUT & CALENDAR --- */
+    .layout { display:grid; grid-template-columns: 2fr 1fr; gap:16px; padding:0 10px; }
+    @media (max-width:850px) { .layout { grid-template-columns: 1fr; } }
+
+    .calendar-wrapper { background:#fff; border-radius:24px; padding:20px; box-shadow:var(--shadow-soft); }
+    .calendar-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+    .calendar-title { font-size:1.4rem; font-weight:700; text-transform:capitalize; }
+    
     .nav-arrow {
-      width:36px; height:36px; font-size:24px; border-radius:50%;
-      border:1px solid #e5e7eb; background:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer;
-      transition:all .2s;
+      width:32px; height:32px; border-radius:50%; border:1px solid #e5e7eb;
+      background:#fff; cursor:pointer; font-size:1.2rem; display:flex; align-items:center; justify-content:center;
+      transition:transform 0.1s;
     }
-    .nav-arrow:hover { background:#f3f4f6; transform:scale(1.1); }
-    .calendar-title { font-size:1.5rem; font-weight:700; }
+    .nav-arrow:hover { background:#f9fafb; }
+    .nav-arrow:active { transform:scale(0.95); }
 
-    .calendar-subheader {
-      display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;
-      padding-bottom:10px; border-bottom:1px solid #f3f4f6; margin-bottom:12px;
-    }
-    .legend { font-size:0.9rem; gap:16px; font-weight:600; }
+    .calendar-subheader { display:flex; justify-content:space-between; align-items:center; padding-bottom:12px; border-bottom:1px solid #f3f4f6; margin-bottom:12px; }
+    .legend { display:flex; gap:12px; font-size:0.85rem; color:#6b7280; font-weight:500; }
+    .legend-item { display:flex; align-items:center; gap:4px; }
 
-    @media (max-width:768px) { .calendar-grid { display:block; } }
-
-    .month {
-      border-radius:16px; background:#ffffff; border:1px solid #f3f4f6; overflow:hidden; margin-bottom:24px;
-    }
-    .month-header {
-      text-align:center; padding:8px; background:#f9fafb;
-      font-weight:600; font-size:0.9rem; color:#374151;
-    }
-    table.month-table {
-      width:100%; border-collapse:separate; border-spacing:2.5px; table-layout:fixed;
-    }
-    .month-table th {
-      font-size:0.7rem; color:#9ca3af; font-weight:500; padding-bottom:4px;
-    }
+    /* GRID MES */
+    .month { margin-bottom:20px; background:#fff; border-radius:16px; border:1px solid #f3f4f6; overflow:hidden; }
+    .month-header { text-align:center; padding:8px; background:#f8fafc; font-weight:600; color:#475569; font-size:0.95rem; }
+    
+    table.month-table { width:100%; border-collapse:separate; border-spacing:3px; table-layout:fixed; }
+    .month-table th { font-size:0.75rem; color:#94a3b8; font-weight:600; padding:4px 0; }
+    
     .month-table td {
-      height:52px;
-      position:relative;
-      border-radius:12px;
-      background:#f8fafc;
+      height: 54px;
+      position: relative;
+      border-radius: 12px;
+      vertical-align: top;
+      transition: transform 0.1s;
+      cursor: default;
     }
-    .day-mother { background:var(--mother-color); }
-    .day-father { background:var(--father-color); }
-
+    
+    /* COLORES CUSTODIA */
+    .day-mother { background: var(--mother-color); color: var(--mother-text); }
+    .day-father { background: var(--father-color); color: var(--father-text); }
+    
     .day-number {
-      position:absolute;
-      top:50%; left:50%;
-      transform:translate(-50%,-50%);
-      font-size:1.1rem;
-      font-weight:700;
-      color:#1f2937;
-      background:white;
-      width:32px; height:32px;
-      border-radius:50%;
-      display:flex; align-items:center; justify-content:center;
-      z-index:2;
+      position: absolute; top: 4px; left: 6px;
+      font-size: 0.85rem; font-weight: 700;
+      z-index: 2; /* Encima del icono */
     }
 
+    /* ICONO (MARCA DE AGUA) */
     .owner-icon {
-      position:absolute;
-      right:8px;
-      top:50%;
-      transform:translateY(-50%);
-      font-size:2.1rem;
-      pointer-events:none;
-      user-select:none;
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 2rem; /* Tamaño grande */
+      opacity: 0.25;   /* Transparente para no molestar */
+      pointer-events: none;
+      z-index: 1;      /* Debajo del número */
+      filter: grayscale(0.2);
     }
-    .day-mother .owner-icon { color:#dc2626; }
-    .day-father .owner-icon { color:#2563eb; }
-
+    
+    /* Indicador de cambio manual */
+    .day-overridden { box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1); }
     .day-overridden::after {
-      content:"⇄";
-      position:absolute; top:6px; left:6px;
-      font-size:1rem; color:var(--accent-color); opacity:0.9;
+      content: "⇄"; position: absolute; top: 2px; right: 4px;
+      font-size: 0.8rem; opacity: 0.7; z-index: 3;
     }
+    
     .today-marker {
-      position:absolute; bottom:6px; right:6px;
-      width:8px; height:8px; background:var(--accent-color);
-      border-radius:50%; box-shadow:0 0 0 2px white;
+      position: absolute; bottom: 4px; right: 4px;
+      width: 6px; height: 6px; background: var(--accent-color);
+      border-radius: 50%; box-shadow: 0 0 0 2px rgba(255,255,255,0.8);
+      z-index: 3;
     }
 
-    @media (max-width:640px) {
-      .month-table td { height:48px; }
-      .day-number { font-size:1rem; width:28px; height:28px; }
-      .owner-icon { font-size:1.9rem; right:6px; }
-      .nav-arrow { width:48px; height:48px; font-size:32px; }
-      .calendar-title { font-size:1.8rem; }
-      .legend { font-size:1rem; }
+    /* --- SIDE PANEL --- */
+    .card { background:#fff; border-radius:20px; box-shadow:var(--shadow-soft); padding:16px; margin-bottom:16px; }
+    .panel-title { font-size:1rem; font-weight:600; margin:0 0 12px 0; display:flex; align-items:center; gap:6px; }
+    .panel-title.active { color: var(--accent-color); }
+    
+    .request-item {
+      padding:10px; border:1px solid #e5e7eb; border-radius:12px; margin-bottom:8px;
+      font-size:0.85rem; background:#f9fafb;
     }
+    .requests-list { max-height:250px; overflow-y:auto; }
+
   </style>
 </head>
 <body>
 
 <div class="toast-container" id="toast-container"></div>
 
-<!-- LOGIN -->
 <div id="login-view" class="login-wrapper">
   <div class="login-card">
     <div class="login-title">📅 Custodia Familiar</div>
-    <p class="login-subtitle">Introduce tu correo y contraseña para acceder al calendario compartido.</p>
+    <p style="color:#6b7280; font-size:0.9rem; margin-bottom:20px;">Acceso al calendario compartido.</p>
+    
     <form id="login-form">
       <div class="login-field">
-        <label for="login-email">Correo electrónico</label>
-        <input type="email" id="login-email" required autocomplete="email" placeholder="nombre@ejemplo.com">
+        <label>Email</label>
+        <input type="email" id="login-email" required placeholder="tu@email.com">
       </div>
       <div class="login-field">
-        <label for="login-password">Contraseña</label>
-        <input type="password" id="login-password" required autocomplete="current-password" placeholder="••••••••">
+        <label>Contraseña</label>
+        <input type="password" id="login-password" required placeholder="••••••">
       </div>
-      <button type="submit" class="login-btn primary-btn" id="login-submit-btn">Entrar</button>
+      <button type="submit" class="primary-btn" id="login-submit-btn">Entrar</button>
       <p id="login-error" class="login-error"></p>
     </form>
   </div>
 </div>
 
-<!-- APP -->
 <div id="app-root" class="app hidden">
   <header class="topbar">
-    <div class="topbar-left" style="display:flex;align-items:center;gap:10px;">
-      <div class="logo-icon">📅</div>
+    <div class="topbar-left">
+      <div class="logo-icon">🗓️</div>
       <div>
-        <div class="app-name">Custodia Familiar</div>
+        <div class="app-name">Custodia</div>
         <div class="status-pill status-connecting" id="status-pill">
           <span class="status-dot"></span>
           <span id="status-text">Conectando...</span>
         </div>
       </div>
     </div>
-    <div class="topbar-right" style="display:flex;align-items:center;gap:8px;">
+    <div class="topbar-right">
       <select id="year-select" class="year-select"></select>
-      <div class="user-info">
-        <span class="user-role-label" id="user-role-label">Usuario</span>
-        <button type="button" id="logout-btn" class="logout-btn">Salir</button>
-      </div>
+      <span class="user-role-label" id="user-role-label">...</span>
+      <button id="logout-btn" class="logout-btn">Salir</button>
     </div>
   </header>
 
   <div class="layout">
     <section class="calendar-wrapper">
       <div class="calendar-header">
-        <button id="prev-period" class="nav-arrow" title="Anterior">‹</button>
+        <button id="prev-period" class="nav-arrow">‹</button>
         <div class="month-nav">
           <div class="calendar-title" id="calendar-title"></div>
         </div>
-        <button id="next-period" class="nav-arrow" title="Siguiente">›</button>
+        <button id="next-period" class="nav-arrow">›</button>
       </div>
+
       <div class="calendar-subheader">
         <div class="legend">
-          <span class="legend-item">👩 Madre</span>
-          <span class="legend-item">👨 Padre</span>
-          <span class="legend-item">⇄ Cambio</span>
+          <span class="legend-item"><span style="width:10px;height:10px;background:#fce7f3;border-radius:2px;"></span> Madre</span>
+          <span class="legend-item"><span style="width:10px;height:10px;background:#dbeafe;border-radius:2px;"></span> Padre</span>
         </div>
       </div>
+
       <div id="calendar-grid" class="calendar-grid"></div>
     </section>
 
-    <!-- PANEL LATERAL -->
     <section class="side-panel">
       <div class="card">
-        <div class="new-request-header"><span>➕ Nueva solicitud de cambio</span></div>
-        <div class="card-content">
-          <form id="request-form">
-            <div class="field-group">
-              <label>Solicitante</label>
-              <div id="whoami-label" style="font-size:0.95rem; font-weight:600; color:#4b5563;">Cargando...</div>
+        <div class="panel-title">➕ Solicitar cambio</div>
+        <form id="request-form">
+          <div style="margin-bottom:10px;">
+            <label style="font-size:0.8rem;color:#6b7280;display:block;">Fechas</label>
+            <div style="display:flex; gap:8px;">
+              <input type="date" id="start-date" required style="width:100%;padding:8px;border:1px solid #e5e7eb;border-radius:8px;">
+              <input type="date" id="end-date" required style="width:100%;padding:8px;border:1px solid #e5e7eb;border-radius:8px;">
             </div>
-            <div class="field-group">
-              <label>Fechas (2026-2027)</label>
-              <div style="display:flex; gap:12px;">
-                <input type="date" id="start-date" required>
-                <input type="date" id="end-date" required>
-              </div>
-            </div>
-            <div class="field-group">
-              <label for="reason">Motivo</label>
-              <textarea id="reason" placeholder="Ej: Viaje de trabajo, cumpleaños..." required></textarea>
-            </div>
-            <button type="submit" class="primary-btn">Enviar Solicitud</button>
-            <p class="helper-text" style="text-align:center; margin-top:8px;">
-              Se enviará una notificación a ambos correos.
-            </p>
-          </form>
-        </div>
+          </div>
+          <div style="margin-bottom:10px;">
+            <label style="font-size:0.8rem;color:#6b7280;display:block;">Motivo</label>
+            <textarea id="reason" required style="width:100%;padding:8px;border:1px solid #e5e7eb;border-radius:8px;min-height:50px;"></textarea>
+          </div>
+          <button type="submit" class="primary-btn" style="padding:10px;font-size:0.9rem;">Enviar</button>
+        </form>
       </div>
 
-      <div style="display:flex; flex-direction:column; gap:16px;">
-        <div class="card">
-          <div class="card-content">
-            <h3 class="panel-title active">Solicitudes Pendientes</h3>
-            <div class="requests-list" id="pending-requests"></div>
-            <p class="helper-text">Solo puedes aceptar las que recibes.</p>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-content">
-            <h3 class="panel-title">Historial</h3>
-            <div class="requests-list" id="history-requests"></div>
-          </div>
-        </div>
+      <div class="card">
+        <div class="panel-title active">Pendientes</div>
+        <div class="requests-list" id="pending-requests"></div>
+      </div>
+      <div class="card">
+        <div class="panel-title">Historial</div>
+        <div class="requests-list" id="history-requests"></div>
       </div>
     </section>
   </div>
@@ -455,19 +308,18 @@
     appId: "1:1038952432258:web:7608d6a48d8ad8308a6a9b"
   };
 
-  // Inicializar Firebase
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
   const auth = firebase.auth();
 
-  // --- VARIABLES GLOBALES ---
+  // --- VARIABLES ---
   const MIN_YEAR = 2026;
   const MAX_YEAR = 2027;
   const GLOBAL_MIN_DATE = `${MIN_YEAR}-01-01`;
   const GLOBAL_MAX_DATE = `${MAX_YEAR}-12-31`;
 
   let currentYear = 2026;
-  let currentMonth = 0; // 0 = Enero
+  let currentMonth = 0;
   let currentView = "month";
   let currentUser = null;
   let currentRole = null;
@@ -479,10 +331,10 @@
   const monthNames = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
   const weekDayNames = ["Lun","Mar","Mié","Jue","Vie","Sáb","Dom"];
   
-  // Lunes 5 Enero 2026 es el inicio de ciclo (Semana 0 = Madre)
+  // Lunes 5 de Enero de 2026 es el inicio de la semana base.
   const BASE_MONDAY = new Date(2026, 0, 5, 12, 0, 0); 
 
-  // --- UI HELPERS ---
+  // --- UI ---
   function showToast(msg, type = 'success') {
     const container = document.getElementById('toast-container');
     const el = document.createElement('div');
@@ -493,7 +345,7 @@
     setTimeout(() => {
       el.classList.remove('visible');
       setTimeout(() => el.remove(), 300);
-    }, 5000); // Aumentado a 5s para leer mejor los errores
+    }, 4000);
   }
 
   function setConnectionStatus(state) {
@@ -503,7 +355,7 @@
     text.textContent = state === "online" ? "En línea" : state === "connecting" ? "Conectando..." : "Error";
   }
 
-  // --- LÓGICA DE FECHAS ---
+  // --- LOGICA FECHAS ---
   function formatDateKey(year, monthIndex, day) {
     const m = String(monthIndex + 1).padStart(2, "0");
     const d = String(day).padStart(2, "0");
@@ -513,27 +365,37 @@
   function getBaseOwner(year, monthIndex, day) {
     const date = new Date(year, monthIndex, day, 12, 0, 0);
     if (date.getFullYear() < MIN_YEAR || date.getFullYear() > MAX_YEAR) return null;
+    
+    // Diferencia en días desde el 5 Enero 2026
     const diffMs = date - BASE_MONDAY;
     const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
+    
+    // Índice de semana
     const weekIndex = Math.floor(diffDays / 7);
-    // Lógica: Semana par = Madre, Impar = Padre
-    return (weekIndex % 2 === 0) ? "madre" : "padre";
+
+    // LOGICA CORREGIDA PARA QUE 5-11 ENERO SEA PADRE
+    // weekIndex = 0 (Semana 5-11 Ene). 0 es par.
+    // Queremos que Par = Padre.
+    
+    const isEven = Math.abs(weekIndex) % 2 === 0;
+    
+    // Si es Par -> PADRE. Si es Impar -> MADRE.
+    return isEven ? "padre" : "madre";
   }
 
-  // --- RENDERIZADO ---
+  // --- RENDERIZADO CALENDARIO ---
   function renderCalendar() {
     const grid = document.getElementById("calendar-grid");
     const titleEl = document.getElementById("calendar-title");
-    if (!grid || !titleEl) return;
+    if (!grid) return;
 
-    // Animación de salida
     grid.classList.add('fading');
 
     setTimeout(() => {
       grid.innerHTML = "";
       titleEl.innerHTML = currentView === "year" 
-        ? `Año <span class="year">${currentYear}</span>`
-        : `${monthNames[currentMonth]} <span class="year">${currentYear}</span>`;
+        ? `Año ${currentYear}`
+        : `${monthNames[currentMonth]} ${currentYear}`;
 
       const monthsToRender = currentView === "year" ? [...Array(12).keys()] : [currentMonth];
       const today = new Date();
@@ -544,13 +406,13 @@
 
         const header = document.createElement("div");
         header.className = "month-header";
-        header.textContent = currentView === "year" ? `${monthNames[mIndex]} ${currentYear}` : monthNames[mIndex];
+        header.textContent = monthNames[mIndex];
         monthDiv.appendChild(header);
 
         const table = document.createElement("table");
         table.className = "month-table";
 
-        // Cabecera L M X J V S D
+        // Cabecera
         const thead = document.createElement("thead");
         const trHead = document.createElement("tr");
         weekDayNames.forEach(d => {
@@ -565,7 +427,7 @@
         const daysInMonth = new Date(currentYear, mIndex + 1, 0).getDate();
         const firstDayInstance = new Date(currentYear, mIndex, 1);
         let startDay = firstDayInstance.getDay();
-        startDay = (startDay === 0) ? 6 : startDay - 1; // Ajuste Lunes=0
+        startDay = (startDay === 0) ? 6 : startDay - 1; // Lunes=0
 
         const tbody = document.createElement("tbody");
         let dayCounter = 1;
@@ -579,38 +441,37 @@
             if(dayCounter <= daysInMonth && (dayCounter > 1 || i >= startDay)) {
               const dateKey = formatDateKey(currentYear, mIndex, dayCounter);
               const base = getBaseOwner(currentYear, mIndex, dayCounter);
-              const override = overrides[dateKey]; // Mirar si hay cambio manual
+              const override = overrides[dateKey];
               const final = override || base;
 
               td.className = "day-cell";
               if(final === "padre") td.classList.add("day-father");
-              if(final === "madre") td.classList.add("day-mother");
+              else if(final === "madre") td.classList.add("day-mother");
+              
               if(override) td.classList.add("day-overridden");
 
-              // Número del día
+              // Número día
               const spanNum = document.createElement("span");
               spanNum.className = "day-number";
               spanNum.textContent = dayCounter;
               td.appendChild(spanNum);
 
-              // Icono
-              const ownerIcon = document.createElement("div");
-              ownerIcon.className = "owner-icon";
-              ownerIcon.textContent = final === "madre" ? "👩" : "👨";
-              td.appendChild(ownerIcon);
+              // Icono marca de agua
+              const iconDiv = document.createElement("div");
+              iconDiv.className = "owner-icon";
+              iconDiv.textContent = final === "madre" ? "👩" : "👨";
+              td.appendChild(iconDiv);
 
-              // Marca de hoy
               if(currentYear === today.getFullYear() && mIndex === today.getMonth() && dayCounter === today.getDate()){
                 const todayMark = document.createElement("div");
                 todayMark.className = "today-marker";
                 td.appendChild(todayMark);
               }
 
-              td.title = `${dateKey}: ${final === "madre" ? "Madre" : "Padre"} ${override ? "(Cambio)" : ""}`;
+              td.title = `${dateKey}: ${final.toUpperCase()}`;
               tr.appendChild(td);
               dayCounter++;
             } else {
-              // Celda vacía
               td.style.background = "transparent";
               tr.appendChild(td);
             }
@@ -623,7 +484,6 @@
         grid.appendChild(monthDiv);
       });
 
-      // Animación de entrada
       requestAnimationFrame(() => {
         grid.classList.remove('fading');
         const cells = grid.querySelectorAll('.day-cell');
@@ -637,74 +497,80 @@
   function renderRequestsList() {
     const pendingEl = document.getElementById("pending-requests");
     const historyEl = document.getElementById("history-requests");
-    if (!pendingEl || !historyEl) return;
-
     pendingEl.innerHTML = "";
     historyEl.innerHTML = "";
 
-    if (pendingRequests.length === 0) pendingEl.innerHTML = "<div style='color:#9ca3af;font-style:italic;'>No hay pendientes</div>";
+    if (pendingRequests.length === 0) pendingEl.innerHTML = "<div style='color:#9ca3af;font-style:italic;padding:4px;'>Sin pendientes</div>";
     
     pendingRequests.forEach(req => {
       const div = document.createElement("div");
       div.className = "request-item";
-      // Formato fecha simple
-      div.innerHTML = `<strong>${req.startDate}</strong> al <strong>${req.endDate}</strong><br><span style="color:#6b7280">${req.reason}</span>`;
+      div.innerHTML = `<strong>${req.startDate}</strong> al <strong>${req.endDate}</strong><br><span style="color:#6b7280;font-size:0.8rem">${req.reason}</span>`;
       pendingEl.appendChild(div);
     });
 
-    if (historyRequests.length === 0) historyEl.innerHTML = "<div style='color:#9ca3af;font-style:italic;'>Historial vacío</div>";
+    if (historyRequests.length === 0) historyEl.innerHTML = "<div style='color:#9ca3af;font-style:italic;padding:4px;'>Vacío</div>";
 
     historyRequests.forEach(req => {
       const div = document.createElement("div");
       div.className = "request-item";
-      const statusIcon = req.status === "aceptado" ? "✅" : "❌";
-      div.innerHTML = `${statusIcon} <strong>${req.startDate}</strong> - ${req.endDate}`;
+      const icon = req.status === "aceptado" ? "✅" : "❌";
+      div.innerHTML = `${icon} <strong>${req.startDate}</strong> (${req.endDate})`;
       historyEl.appendChild(div);
     });
   }
 
-  // --- AUTH HANDLER (EL CORAZÓN DEL LOGIN) ---
+  // --- LOGIN LOGIC ---
+  document.getElementById("login-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const btn = document.getElementById("login-submit-btn");
+    const err = document.getElementById("login-error");
+    btn.disabled = true;
+    btn.textContent = "Verificando...";
+    err.textContent = "";
+
+    auth.signInWithEmailAndPassword(
+      document.getElementById("login-email").value,
+      document.getElementById("login-password").value
+    ).catch(error => {
+      console.error(error);
+      err.textContent = "Error de credenciales.";
+    }).finally(() => {
+      btn.disabled = false;
+      btn.textContent = "Entrar";
+    });
+  });
+
+  document.getElementById("logout-btn").addEventListener("click", () => auth.signOut());
+
+  // --- AUTH LISTENER ---
   auth.onAuthStateChanged(async (user) => {
     const loginView = document.getElementById("login-view");
     const appRoot = document.getElementById("app-root");
 
     if (user) {
-      console.log("Usuario autenticado:", user.uid);
       currentUser = user;
-      
       try {
-        // LEER ROL DE FIRESTORE
         const snap = await db.collection("users").doc(user.uid).get();
-
         if (snap.exists) {
-          const data = snap.data();
-          currentRole = data.role; // "padre" o "madre"
-          console.log("Rol obtenido:", currentRole);
-
-          // Actualizar UI
+          currentRole = snap.data().role;
           document.getElementById("user-role-label").textContent = currentRole === "padre" ? "Padre 👨" : "Madre 👩";
-          document.getElementById("whoami-label").innerHTML = `Eres: <strong>${currentRole === "padre" ? "Padre 👨" : "Madre 👩"}</strong>`;
-
-          // CAMBIO DE PANTALLA
+          
           loginView.classList.add("hidden");
           appRoot.classList.remove("hidden");
-
-          // Iniciar datos
+          
           initDataListeners();
           renderCalendar();
         } else {
-          // ERROR: EL USUARIO NO EXISTE EN LA DB
-          console.error("El documento de usuario no existe en Firestore.");
-          alert(`⚠️ ERROR DE CONFIGURACIÓN:\n\nEl usuario se ha logueado, pero no tiene perfil en la base de datos.\n\nVe a Firestore Database > colección 'users' > crea un documento con ID: ${user.uid}\ny añade el campo: role = "padre" (o "madre").`);
-          auth.signOut(); // Salir para evitar estado zombie
+          alert(`Usuario sin perfil. Crea en Firestore 'users/${user.uid}' con role="padre" o "madre".`);
+          auth.signOut();
         }
       } catch (e) {
-        console.error("Error obteniendo usuario:", e);
-        alert("Error de conexión con la base de datos. Verifica tu conexión a internet o los permisos de Firebase.");
+        console.error(e);
+        alert("Error de conexión.");
         auth.signOut();
       }
     } else {
-      // No logueado
       currentUser = null;
       currentRole = null;
       loginView.classList.remove("hidden");
@@ -712,20 +578,14 @@
     }
   });
 
-  // --- LISTENERS DE DATOS ---
   function initDataListeners() {
-    // 1. Escuchar cambios manuales (overrides)
     db.collection("overrides").onSnapshot(snap => {
       overrides = {};
       snap.forEach(doc => overrides[doc.id] = doc.data().owner);
       renderCalendar();
       setConnectionStatus("online");
-    }, (error) => {
-      console.error("Error overrides:", error);
-      setConnectionStatus("error");
-    });
+    }, () => setConnectionStatus("error"));
 
-    // 2. Escuchar solicitudes
     db.collection("requests").orderBy("createdAt", "desc").onSnapshot(snap => {
       pendingRequests = [];
       historyRequests = [];
@@ -736,121 +596,64 @@
         else historyRequests.push(item);
       });
       renderRequestsList();
-    }, (error) => {
-      console.error("Error requests:", error);
     });
   }
 
-  // --- EVENTOS DOM ---
-  document.getElementById("login-form").addEventListener("submit", (e) => {
-    e.preventDefault();
-    const btn = document.getElementById("login-submit-btn");
-    const errEl = document.getElementById("login-error");
-    
-    btn.disabled = true;
-    btn.textContent = "Verificando...";
-    errEl.textContent = "";
-
-    const email = document.getElementById("login-email").value.trim();
-    const pass = document.getElementById("login-password").value;
-
-    auth.signInWithEmailAndPassword(email, pass)
-      .catch(err => {
-        console.error("Login fallido:", err);
-        let msg = "Error al entrar.";
-        if (err.code === 'auth/wrong-password') msg = "Contraseña incorrecta.";
-        if (err.code === 'auth/user-not-found') msg = "Usuario no encontrado.";
-        if (err.code === 'auth/invalid-email') msg = "Email inválido.";
-        errEl.textContent = msg;
-      })
-      .finally(() => {
-        btn.disabled = false;
-        btn.textContent = "Entrar";
-      });
-  });
-
-  document.getElementById("logout-btn").addEventListener("click", () => auth.signOut());
-
+  // --- INPUT HANDLERS ---
   document.getElementById("year-select").addEventListener("change", (e) => {
     currentYear = parseInt(e.target.value);
     renderCalendar();
   });
-
+  
   document.getElementById("prev-period").addEventListener("click", () => {
-    if(currentView === "month") {
-      currentMonth--;
-      if(currentMonth < 0) { currentMonth = 11; currentYear--; document.getElementById("year-select").value = currentYear; }
-    } else {
-      currentYear--;
-      document.getElementById("year-select").value = currentYear;
-    }
+    currentMonth--;
+    if (currentMonth < 0) { currentMonth = 11; currentYear--; }
     renderCalendar();
   });
-
+  
   document.getElementById("next-period").addEventListener("click", () => {
-    if(currentView === "month") {
-      currentMonth++;
-      if(currentMonth > 11) { currentMonth = 0; currentYear++; document.getElementById("year-select").value = currentYear; }
-    } else {
-      currentYear++;
-      document.getElementById("year-select").value = currentYear;
-    }
+    currentMonth++;
+    if (currentMonth > 11) { currentMonth = 0; currentYear++; }
     renderCalendar();
   });
 
-  // Enviar solicitud
   document.getElementById("request-form").addEventListener("submit", async (e) => {
     e.preventDefault();
-    if (!currentUser || !currentRole) return showToast("Debes iniciar sesión.", "error");
-
-    const sd = document.getElementById("start-date").value;
-    const ed = document.getElementById("end-date").value;
-    const reason = document.getElementById("reason").value.trim();
-
-    if (!sd || !ed || !reason) return showToast("Completa todos los campos.", "error");
-
+    if (!currentUser || !currentRole) return;
+    
     try {
       await db.collection("requests").add({
         requesterUid: currentUser.uid,
         requesterRole: currentRole,
-        startDate: sd,
-        endDate: ed,
-        reason: reason,
+        startDate: document.getElementById("start-date").value,
+        endDate: document.getElementById("end-date").value,
+        reason: document.getElementById("reason").value,
         status: "pendiente",
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
-      showToast("Solicitud enviada con éxito.");
+      showToast("Solicitud enviada");
       e.target.reset();
     } catch (err) {
-      console.error(err);
-      showToast("Error al enviar solicitud.", "error");
+      showToast("Error al enviar", "error");
     }
   });
 
-  // Iniciar configuración al cargar
+  // Init
   document.addEventListener("DOMContentLoaded", () => {
-    // Configurar inputs de fecha
+    const yearSel = document.getElementById("year-select");
+    [2026, 2027].forEach(y => {
+      const op = document.createElement("option");
+      op.value = y; op.textContent = y;
+      if (y === currentYear) op.selected = true;
+      yearSel.appendChild(op);
+    });
+    
     const sd = document.getElementById("start-date");
     const ed = document.getElementById("end-date");
-    if(sd && ed) {
-      sd.min = GLOBAL_MIN_DATE; sd.max = GLOBAL_MAX_DATE;
-      ed.min = GLOBAL_MIN_DATE; ed.max = GLOBAL_MAX_DATE;
-    }
-
-    // Llenar selector de año
-    const yearSel = document.getElementById("year-select");
-    if(yearSel) {
-      yearSel.innerHTML = "";
-      [2026, 2027].forEach(y => {
-        const op = document.createElement("option");
-        op.value = y; op.textContent = y;
-        if(y === currentYear) op.selected = true;
-        yearSel.appendChild(op);
-      });
-    }
-
-    renderCalendar(); // Render inicial (vacío)
+    sd.min = GLOBAL_MIN_DATE; sd.max = GLOBAL_MAX_DATE;
+    ed.min = GLOBAL_MIN_DATE; ed.max = GLOBAL_MAX_DATE;
   });
+
 </script>
 </body>
 </html>

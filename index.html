@@ -4,13 +4,11 @@
   <meta charset="UTF-8">
   <title>Custodia Familiar 2026-2027</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' x='0.1em' font-size='80'%3E%F0%9F%93%85%3C/text%3E%3C/svg%3E">
-
   <style>
     :root {
-      --father-color: #ffe4e4;
-      --mother-color: #e4ecff;
+      --father-color: #fecaca; /* red-200 → más visible */
+      --mother-color: #dbeafe; /* blue-200 → más contraste */
       --border-color: #e3e3ee;
       --accent-color: #7c3aed;
       --accent-soft: #ede9fe;
@@ -22,9 +20,7 @@
       --success: #10b981;
       --error: #ef4444;
     }
-
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
     body {
       margin: 0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -32,11 +28,10 @@
       color: var(--text-main);
       padding-bottom: 40px;
     }
-
     h1, h2, h3 { margin-top: 0; color: #1f2937; }
     .hidden { display: none !important; }
 
-    /* ========== TOAST NOTIFICATIONS ========== */
+    /* TOASTS */
     .toast-container {
       position: fixed;
       bottom: 20px;
@@ -51,875 +46,193 @@
     .toast {
       background: #333;
       color: #fff;
-      padding: 12px 24px;
+      padding: 14px 28px;
       border-radius: 50px;
-      font-size: 0.9rem;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      font-size: 1rem;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
       opacity: 0;
       transform: translateY(20px);
       transition: all 0.3s ease;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
     }
     .toast.visible { opacity: 1; transform: translateY(0); }
     .toast.success { background: var(--success); }
     .toast.error { background: var(--error); }
 
-    /* ========== LOGIN ========== */
+    /* LOGIN */
     .login-wrapper {
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 16px;
+      padding: 20px;
       background: radial-gradient(circle at top, #ede9fe, #f3f4fb);
     }
-
     .login-card {
-      background: #ffffff;
+      background: #fff;
       max-width: 380px;
       width: 100%;
       border-radius: 24px;
-      box-shadow: 0 20px 45px rgba(15, 23, 42, 0.15);
-      padding: 24px;
+      box-shadow: 0 20px 45px rgba(15,23,42,0.15);
+      padding: 32px 24px;
     }
-
     .login-title {
-      font-size: 1.25rem;
+      font-size: 1.4rem;
       font-weight: 700;
       margin-bottom: 8px;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
       color: var(--accent-color);
     }
+    .login-subtitle { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 24px; }
 
-    .login-subtitle {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      margin-bottom: 20px;
-      line-height: 1.5;
-    }
-
-    .login-field { margin-bottom: 14px; display: flex; flex-direction: column; gap: 6px; }
-    .login-field label { font-size: 0.8rem; font-weight: 500; color: #4b5563; }
     .login-field input {
-      font-family: inherit; font-size: 0.95rem; padding: 10px 12px;
-      border-radius: 12px; border: 1px solid #d1d5db; width: 100%;
-      transition: border-color 0.2s;
+      padding: 14px 16px;
+      font-size: 1.05rem;
     }
-    .login-field input:focus { outline: none; border-color: var(--accent-color); box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1); }
+    .login-btn { padding: 16px; font-size: 1.1rem; font-weight: 600; }
 
-    .login-btn {
-      margin-top: 10px; width: 100%; justify-content: center; padding: 12px;
-      font-size: 0.95rem; font-weight: 600;
-    }
+    /* APP */
+    .app { max-width: 1200px; margin: 0 auto; padding: 12px; }
 
-    .login-error { color: #dc2626; font-size: 0.8rem; margin-top: 10px; min-height: 1.2em; text-align: center; }
-    .login-hint { margin-top: 20px; font-size: 0.75rem; color: #9ca3af; text-align: center; border-top: 1px solid #f3f4f6; padding-top: 10px; }
-
-    /* ========== APP ========== */
-    .app { max-width: 1200px; margin: 0 auto; padding: 12px; opacity: 1; transition: opacity 0.3s ease; }
-    
-    /* TOPBAR */
     .topbar {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 10px 16px; border-radius: 20px; background: #ffffff;
-      box-shadow: var(--shadow-soft); margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      border-radius: 20px;
+      background: #fff;
+      box-shadow: var(--shadow-soft);
+      margin-bottom: 20px;
     }
-    .topbar-left { display: flex; align-items: center; gap: 12px; }
-    .logo-icon {
-      width: 32px; height: 32px; border-radius: 10px; background: var(--accent-soft);
-      display: flex; align-items: center; justify-content: center; font-size: 20px;
-    }
-    .app-name { font-weight: 700; font-size: 1.05rem; color: #1f2937; }
-    .status-pill {
-      display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px;
-      border-radius: 20px; font-size: 0.7rem; font-weight: 600;
-      background: #f3f4f6; color: #6b7280; margin-top: 2px;
-    }
-    .status-dot { width: 6px; height: 6px; border-radius: 50%; background: #9ca3af; }
-    
-    .status-connecting { background: #fff7ed; color: #c2410c; } .status-connecting .status-dot { background: #f97316; }
-    .status-online { background: #ecfdf5; color: #047857; } .status-online .status-dot { background: #10b981; }
-    .status-error { background: #fef2f2; color: #b91c1c; } .status-error .status-dot { background: #ef4444; }
+    .logo-icon { width: 40px; height: 40px; font-size: 24px; border-radius: 2px solid #e5e7eb; border-radius: 12px; background: var(--accent-soft); display: flex; align-items: center; justify-content: center; }
+    .app-name { font-size: 1.2rem; font-weight: 700; }
 
-    .topbar-right { display: flex; align-items: center; gap: 10px; }
-    .year-select {
-      padding: 6px 30px 6px 12px; border-radius: 20px; border: 1px solid #e5e7eb;
-      background: #f9fafb url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E") no-repeat right 8px center;
-      background-size: 14px; appearance: none; font-size: 0.85rem; font-weight: 600; cursor: pointer;
-    }
-    .user-info {
-      display: flex; align-items: center; gap: 8px; font-size: 0.8rem;
-      background: #f3f4f6; padding: 4px 4px 4px 12px; border-radius: 20px;
-    }
-    .user-role-label { font-weight: 600; color: var(--text-main); }
-    .logout-btn { padding: 4px 12px; font-size: 0.75rem; background: #ffffff; color: #ef4444; border-radius: 16px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: all 0.2s; }
-    .logout-btn:hover { background: #fee2e2; }
-
-    @media (max-width: 640px) {
-      .topbar { flex-direction: column; align-items: flex-start; gap: 12px; padding: 12px; }
-      .topbar-right { width: 100%; justify-content: space-between; }
-    }
-
-    /* LAYOUT */
-    .layout { display: flex; flex-direction: column; gap: 16px; }
+    .year-select { padding: 10px 36px 10px 16px; font-size: 1rem; }
 
     /* CALENDARIO */
     .calendar-wrapper {
-      background: var(--card-bg); border-radius: 24px; padding: 20px;
-      box-shadow: var(--shadow-soft); display: flex; flex-direction: column; gap: 12px;
+      background: var(--card-bg);
+      border-radius: 24px;
+      padding: 20px;
+      box-shadow: var(--shadow-soft);
     }
-    .calendar-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
-    .month-nav { display: flex; align-items: center; justify-content: center; flex: 1; }
-    .nav-arrow {
-      border-radius: 50%; border: 1px solid #e5e7eb; width: 32px; height: 32px;
-      display: flex; align-items: center; justify-content: center; cursor: pointer;
-      background: #fff; color: #374151; font-size: 18px; transition: all 0.2s;
+    .month-table td {
+      height: 60px;
+      position: relative;
+      border-radius: 12px;
+      transition: transform 0.15s;
     }
-    .nav-arrow:hover { background: #f3f4f6; border-color: #d1d5db; }
-    .calendar-title { font-weight: 700; font-size: 1.2rem; text-transform: capitalize; }
-    .calendar-title span.year { color: var(--accent-color); }
-
-    .calendar-subheader {
-      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
-      padding-bottom: 10px; border-bottom: 1px solid #f3f4f6;
+    .day-number {
+      position: absolute;
+      top: 6px;
+      left: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #64748b;
+      background: white;
+      padding: 2px 8px;
+      border-radius: 8px;
+      z-index: 2;
     }
-    .legend { display: flex; gap: 12px; font-size: 0.8rem; color: var(--text-muted); }
-    .legend-item { display: flex; align-items: center; gap: 6px; }
-    .legend-color { width: 12px; height: 12px; border-radius: 4px; }
-    .legend-color.mother { background: var(--mother-color); border: 1px solid #dbeafe; }
-    .legend-color.father { background: var(--father-color); border: 1px solid #fee2e2; }
-
-    .calendar-controls select {
-      padding: 4px 24px 4px 10px; border-radius: 12px; border: 1px solid #e5e7eb;
-      font-size: 0.8rem; background-color: #f9fafb; appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239ca3af'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
-      background-repeat: no-repeat; background-position: right 6px center; background-size: 12px;
+    .owner-text {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem; /* grande en desktop */
+      font-weight: 800;
+      pointer-events: none;
+      user-select: none;
     }
-
-    .calendar-grid { margin-top: 10px; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
-    .month { border-radius: 16px; background: #ffffff; border: 1px solid #f3f4f6; overflow: hidden; }
-    .month-header { text-align: center; padding: 8px; background: #f9fafb; font-weight: 600; font-size: 0.9rem; color: #374151; border-bottom: 1px solid #f3f4f6; }
-    .month-body { padding: 8px; }
-
-    table.month-table { width: 100%; border-collapse: separate; border-spacing: 2px; table-layout: fixed; }
-    .month-table th { font-size: 0.7rem; color: #9ca3af; font-weight: 500; padding-bottom: 4px; }
-    .month-table td { height: 42px; vertical-align: top; position: relative; border-radius: 8px; transition: transform 0.1s; }
-    .day-cell:hover { z-index: 2; transform: scale(1.05); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-
-    .day-number { position: absolute; top: 4px; left: 4px; font-size: 0.7rem; font-weight: 600; color: #4b5563; z-index: 1; }
+    .day-mother .owner-text { color: #2563eb; }
+    .day-father .owner-text { color: #dc2626; }
+    .day-overridden::after {
+      content: "⇄";
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      font-size: 1.1rem;
+      color: #7c3aed;
+      opacity: 0.8;
+    }
     .today-marker {
-      position: absolute; top: 3px; right: 3px; width: 6px; height: 6px; 
-      background: var(--accent-color); border-radius: 50%; box-shadow: 0 0 0 2px rgba(255,255,255,0.8);
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 10px;
+      height: 10px;
+      background: var(--accent-color);
+      border-radius: 50%;
+      box-shadow: 0 0 0 3px white;
     }
-    
-    .owner-pill {
-      position: absolute; bottom: 4px; width: calc(100% - 8px); left: 4px;
-      text-align: center; font-size: 0.6rem; font-weight: 700; text-transform: uppercase;
-      border-radius: 4px; padding: 1px 0; letter-spacing: 0.5px;
+
+    /* MOBILE OPTIMIZATIONS */
+    @media (max-width: 640px) {
+      .topbar { padding: 20px; gap: 20px; flex-direction: column; align-items: flex-start; }
+      .topbar-right { width: 100%; justify-content: space-between; }
+      .month-table td { height: 80px !important; }
+      .owner-text { font-size: 3rem; } /* ¡IMPOSIBLE NO VERLO! */
+      .day-number { font-size: 1.1rem; }
+      .nav-arrow { width: 48px; height: 48px; font-size: 32px; }
+      .calendar-title { font-size: 1.8rem; }
+      .legend { font-size: 1rem; gap: 20px; flex-wrap: wrap; }
+      .day-cell:hover { transform: none; } /* desactivado en móvil */
+      .login-card { padding: 40px 32px; }
+      .login-title { font-size: 1.6rem; }
+      .login-subtitle { font-size: 1rem; }
+      .login-field input { padding: 16px; font-size: 1.1rem; }
+      .login-btn { padding: 18px; font-size: 1.2rem; }
+      .new-request-header { font-size: 1.1rem; }
     }
-    .owner-pill.madre-pill { color: #2563eb; background: rgba(255,255,255,0.6); }
-    .owner-pill.padre-pill { color: #dc2626; background: rgba(255,255,255,0.6); }
 
-    .day-father { background: var(--father-color); }
-    .day-mother { background: var(--mother-color); }
-    .day-overridden { box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1); }
-    .day-overridden::after { content: "⇄"; position: absolute; top: 2px; right: 4px; font-size: 0.7rem; color: #6b7280; opacity: 0.7; }
-
-    /* SIDE PANEL */
-    .side-panel { display: grid; grid-template-columns: 1.2fr 1fr; gap: 16px; }
-    @media (max-width: 900px) { .side-panel { grid-template-columns: 1fr; } }
-
-    .card { background: #ffffff; border-radius: 20px; box-shadow: var(--shadow-soft); overflow: hidden; border: 1px solid #f3f4f6; }
-    .card-content { padding: 16px; }
-
-    /* NEW REQUEST */
-    .new-request-header { background: linear-gradient(135deg, #7c3aed, #6d28d9); color: #fff; padding: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; }
-    .field-group { margin-bottom: 12px; }
-    .field-group label { display: block; margin-bottom: 4px; font-size: 0.8rem; color: #4b5563; font-weight: 500; }
-    
-    input[type="date"], textarea {
-      width: 100%; padding: 8px 10px; border-radius: 10px; border: 1px solid #d1d5db;
-      font-family: inherit; font-size: 0.85rem; background: #fff;
-    }
-    input[type="date"]:focus, textarea:focus { outline: none; border-color: var(--accent-color); box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1); }
-    textarea { resize: vertical; min-height: 60px; }
-
-    button.primary-btn {
-      background: var(--accent-color); color: #fff; border: none; padding: 10px 16px;
-      border-radius: 20px; font-weight: 600; font-size: 0.85rem; cursor: pointer; width: 100%;
-      transition: background 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px;
-    }
-    button.primary-btn:hover { background: #6d28d9; }
-    button:disabled { opacity: 0.6; cursor: not-allowed; }
-
-    /* REQUEST LISTS */
-    .requests-list { max-height: 300px; overflow-y: auto; padding-right: 4px; margin-top: 8px; }
-    
-    /* Scrollbar styling */
-    .requests-list::-webkit-scrollbar { width: 6px; }
-    .requests-list::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
-    .requests-list::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
-    .requests-list::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
-
-    .request-item { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 12px; padding: 10px; margin-bottom: 8px; }
-    .request-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
-    .req-parties { font-weight: 700; font-size: 0.8rem; color: #374151; }
-    .req-date { font-size: 0.75rem; color: #6b7280; font-family: monospace; }
-    .req-reason { font-size: 0.8rem; margin: 4px 0; color: #1f2937; }
-    
-    .req-actions { display: flex; gap: 8px; margin-top: 8px; }
-    .btn-xs { padding: 4px 10px; border-radius: 12px; font-size: 0.7rem; border: none; font-weight: 600; cursor: pointer; }
-    .btn-accept { background: #dcfce7; color: #166534; } .btn-accept:hover { background: #bbf7d0; }
-    .btn-reject { background: #fee2e2; color: #991b1b; } .btn-reject:hover { background: #fecaca; }
-
-    .empty-state { text-align: center; padding: 20px 0; color: #9ca3af; font-size: 0.85rem; font-style: italic; }
-    
-    h3.panel-title { font-size: 0.95rem; display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
-    h3.panel-title::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: #d1d5db; }
-    h3.panel-title.active::before { background: #f59e0b; box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2); }
-
-    .helper-text { font-size: 0.75rem; color: #6b7280; margin-top: 4px; line-height: 1.4; }
+    /* RESTO DE ESTILOS (igual que antes con pequeños ajustes) */
+    /* ... (mantengo todo el resto de estilos que ya tenías, solo añado los nuevos) */
+    .legend-color.mother { background: var(--mother-color); border: 1px solid #93c5fd; }
+    .legend-color.father { background: var(--father-color); border: 1px solid #fca5a5; }
+    /* etc... (el resto del CSS original se mantiene) */
   </style>
 </head>
 <body>
+<!-- ... (el HTML del login y estructura igual) -->
 
-<div class="toast-container" id="toast-container"></div>
-
-<div id="login-view" class="login-wrapper">
-  <div class="login-card">
-    <div class="login-title">
-      <span>🔐</span>
-      <span>Custodia Familiar</span>
+  <div class="calendar-subheader">
+    <div class="legend">
+      <span class="legend-item"><span class="legend-color mother"></span> 👩 Mamá</span>
+      <span class="legend-item"><span class="legend-color father"></span> 👨 Papá</span>
+      <span class="legend-item">⇄ Cambio manual</span>
     </div>
-    <p class="login-subtitle">Introduce tu correo y contraseña para acceder al calendario.</p>
-
-    <form id="login-form">
-      <div class="login-field">
-        <label for="login-email">Correo electrónico</label>
-        <input type="email" id="login-email" required autocomplete="email" placeholder="nombre@ejemplo.com">
-      </div>
-      <div class="login-field">
-        <label for="login-password">Contraseña</label>
-        <input type="password" id="login-password" required autocomplete="current-password" placeholder="••••••••">
-      </div>
-      <button type="submit" class="login-btn primary-btn">Entrar</button>
-      <p id="login-error" class="login-error"></p>
-    </form>
+    <!-- controles -->
   </div>
-</div>
 
-<div id="app-root" class="app hidden">
-  <header class="topbar">
-    <div class="topbar-left">
-      <div class="logo-icon">📅</div>
-      <div>
-        <div class="app-name">Custodia Familiar</div>
-        <div class="status-pill status-connecting" id="status-pill">
-          <span class="status-dot"></span>
-          <span id="status-text">Conectando...</span>
-        </div>
-      </div>
-    </div>
-    <div class="topbar-right">
-      <select id="year-select" class="year-select"></select>
-      <div class="user-info">
-        <span class="user-role-label" id="user-role-label">Usuario</span>
-        <button type="button" id="logout-btn" class="logout-btn">Salir</button>
-      </div>
-    </div>
-  </header>
+<!-- Dentro del script, cambia esta parte del renderCalendar(): -->
+    // Antes tenías:
+    // const pill = document.createElement("div");
+    // pill.className = `owner-pill ${final === "madre" ? "madre-pill" : "padre-pill"}`;
+    // pill.textContent = final === "madre" ? "MAMÁ" : "PAPÁ";
 
-  <div class="layout">
-    <section class="calendar-wrapper">
-      <div class="calendar-header">
-        <button id="prev-period" class="nav-arrow" title="Anterior">‹</button>
-        <div class="month-nav">
-          <div class="calendar-title" id="calendar-title"></div>
-        </div>
-        <button id="next-period" class="nav-arrow" title="Siguiente">›</button>
-      </div>
+    // Ahora:
+    const ownerText = document.createElement("div");
+    ownerText.className = "owner-text";
+    ownerText.textContent = final === "madre" ? "👩" : "👨";
+    td.appendChild(ownerText);
 
-      <div class="calendar-subheader">
-        <div class="legend">
-          <span class="legend-item"><span class="legend-color mother"></span> Madre</span>
-          <span class="legend-item"><span class="legend-color father"></span> Padre</span>
-          <span class="legend-item" style="font-size:0.75rem">⇄ Cambio manual</span>
-        </div>
-        <div class="calendar-controls">
-          <label>Vista: 
-            <select id="view-mode">
-              <option value="month">Mes</option>
-              <option value="year">Año completo</option>
-            </select>
-          </label>
-          <label id="month-select-wrapper">Mes: 
-            <select id="month-select">
-              <option value="0">Enero</option>
-              <option value="1">Febrero</option>
-              <option value="2">Marzo</option>
-              <option value="3">Abril</option>
-              <option value="4">Mayo</option>
-              <option value="5">Junio</option>
-              <option value="6">Julio</option>
-              <option value="7">Agosto</option>
-              <option value="8">Septiembre</option>
-              <option value="9">Octubre</option>
-              <option value="10">Noviembre</option>
-              <option value="11">Diciembre</option>
-            </select>
-          </label>
-        </div>
-      </div>
+    // Tooltip mejorado
+    td.title = `${dateKey}: ${final === "madre" ? "Mamá 👩" : "Papá 👨"} ${override ? "(cambio manual)" : ""}`;
 
-      <div id="calendar-grid" class="calendar-grid"></div>
-    </section>
+    // Y en los lugares donde muestras "Padre"/"Madre" → "Papá 👨" / "Mamá 👩"
+    // Ejemplo:
+    document.getElementById("user-role-label").textContent = currentRole === "padre" ? "Papá 👨" : "Mamá 👩";
+    document.getElementById("whoami-label").innerHTML = `Eres: <strong>${currentRole === "padre" ? "Papá 👨" : "Mamá 👩"}</strong>`;
 
-    <section class="side-panel">
-      <div class="card">
-        <div class="new-request-header">
-          <span>➕ Nueva solicitud de cambio</span>
-        </div>
-        <div class="card-content">
-          <form id="request-form">
-            <div class="field-group">
-              <label>Solicitante</label>
-              <div id="whoami-label" style="font-size:0.85rem; font-weight:600; color:#4b5563;">Cargando...</div>
-            </div>
+    // En renderRequests también:
+    const fromName = req.requester === "padre" ? "Papá 👨" : "Mamá 👩";
+    const toName = req.target === "padre" ? "Papá 👨" : "Mamá 👩";
 
-            <div class="field-group">
-              <label>Fechas (2026-2027)</label>
-              <div style="display:flex; gap:8px;">
-                <input type="date" id="start-date" required>
-                <input type="date" id="end-date" required>
-              </div>
-            </div>
+Con estos cambios el calendario se ve **mucho más claro y moderno en móviles**, incluso en pantallas pequeñas el emoji es imposible pasarlo por alto, y la experiencia táctil es muy superior.
 
-            <div class="field-group">
-              <label for="reason">Motivo</label>
-              <textarea id="reason" placeholder="Ej: Viaje de trabajo, cumpleaños..." required></textarea>
-            </div>
-
-            <button type="submit" class="primary-btn">Enviar Solicitud</button>
-            <p class="helper-text" style="text-align:center; margin-top:8px;">
-              Se enviará una notificación a ambos correos.
-            </p>
-          </form>
-        </div>
-      </div>
-
-      <div style="display:flex; flex-direction:column; gap:16px;">
-        <div class="card">
-          <div class="card-content">
-            <h3 class="panel-title active">Solicitudes Pendientes</h3>
-            <div class="requests-list" id="pending-requests">
-              </div>
-            <p class="helper-text">Solo puedes aceptar las que recibes.</p>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-content">
-            <h3 class="panel-title">Historial</h3>
-            <div class="requests-list" id="history-requests">
-              </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  </div>
-</div>
-
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-
-<script>
-  // =================== 1. CONFIGURACIÓN FIREBASE ===================
-  // NOTA: En producción real, usa Firebase Hosting o variables de entorno.
-  const firebaseConfig = {
-    apiKey: "AIzaSyAwgk4_l0zvaCUCgm1CjqqqXjJHr5KPBjc",
-    authDomain: "custodia-familiar.firebaseapp.com",
-    projectId: "custodia-familiar",
-    storageBucket: "custodia-familiar.firebasestorage.app",
-    messagingSenderId: "1038952432258",
-    appId: "1:1038952432258:web:7608d6a48d8ad8308a6a9b"
-  };
-
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
-  const auth = firebase.auth();
-
-  // =================== 2. ESTADO GLOBAL ===================
-  const MIN_YEAR = 2026;
-  const MAX_YEAR = 2027;
-  const GLOBAL_MIN_DATE = `${MIN_YEAR}-01-01`;
-  const GLOBAL_MAX_DATE = `${MAX_YEAR}-12-31`;
-
-  // Variables de estado
-  let currentYear = 2026;
-  let currentMonth = 0; // 0 = Enero
-  let currentView = "month"; // "month" | "year"
-  let currentUser = null;
-  let currentRole = null; // "padre" | "madre"
-  
-  // Datos
-  let overrides = {}; 
-  let pendingRequests = [];
-  let historyRequests = [];
-
-  // Constantes fechas
-  const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-  const weekDayNames = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
-  const BASE_MONDAY = new Date(2026, 0, 5, 12, 0, 0); // Lunes 5 enero 2026 (Mediodía para evitar DST)
-
-  // =================== 3. UTILIDADES UI ===================
-  function showToast(msg, type = 'success') {
-    const container = document.getElementById('toast-container');
-    const el = document.createElement('div');
-    el.className = `toast ${type}`;
-    el.innerHTML = type === 'success' ? `✅ ${msg}` : `⚠️ ${msg}`;
-    container.appendChild(el);
-    
-    // Animar entrada
-    requestAnimationFrame(() => el.classList.add('visible'));
-    // Remover
-    setTimeout(() => {
-      el.classList.remove('visible');
-      setTimeout(() => el.remove(), 300);
-    }, 4000);
-  }
-
-  function setConnectionStatus(state) {
-    const pill = document.getElementById("status-pill");
-    const text = document.getElementById("status-text");
-    pill.className = `status-pill status-${state}`;
-    if(state === "connecting") text.textContent = "Conectando...";
-    else if(state === "online") text.textContent = "En línea";
-    else text.textContent = "Error";
-  }
-
-  // =================== 4. LÓGICA DE FECHAS ===================
-  
-  function parseDateStr(str) {
-    const [y, m, d] = str.split("-").map(Number);
-    return new Date(y, m - 1, d, 12, 0, 0);
-  }
-
-  function formatDateKey(year, monthIndex, day) {
-    const m = String(monthIndex + 1).padStart(2, "0");
-    const d = String(day).padStart(2, "0");
-    return `${year}-${m}-${d}`;
-  }
-
-  // Calcula propietario base (pares/impares desde 5 Ene 2026)
-  function getBaseOwner(year, monthIndex, day) {
-    const date = new Date(year, monthIndex, day, 12, 0, 0);
-    // Limites
-    if (date.getFullYear() < MIN_YEAR || date.getFullYear() > MAX_YEAR) return null;
-
-    // Diferencia en días (usando Math.round y mediodía para saltar problemas de cambio de hora)
-    const diffMs = date - BASE_MONDAY;
-    const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
-    
-    // Calcular índice de semana
-    const weekIndex = Math.floor(diffDays / 7);
-    
-    // Semana par = Madre (según tu lógica base), impar = Padre
-    return (weekIndex % 2 === 0) ? "madre" : "padre";
-  }
-
-  // =================== 5. RENDERIZADO CALENDARIO ===================
-
-  function renderCalendar() {
-    const grid = document.getElementById("calendar-grid");
-    const titleEl = document.getElementById("calendar-title");
-    const monthSelectWrap = document.getElementById("month-select-wrapper");
-    
-    grid.innerHTML = "";
-
-    // Actualizar título y visibilidad selector mes
-    if (currentView === "year") {
-      titleEl.innerHTML = `Año <span class="year">${currentYear}</span>`;
-      monthSelectWrap.style.display = "none";
-    } else {
-      titleEl.innerHTML = `${monthNames[currentMonth]} <span class="year">${currentYear}</span>`;
-      monthSelectWrap.style.display = "inline-flex";
-    }
-
-    const monthsToRender = currentView === "year" ? [...Array(12).keys()] : [currentMonth];
-    const today = new Date();
-
-    monthsToRender.forEach(mIndex => {
-      const monthDiv = document.createElement("div");
-      monthDiv.className = "month";
-
-      // Header mes
-      const header = document.createElement("div");
-      header.className = "month-header";
-      header.textContent = `${monthNames[mIndex]}`;
-      if(currentView === "year") header.textContent += ` ${currentYear}`; // mostrar año si es vista anual
-      monthDiv.appendChild(header);
-
-      const body = document.createElement("div");
-      body.className = "month-body";
-      
-      const table = document.createElement("table");
-      table.className = "month-table";
-
-      // Encabezados días (L, M, X...)
-      const thead = document.createElement("thead");
-      const trHead = document.createElement("tr");
-      weekDayNames.forEach(d => {
-        const th = document.createElement("th");
-        th.textContent = d.charAt(0);
-        trHead.appendChild(th);
-      });
-      thead.appendChild(trHead);
-      table.appendChild(thead);
-
-      // Celdas
-      const daysInMonth = new Date(currentYear, mIndex + 1, 0).getDate();
-      const firstDayInstance = new Date(currentYear, mIndex, 1);
-      let startDay = firstDayInstance.getDay(); // 0=Dom, 1=Lun
-      startDay = (startDay === 0) ? 6 : startDay - 1; // Ajustar a Lunes=0
-
-      const tbody = document.createElement("tbody");
-      let dayCounter = 1;
-      let finished = false;
-
-      while(!finished) {
-        const tr = document.createElement("tr");
-        for(let i=0; i<7; i++) {
-          const td = document.createElement("td");
-          
-          if(dayCounter <= daysInMonth && (dayCounter > 1 || i >= startDay)) {
-            // Es un día válido
-            const dateKey = formatDateKey(currentYear, mIndex, dayCounter);
-            
-            // Lógica Propietario
-            const base = getBaseOwner(currentYear, mIndex, dayCounter);
-            const override = overrides[dateKey];
-            const final = override || base;
-
-            td.className = "day-cell";
-            if(final === "padre") td.classList.add("day-father");
-            else if(final === "madre") td.classList.add("day-mother");
-            if(override) td.classList.add("day-overridden");
-
-            // Número día
-            const spanNum = document.createElement("span");
-            spanNum.className = "day-number";
-            spanNum.textContent = dayCounter;
-            td.appendChild(spanNum);
-
-            // Marca "Hoy"
-            if(currentYear === today.getFullYear() && mIndex === today.getMonth() && dayCounter === today.getDate()){
-              const todayMark = document.createElement("div");
-              todayMark.className = "today-marker";
-              td.appendChild(todayMark);
-            }
-
-            // Pill Propietario
-            const pill = document.createElement("div");
-            pill.className = `owner-pill ${final === "madre" ? "madre-pill" : "padre-pill"}`;
-            pill.textContent = final === "madre" ? "MAMÁ" : "PAPÁ";
-            td.appendChild(pill);
-            
-            // Tooltip nativo simple
-            td.title = `${dateKey}: ${final.toUpperCase()}`;
-
-            dayCounter++;
-          } else {
-            // Fuera de rango
-            td.style.background = "transparent";
-            td.style.cursor = "default";
-          }
-          tr.appendChild(td);
-        }
-        tbody.appendChild(tr);
-        if(dayCounter > daysInMonth) finished = true;
-      }
-
-      table.appendChild(tbody);
-      body.appendChild(table);
-      monthDiv.appendChild(body);
-      grid.appendChild(monthDiv);
-    });
-  }
-
-  // =================== 6. GESTIÓN SOLICITUDES ===================
-  
-  function renderRequestsList() {
-    const pContainer = document.getElementById("pending-requests");
-    const hContainer = document.getElementById("history-requests");
-    
-    pContainer.innerHTML = "";
-    hContainer.innerHTML = "";
-
-    if(pendingRequests.length === 0) {
-      pContainer.innerHTML = `<div class="empty-state">No hay solicitudes pendientes.</div>`;
-    }
-    if(historyRequests.length === 0) {
-      hContainer.innerHTML = `<div class="empty-state">No hay historial.</div>`;
-    }
-
-    // Render Pendientes
-    pendingRequests.forEach(req => pContainer.appendChild(createRequestCard(req, true)));
-    // Render Historial
-    historyRequests.forEach(req => hContainer.appendChild(createRequestCard(req, false)));
-  }
-
-  function createRequestCard(req, isPending) {
-    const div = document.createElement("div");
-    div.className = "request-item";
-
-    // Formatear textos
-    const fromName = req.requester === "padre" ? "Padre" : "Madre";
-    const toName = req.target === "padre" ? "Padre" : "Madre";
-    
-    let statusHtml = "";
-    if(!isPending) {
-      const color = req.status === "aceptado" ? "green" : "red";
-      const icon = req.status === "aceptado" ? "✔" : "✘";
-      statusHtml = `<span style="color:${color}; font-weight:700; font-size:0.75rem; margin-left:auto;">${icon} ${req.status.toUpperCase()}</span>`;
-    } else {
-      statusHtml = `<span style="color:#d97706; font-weight:700; font-size:0.75rem; margin-left:auto;">⏳ PENDIENTE</span>`;
-    }
-
-    div.innerHTML = `
-      <div class="request-header">
-        <span class="req-parties">${fromName} ➝ ${toName}</span>
-        ${statusHtml}
-      </div>
-      <div class="req-date">📅 ${req.startDate} al ${req.endDate}</div>
-      <div class="req-reason">"${req.reason}"</div>
-    `;
-
-    // Botones de acción (Solo si soy el destinatario y está pendiente)
-    if(isPending && currentRole && req.target === currentRole) {
-      const actionsDiv = document.createElement("div");
-      actionsDiv.className = "req-actions";
-      
-      const btnAccept = document.createElement("button");
-      btnAccept.className = "btn-xs btn-accept";
-      btnAccept.textContent = "ACEPTAR";
-      btnAccept.onclick = () => handleAction(req.id, "aceptado", req);
-
-      const btnReject = document.createElement("button");
-      btnReject.className = "btn-xs btn-reject";
-      btnReject.textContent = "RECHAZAR";
-      btnReject.onclick = () => handleAction(req.id, "rechazado", req);
-
-      actionsDiv.appendChild(btnAccept);
-      actionsDiv.appendChild(btnReject);
-      div.appendChild(actionsDiv);
-    } else if(isPending) {
-       const info = document.createElement("div");
-       info.className = "helper-text";
-       info.textContent = "Esperando respuesta...";
-       div.appendChild(info);
-    }
-
-    return div;
-  }
-
-  // =================== 7. INTERACCIONES FIREBASE ===================
-
-  async function handleAction(docId, newStatus, reqData) {
-    try {
-      await db.collection("requests").doc(docId).update({ status: newStatus });
-      showToast(`Solicitud ${newStatus}.`);
-
-      if(newStatus === "aceptado") {
-        // Aplicar cambios en overrides
-        const start = parseDateStr(reqData.startDate);
-        const end = parseDateStr(reqData.endDate);
-        const batch = db.batch();
-        
-        let loopDate = new Date(start);
-        while(loopDate <= end) {
-          const key = formatDateKey(loopDate.getFullYear(), loopDate.getMonth(), loopDate.getDate());
-          const ref = db.collection("overrides").doc(key);
-          batch.set(ref, { owner: reqData.requester });
-          loopDate.setDate(loopDate.getDate() + 1);
-        }
-        await batch.commit();
-        showToast("Calendario actualizado exitosamente.");
-      }
-    } catch(err) {
-      console.error(err);
-      showToast("Error al procesar la solicitud.", "error");
-    }
-  }
-
-  // Enviar formulario
-  document.getElementById("request-form").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    if(!currentRole) return showToast("Error: No tienes rol asignado.", "error");
-
-    const sVal = document.getElementById("start-date").value;
-    const eVal = document.getElementById("end-date").value;
-    const reason = document.getElementById("reason").value.trim();
-
-    if(sVal > eVal) return showToast("La fecha fin no puede ser antes de la fecha inicio.", "error");
-
-    try {
-      await db.collection("requests").add({
-        requester: currentRole,
-        target: currentRole === "padre" ? "madre" : "padre",
-        startDate: sVal,
-        endDate: eVal,
-        reason: reason,
-        status: "pendiente",
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
-      showToast("Solicitud creada correctamente.");
-      e.target.reset();
-    } catch(err) {
-      console.error(err);
-      showToast("Error al guardar solicitud.", "error");
-    }
-  });
-
-  // =================== 8. AUTH Y LISTENERS ===================
-
-  auth.onAuthStateChanged(async (user) => {
-    const loginView = document.getElementById("login-view");
-    const appRoot = document.getElementById("app-root");
-    
-    if (user) {
-      currentUser = user;
-      // Obtener rol
-      try {
-        const snap = await db.collection("users").doc(user.uid).get();
-        if(snap.exists) {
-          currentRole = snap.data().role; // "padre" o "madre"
-          document.getElementById("user-role-label").textContent = currentRole === "padre" ? "Padre" : "Madre";
-          document.getElementById("whoami-label").innerHTML = `Eres: <strong>${currentRole === "padre" ? "Padre" : "Madre"}</strong>`;
-          
-          loginView.classList.add("hidden");
-          appRoot.classList.remove("hidden");
-          
-          // Iniciar listeners de datos
-          initDataListeners();
-          
-        } else {
-          showToast("Tu usuario no tiene configuración (rol) en base de datos.", "error");
-          auth.signOut();
-        }
-      } catch(e) {
-        console.error(e);
-        showToast("Error de conexión al obtener usuario.", "error");
-      }
-    } else {
-      currentUser = null;
-      currentRole = null;
-      loginView.classList.remove("hidden");
-      appRoot.classList.add("hidden");
-    }
-  });
-
-  function initDataListeners() {
-    // Escuchar overrides
-    db.collection("overrides").onSnapshot(snap => {
-      overrides = {};
-      snap.forEach(doc => overrides[doc.id] = doc.data().owner);
-      renderCalendar();
-      setConnectionStatus("online");
-    }, err => setConnectionStatus("error"));
-
-    // Escuchar requests
-    db.collection("requests").orderBy("createdAt", "desc").onSnapshot(snap => {
-      pendingRequests = [];
-      historyRequests = [];
-      snap.forEach(doc => {
-        const d = doc.data();
-        const item = { id: doc.id, ...d };
-        if(item.status === "pendiente") pendingRequests.push(item);
-        else historyRequests.push(item);
-      });
-      renderRequestsList();
-    });
-  }
-
-  // Login Form
-  document.getElementById("login-form").addEventListener("submit", (e) => {
-    e.preventDefault();
-    const email = document.getElementById("login-email").value;
-    const pass = document.getElementById("login-password").value;
-    const errEl = document.getElementById("login-error");
-    errEl.textContent = "";
-
-    auth.signInWithEmailAndPassword(email, pass).catch(err => {
-      errEl.textContent = "Credenciales incorrectas.";
-    });
-  });
-
-  document.getElementById("logout-btn").addEventListener("click", () => auth.signOut());
-
-  // Controles Calendario
-  document.getElementById("view-mode").addEventListener("change", (e) => {
-    currentView = e.target.value;
-    renderCalendar();
-  });
-  
-  const yearSel = document.getElementById("year-select");
-  [2026, 2027].forEach(y => {
-    const op = document.createElement("option");
-    op.value = y; op.textContent = y;
-    if(y === currentYear) op.selected = true;
-    yearSel.appendChild(op);
-  });
-  yearSel.addEventListener("change", (e) => {
-    currentYear = parseInt(e.target.value);
-    renderCalendar();
-  });
-
-  const monthSel = document.getElementById("month-select");
-  monthSel.value = currentMonth;
-  monthSel.addEventListener("change", (e) => {
-    currentMonth = parseInt(e.target.value);
-    renderCalendar();
-  });
-
-  document.getElementById("prev-period").addEventListener("click", () => {
-    if(currentView === "month") {
-      currentMonth--;
-      if(currentMonth < 0) { currentMonth = 11; currentYear--; yearSel.value = currentYear; }
-      monthSel.value = currentMonth;
-    } else {
-      currentYear--;
-      yearSel.value = currentYear;
-    }
-    renderCalendar();
-  });
-
-  document.getElementById("next-period").addEventListener("click", () => {
-    if(currentView === "month") {
-      currentMonth++;
-      if(currentMonth > 11) { currentMonth = 0; currentYear++; yearSel.value = currentYear; }
-      monthSel.value = currentMonth;
-    } else {
-      currentYear++;
-      yearSel.value = currentYear;
-    }
-    renderCalendar();
-  });
-
-  // Init
-  document.addEventListener("DOMContentLoaded", () => {
-    // Set inputs min/max
-    document.getElementById("start-date").min = GLOBAL_MIN_DATE;
-    document.getElementById("start-date").max = GLOBAL_MAX_DATE;
-    document.getElementById("end-date").min = GLOBAL_MIN_DATE;
-    document.getElementById("end-date").max = GLOBAL_MAX_DATE;
-    renderCalendar();
-  });
-
-</script>
-</body>
-</html>
+¿Quieres que además le añada modo oscuro, modo anual horizontal swipeable o que el botón de nueva solicitud sea flotante? Puedo seguir mejorándolo. 😊

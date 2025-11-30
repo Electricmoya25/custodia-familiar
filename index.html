@@ -27,7 +27,7 @@
       background: var(--bg-main);
       color: var(--text-main);
       padding-bottom: 50px;
-      overscroll-behavior-y: none; /* Evita rebote en scroll */
+      overscroll-behavior-y: none;
     }
     .hidden { display: none !important; }
 
@@ -35,7 +35,6 @@
     .calendar-grid { 
       opacity: 1;
       transition: opacity 0.3s ease, transform 0.3s ease; 
-      /* Importante para el swipe */
       touch-action: pan-y;
     }
     .calendar-grid.fading { opacity: 0; transform: scale(0.98); }
@@ -131,11 +130,18 @@
     .field-group input, .field-group textarea { width:100%; padding:8px 10px; border-radius:10px; border:1px solid #d1d5db; font-size:0.9rem; }
     .field-group textarea { min-height:60px; resize:vertical; }
     .primary-btn { display:inline-block; margin-top:8px; padding:10px 14px; border-radius:999px; border:none; background:var(--accent-color); color:#fff; font-size:0.9rem; font-weight:600; cursor:pointer; width:100%; }
-    .requests-list { max-height:260px; overflow:auto; border-radius:12px; border:1px solid #e5e7eb; padding:8px; }
-    .request-item { border-radius:10px; border:1px solid #e5e7eb; padding:8px 10px; margin-bottom:8px; font-size:0.8rem; background: #f9fafb; }
+    
+    /* ESTILOS NUEVOS PARA SOLICITUDES */
+    .requests-list { max-height:300px; overflow:auto; border-radius:12px; border:1px solid #e5e7eb; padding:8px; }
+    .request-item { border-radius:10px; border:1px solid #e5e7eb; padding:10px; margin-bottom:8px; font-size:0.85rem; background: #f9fafb; }
+    .req-actions { display: flex; gap: 8px; margin-top: 8px; }
+    .btn-action { flex: 1; padding: 6px; border-radius: 6px; border: none; font-weight: 600; cursor: pointer; font-size: 0.8rem; }
+    .btn-accept { background: #dcfce7; color: #166534; }
+    .btn-reject { background: #fee2e2; color: #b91c1c; }
+    .req-wait { font-size: 0.75rem; color: #9ca3af; font-style: italic; margin-top: 4px; }
 
     /* CALENDARIO */
-    .calendar-wrapper { background:var(--card-bg); border-radius:28px; padding:16px 12px; box-shadow:var(--shadow-soft); overflow: hidden; /* Importante para swipe */ }
+    .calendar-wrapper { background:var(--card-bg); border-radius:28px; padding:16px 12px; box-shadow:var(--shadow-soft); overflow: hidden; }
     .calendar-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
     .nav-arrow { width:36px; height:36px; font-size:24px; border-radius:50%; border:1px solid #e5e7eb; background:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all .2s; }
     .nav-arrow:hover { background:#f3f4f6; transform:scale(1.1); }
@@ -251,7 +257,7 @@
       </div>
 
       <div class="card">
-        <h3 class="panel-title active">Pendientes</h3>
+        <h3 class="panel-title active">Pendientes de acción</h3>
         <div class="requests-list" id="pending-requests"></div>
       </div>
       <div class="card">
@@ -382,7 +388,6 @@
               const spanNum = document.createElement("span"); spanNum.className = "day-number"; spanNum.textContent = dayCounter;
               td.appendChild(spanNum);
               
-              // ICONO MARCA DE AGUA
               const ownerIcon = document.createElement("div");
               ownerIcon.className = "owner-icon";
               ownerIcon.textContent = final === "madre" ? "👩" : "👨"; td.appendChild(ownerIcon);
@@ -410,21 +415,43 @@
     }, 250);
   }
 
+  // --- MODIFICACIÓN CLAVE: Renderizado de botones de aceptación ---
   function renderRequestsList() {
     const pendingEl = document.getElementById("pending-requests");
     const historyEl = document.getElementById("history-requests");
     if(pendingEl) pendingEl.innerHTML = ""; if(historyEl) historyEl.innerHTML = "";
 
+    // PENDIENTES
     if(pendingRequests.length === 0 && pendingEl) pendingEl.innerHTML = "<div style='color:#9ca3af;font-style:italic;text-align:center;'>No hay pendientes</div>";
     else if(pendingEl) {
       pendingRequests.forEach(req => {
         const div = document.createElement("div"); div.className = "request-item";
         const quien = req.requesterRole ? (req.requesterRole.charAt(0).toUpperCase() + req.requesterRole.slice(1)) : "Usuario";
-        div.innerHTML = `<div style="font-weight:700;">${req.startDate} ➔ ${req.endDate}</div><div style="font-size:0.85rem;margin:4px 0;">"${req.reason||'Sin motivo'}"</div><div style="font-size:0.75rem;">Solicita: <strong>${quien}</strong></div>`;
+        
+        let actionsHtml = "";
+        
+        // Si yo NO soy el que pidió, y soy el otro rol (o admin), muestro botones
+        if (req.requesterRole !== currentRole) {
+            actionsHtml = `
+            <div class="req-actions">
+                <button class="btn-action btn-accept" onclick="processRequest('${req.id}', 'aceptado', '${req.requesterRole}', '${req.startDate}', '${req.endDate}')">✔ Aceptar</button>
+                <button class="btn-action btn-reject" onclick="processRequest('${req.id}', 'rechazado')">✖ Rechazar</button>
+            </div>`;
+        } else {
+            actionsHtml = `<div class="req-wait">⏳ Esperando respuesta...</div>`;
+        }
+
+        div.innerHTML = `
+            <div style="font-weight:700;">${req.startDate} ➔ ${req.endDate}</div>
+            <div style="font-size:0.85rem;margin:4px 0;">"${req.reason||'Sin motivo'}"</div>
+            <div style="font-size:0.75rem;">Solicita: <strong>${quien}</strong></div>
+            ${actionsHtml}
+        `;
         pendingEl.appendChild(div);
       });
     }
 
+    // HISTORIAL
     if(historyRequests.length === 0 && historyEl) historyEl.innerHTML = "<div style='color:#9ca3af;font-style:italic;text-align:center;'>Historial vacío</div>";
     else if(historyEl) {
       historyRequests.forEach(req => {
@@ -437,6 +464,40 @@
       });
     }
   }
+
+  // --- LÓGICA DE PROCESAMIENTO (ACEPTAR/RECHAZAR) ---
+  window.processRequest = async function(reqId, newStatus, reqRole, startStr, endStr) {
+      if(!confirm(`¿Estás seguro de marcar como ${newStatus}?`)) return;
+
+      try {
+          const batch = db.batch();
+          const reqRef = db.collection("requests").doc(reqId);
+          batch.update(reqRef, { status: newStatus });
+
+          // Si se acepta, crear los Overrides en el calendario
+          if (newStatus === 'aceptado' && startStr && endStr) {
+              const start = new Date(startStr);
+              const end = new Date(endStr);
+              // Recorrer días
+              for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+                  const y = d.getFullYear();
+                  const m = String(d.getMonth() + 1).padStart(2, '0');
+                  const da = String(d.getDate()).padStart(2, '0');
+                  const key = `${y}-${m}-${da}`;
+                  
+                  const overrideRef = db.collection("overrides").doc(key);
+                  // Establecemos el dueño como quien lo pidió (reqRole)
+                  batch.set(overrideRef, { owner: reqRole }); 
+              }
+          }
+
+          await batch.commit();
+          showToast(`Solicitud ${newStatus}`);
+      } catch (err) {
+          console.error(err);
+          showToast("Error al procesar", "error");
+      }
+  };
 
   // --- LÓGICA DE SWIPE (DESLIZAR) ---
   const gridElement = document.getElementById("calendar-grid");
@@ -456,13 +517,10 @@
   function handleSwipe() {
     const xDiff = touchStartX - touchEndX;
     const yDiff = touchStartY - touchEndY;
-    // Umbral de 50px y aseguramos que el movimiento sea más horizontal que vertical
     if (Math.abs(xDiff) > Math.abs(yDiff) && Math.abs(xDiff) > 50) {
       if (xDiff > 0) {
-        // Deslizar izquierda -> Siguiente mes
         document.getElementById("next-period").click();
       } else {
-        // Deslizar derecha -> Mes anterior
         document.getElementById("prev-period").click();
       }
     }
@@ -515,9 +573,6 @@
   document.getElementById("prev-period").addEventListener("click", () => { currentMonth--; if(currentMonth < 0) { currentMonth = 11; currentYear--; document.getElementById("year-select").value = currentYear; } renderCalendar(); });
   document.getElementById("next-period").addEventListener("click", () => { currentMonth++; if(currentMonth > 11) { currentMonth = 0; currentYear++; document.getElementById("year-select").value = currentYear; } renderCalendar(); });
 
-  // ---------------------------------------------------------
-  // VERSIÓN SEGURA: SOLO FIREBASE (La notificación la hace el Backend)
-  // ---------------------------------------------------------
   document.getElementById("request-form").addEventListener("submit", async (e) => {
     e.preventDefault();
     if (!currentUser || !currentRole) return;

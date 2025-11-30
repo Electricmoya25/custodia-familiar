@@ -7,7 +7,6 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' x='0.1em' font-size='80'%3E%F0%9F%93%85%3C/text%3E%3C/svg%3E">
   <style>
     :root {
-      /* COLORES DEFINIDOS */
       --mother-color: #fce7f3; /* Rosa pastel */
       --father-color: #dbeafe; /* Azul pastel */
       --accent-color: #7c3aed;
@@ -21,19 +20,27 @@
       --error: #ef4444;
     }
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    
     body {
       margin: 0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background: var(--bg-main);
       color: var(--text-main);
       padding-bottom: 50px;
+      overscroll-behavior-y: none; /* Evita rebote en scroll */
     }
     .hidden { display: none !important; }
 
     /* ANIMACIONES */
-    .calendar-grid { opacity: 1; transition: opacity 0.45s ease; }
-    .calendar-grid.fading { opacity: 0; }
-    .day-cell { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .calendar-grid { 
+      opacity: 1; 
+      transition: opacity 0.3s ease, transform 0.3s ease; 
+      /* Importante para el swipe */
+      touch-action: pan-y; 
+    }
+    .calendar-grid.fading { opacity: 0; transform: scale(0.98); }
+    
+    .day-cell { opacity: 0; transform: translateY(10px); transition: opacity 0.4s ease, transform 0.4s ease; }
     .day-cell.animated { opacity: 1; transform: translateY(0); }
 
     /* TOASTS */
@@ -116,16 +123,15 @@
     .field-group input, .field-group textarea { width:100%; padding:8px 10px; border-radius:10px; border:1px solid #d1d5db; font-size:0.9rem; }
     .field-group textarea { min-height:60px; resize:vertical; }
     .primary-btn { display:inline-block; margin-top:8px; padding:10px 14px; border-radius:999px; border:none; background:var(--accent-color); color:#fff; font-size:0.9rem; font-weight:600; cursor:pointer; width:100%; }
-    .helper-text { font-size:0.8rem; color:#6b7280; text-align: center; margin-top: 5px;}
     .requests-list { max-height:260px; overflow:auto; border-radius:12px; border:1px solid #e5e7eb; padding:8px; }
     .request-item { border-radius:10px; border:1px solid #e5e7eb; padding:8px 10px; margin-bottom:8px; font-size:0.8rem; background: #f9fafb; }
 
     /* CALENDARIO */
-    .calendar-wrapper { background:var(--card-bg); border-radius:28px; padding:16px 12px; box-shadow:var(--shadow-soft); }
+    .calendar-wrapper { background:var(--card-bg); border-radius:28px; padding:16px 12px; box-shadow:var(--shadow-soft); overflow: hidden; /* Importante para swipe */ }
     .calendar-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
     .nav-arrow { width:36px; height:36px; font-size:24px; border-radius:50%; border:1px solid #e5e7eb; background:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all .2s; }
     .nav-arrow:hover { background:#f3f4f6; transform:scale(1.1); }
-    .calendar-title { font-size:1.5rem; font-weight:700; }
+    .calendar-title { font-size:1.5rem; font-weight:700; user-select: none; }
     .calendar-subheader { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; padding-bottom:10px; border-bottom:1px solid #f3f4f6; margin-bottom:12px; }
     .legend { font-size:0.9rem; gap:16px; font-weight:600; display:flex; }
     .legend-item { display: flex; align-items: center; gap: 5px; }
@@ -134,42 +140,22 @@
     .month-header { text-align:center; padding:8px; background:#f9fafb; font-weight:600; font-size:0.9rem; color:#374151; }
     table.month-table { width:100%; border-collapse:separate; border-spacing:2.5px; table-layout:fixed; }
     .month-table th { font-size:0.7rem; color:#9ca3af; font-weight:500; padding:4px 0; }
-    .month-table td {
-      height:55px; position:relative; border-radius:12px;
-      vertical-align: top; overflow: hidden; /* Para que la marca de agua no salga */
-    }
+    .month-table td { height:55px; position:relative; border-radius:12px; vertical-align: top; overflow: hidden; }
 
     /* ESTILOS DE CUSTODIA */
     .day-mother { background:var(--mother-color); }
     .day-father { background:var(--father-color); }
-
-    .day-number {
-      position:absolute; top:4px; left:6px;
-      font-size:0.9rem; font-weight:700; color:#1f2937;
-      z-index: 2; /* Encima de la marca de agua */
-    }
-
-    /* MARCA DE AGUA (ICONO) */
+    
+    .day-number { position:absolute; top:4px; left:6px; font-size:0.9rem; font-weight:700; color:#1f2937; z-index: 2; }
+    
+    /* MARCA DE AGUA */
     .owner-icon {
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 2.5rem; /* Grande */
-      opacity: 0.15;     /* Muy transparente */
-      pointer-events: none;
-      z-index: 1;        /* Detrás del número */
-      user-select: none;
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      font-size: 2.5rem; opacity: 0.15; pointer-events: none; z-index: 1; user-select: none;
     }
 
-    .day-overridden::after {
-      content:"⇄"; position:absolute; top:4px; right:4px;
-      font-size:0.8rem; color:var(--accent-color); opacity:0.9; z-index: 3;
-    }
-    .today-marker {
-      position:absolute; bottom:4px; right:4px;
-      width:6px; height:6px; background:var(--accent-color);
-      border-radius:50%; box-shadow:0 0 0 2px white; z-index: 3;
-    }
+    .day-overridden::after { content:"⇄"; position:absolute; top:4px; right:4px; font-size:0.8rem; color:var(--accent-color); opacity:0.9; z-index: 3; }
+    .today-marker { position:absolute; bottom:4px; right:4px; width:6px; height:6px; background:var(--accent-color); border-radius:50%; box-shadow:0 0 0 2px white; z-index: 3; }
   </style>
 </head>
 <body>
@@ -179,7 +165,7 @@
 <div id="login-view" class="login-wrapper">
   <div class="login-card">
     <div class="login-title">📅 Custodia Familiar</div>
-    <p class="login-subtitle">Introduce tu correo y contraseña para acceder al calendario compartido.</p>
+    <p class="login-subtitle">Introduce tu correo y contraseña para acceder.</p>
     <form id="login-form">
       <div class="login-field">
         <label for="login-email">Correo electrónico</label>
@@ -273,7 +259,6 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 
 <script>
-  // CONFIGURACIÓN FIREBASE
   const firebaseConfig = {
     apiKey: "AIzaSyAwgk4_l0zvaCUCgm1CjqqqXjJHr5KPBjc",
     authDomain: "custodia-familiar.firebaseapp.com",
@@ -297,17 +282,15 @@
   let currentView = "month";
   let currentUser = null;
   let currentRole = null;
-
   let overrides = {};
   let pendingRequests = [];
   let historyRequests = [];
 
   const monthNames = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
   const weekDayNames = ["Lun","Mar","Mié","Jue","Vie","Sáb","Dom"];
-  
-  // LOGICA BASE: 5 de Enero 2026 es Lunes.
   const BASE_MONDAY = new Date(2026, 0, 5, 12, 0, 0); 
 
+  // HELPERS
   function showToast(msg, type = 'success') {
     const container = document.getElementById('toast-container');
     const el = document.createElement('div');
@@ -315,10 +298,7 @@
     el.innerHTML = type === 'success' ? `✅ ${msg}` : `⚠️ ${msg}`;
     container.appendChild(el);
     requestAnimationFrame(() => el.classList.add('visible'));
-    setTimeout(() => {
-      el.classList.remove('visible');
-      setTimeout(() => el.remove(), 300);
-    }, 5000);
+    setTimeout(() => { el.classList.remove('visible'); setTimeout(() => el.remove(), 300); }, 4000);
   }
 
   function setConnectionStatus(state) {
@@ -337,21 +317,10 @@
   function getBaseOwner(year, monthIndex, day) {
     const date = new Date(year, monthIndex, day, 12, 0, 0);
     if (date.getFullYear() < MIN_YEAR || date.getFullYear() > MAX_YEAR) return null;
-    
     const diffMs = date - BASE_MONDAY;
     const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
-    
-    // Índice de semana desde el 5 de enero de 2026
     const weekIndex = Math.floor(diffDays / 7);
-
-    // LOGICA NUEVA:
-    // Semana 0 (del 5 al 11 Ene) -> PAR -> PADRE.
-    // Días previos (1 al 4 Ene) -> IMPAR (-1) -> MADRE.
     const isEven = Math.abs(weekIndex) % 2 === 0;
-
-    // Si es Par -> PADRE. Si es Impar -> MADRE.
-    // Nota: Math.abs(-1) es 1 (impar) -> Madre.
-    //       Math.abs(0) es 0 (par) -> Padre.
     return isEven ? "padre" : "madre";
   }
 
@@ -372,41 +341,28 @@
       const today = new Date();
 
       monthsToRender.forEach(mIndex => {
-        const monthDiv = document.createElement("div");
-        monthDiv.className = "month";
-
-        const header = document.createElement("div");
-        header.className = "month-header";
+        const monthDiv = document.createElement("div"); monthDiv.className = "month";
+        const header = document.createElement("div"); header.className = "month-header";
         header.textContent = currentView === "year" ? `${monthNames[mIndex]} ${currentYear}` : monthNames[mIndex];
         monthDiv.appendChild(header);
 
-        const table = document.createElement("table");
-        table.className = "month-table";
-
+        const table = document.createElement("table"); table.className = "month-table";
         const thead = document.createElement("thead");
         const trHead = document.createElement("tr");
-        weekDayNames.forEach(d => {
-          const th = document.createElement("th");
-          th.textContent = d.charAt(0);
-          trHead.appendChild(th);
-        });
-        thead.appendChild(trHead);
-        table.appendChild(thead);
+        weekDayNames.forEach(d => { const th = document.createElement("th"); th.textContent = d.charAt(0); trHead.appendChild(th); });
+        thead.appendChild(trHead); table.appendChild(thead);
 
         const daysInMonth = new Date(currentYear, mIndex + 1, 0).getDate();
         const firstDayInstance = new Date(currentYear, mIndex, 1);
-        let startDay = firstDayInstance.getDay();
-        startDay = (startDay === 0) ? 6 : startDay - 1;
+        let startDay = firstDayInstance.getDay(); startDay = (startDay === 0) ? 6 : startDay - 1;
 
         const tbody = document.createElement("tbody");
-        let dayCounter = 1;
-        let finished = false;
+        let dayCounter = 1; let finished = false;
 
         while(!finished) {
           const tr = document.createElement("tr");
           for(let i = 0; i < 7; i++) {
             const td = document.createElement("td");
-
             if(dayCounter <= daysInMonth && (dayCounter > 1 || i >= startDay)) {
               const dateKey = formatDateKey(currentYear, mIndex, dayCounter);
               const base = getBaseOwner(currentYear, mIndex, dayCounter);
@@ -418,105 +374,99 @@
               if(final === "madre") td.classList.add("day-mother");
               if(override) td.classList.add("day-overridden");
 
-              const spanNum = document.createElement("span");
-              spanNum.className = "day-number";
-              spanNum.textContent = dayCounter;
-              td.appendChild(spanNum);
-
-              // MARCA DE AGUA
-              const ownerIcon = document.createElement("div");
-              ownerIcon.className = "owner-icon";
-              ownerIcon.textContent = final === "madre" ? "👩" : "👨";
-              td.appendChild(ownerIcon);
+              const spanNum = document.createElement("span"); spanNum.className = "day-number"; spanNum.textContent = dayCounter; td.appendChild(spanNum);
+              
+              // ICONO MARCA DE AGUA
+              const ownerIcon = document.createElement("div"); ownerIcon.className = "owner-icon";
+              ownerIcon.textContent = final === "madre" ? "👩" : "👨"; td.appendChild(ownerIcon);
 
               if(currentYear === today.getFullYear() && mIndex === today.getMonth() && dayCounter === today.getDate()){
-                const todayMark = document.createElement("div");
-                todayMark.className = "today-marker";
-                td.appendChild(todayMark);
+                const todayMark = document.createElement("div"); todayMark.className = "today-marker"; td.appendChild(todayMark);
               }
-
-              td.title = `${dateKey}: ${final === "madre" ? "Madre" : "Padre"} ${override ? "(Cambio)" : ""}`;
-              tr.appendChild(td);
-              dayCounter++;
+              td.title = `${dateKey}: ${final}`;
+              tr.appendChild(td); dayCounter++;
             } else {
-              td.style.background = "transparent";
-              tr.appendChild(td);
+              td.style.background = "transparent"; tr.appendChild(td);
             }
           }
-          tbody.appendChild(tr);
-          if(dayCounter > daysInMonth) finished = true;
+          tbody.appendChild(tr); if(dayCounter > daysInMonth) finished = true;
         }
-        table.appendChild(tbody);
-        monthDiv.appendChild(table);
-        grid.appendChild(monthDiv);
+        table.appendChild(tbody); monthDiv.appendChild(table); grid.appendChild(monthDiv);
       });
 
       requestAnimationFrame(() => {
         grid.classList.remove('fading');
         const cells = grid.querySelectorAll('.day-cell');
-        cells.forEach((cell, index) => {
-          setTimeout(() => cell.classList.add('animated'), index * 10);
-        });
+        cells.forEach((cell, index) => { setTimeout(() => cell.classList.add('animated'), index * 10); });
       });
-    }, 300);
+    }, 250);
   }
 
   function renderRequestsList() {
     const pendingEl = document.getElementById("pending-requests");
     const historyEl = document.getElementById("history-requests");
-    
-    if (pendingEl) pendingEl.innerHTML = "";
-    if (historyEl) historyEl.innerHTML = "";
+    if(pendingEl) pendingEl.innerHTML = ""; if(historyEl) historyEl.innerHTML = "";
 
-    // Pendientes
-    if (pendingRequests.length === 0) {
-        if(pendingEl) pendingEl.innerHTML = "<div style='color:#9ca3af;font-style:italic;text-align:center;'>No hay pendientes</div>";
-    } else {
-        pendingRequests.forEach(req => {
-            const div = document.createElement("div");
-            div.className = "request-item";
-            // Corrección de undefined: usar requesterRole o un valor por defecto
-            const quien = req.requesterRole ? (req.requesterRole.charAt(0).toUpperCase() + req.requesterRole.slice(1)) : "Usuario";
-            const motivo = req.reason || "Sin motivo";
-            
-            div.innerHTML = `
-                <div style="font-weight:700; color:#0f172a;">${req.startDate} ➔ ${req.endDate}</div>
-                <div style="font-size:0.85rem; color:#475569; margin:4px 0;">"${motivo}"</div>
-                <div style="font-size:0.75rem; color:#64748b;">Solicita: <strong>${quien}</strong></div>
-            `;
-            if(pendingEl) pendingEl.appendChild(div);
-        });
+    if(pendingRequests.length === 0 && pendingEl) pendingEl.innerHTML = "<div style='color:#9ca3af;font-style:italic;text-align:center;'>No hay pendientes</div>";
+    else if(pendingEl) {
+      pendingRequests.forEach(req => {
+        const div = document.createElement("div"); div.className = "request-item";
+        const quien = req.requesterRole ? (req.requesterRole.charAt(0).toUpperCase() + req.requesterRole.slice(1)) : "Usuario";
+        div.innerHTML = `<div style="font-weight:700;">${req.startDate} ➔ ${req.endDate}</div><div style="font-size:0.85rem;margin:4px 0;">"${req.reason||'Sin motivo'}"</div><div style="font-size:0.75rem;">Solicita: <strong>${quien}</strong></div>`;
+        pendingEl.appendChild(div);
+      });
     }
 
-    // Historial
-    if (historyRequests.length === 0) {
-        if(historyEl) historyEl.innerHTML = "<div style='color:#9ca3af;font-style:italic;text-align:center;'>Historial vacío</div>";
-    } else {
-        historyRequests.forEach(req => {
-            const div = document.createElement("div");
-            div.className = "request-item";
-            const status = req.status || "finalizado";
-            const icon = status === "aceptado" ? "✅" : "❌";
-            const quien = req.requesterRole ? (req.requesterRole.charAt(0).toUpperCase() + req.requesterRole.slice(1)) : "Usuario";
-
-            div.innerHTML = `
-                <div style="display:flex; justify-content:space-between; font-size:0.75rem; font-weight:600; color:#64748b; margin-bottom:4px;">
-                    <span>${quien}</span>
-                    <span>${icon} ${status.toUpperCase()}</span>
-                </div>
-                <div style="font-weight:700;">${req.startDate} al ${req.endDate}</div>
-                <div style="font-size:0.85rem; color:#475569;">${req.reason || ""}</div>
-            `;
-            if(historyEl) historyEl.appendChild(div);
-        });
+    if(historyRequests.length === 0 && historyEl) historyEl.innerHTML = "<div style='color:#9ca3af;font-style:italic;text-align:center;'>Historial vacío</div>";
+    else if(historyEl) {
+      historyRequests.forEach(req => {
+        const div = document.createElement("div"); div.className = "request-item";
+        const status = req.status || "finalizado";
+        const icon = status === "aceptado" ? "✅" : "❌";
+        const quien = req.requesterRole ? (req.requesterRole.charAt(0).toUpperCase() + req.requesterRole.slice(1)) : "Usuario";
+        div.innerHTML = `<div style="display:flex;justify-content:space-between;font-size:0.75rem;font-weight:600;margin-bottom:4px;"><span>${quien}</span><span>${icon} ${status.toUpperCase()}</span></div><div style="font-weight:700;">${req.startDate} al ${req.endDate}</div><div style="font-size:0.85rem;">${req.reason||""}</div>`;
+        historyEl.appendChild(div);
+      });
     }
   }
 
-  // --- AUTH & LOGIN ---
+  // --- LÓGICA DE SWIPE (DESLIZAR) ---
+  const gridElement = document.getElementById("calendar-grid");
+  let touchStartX = 0;
+  let touchStartY = 0;
+  let touchEndX = 0;
+  let touchEndY = 0;
+
+  gridElement.addEventListener('touchstart', e => {
+    touchStartX = e.changedTouches[0].screenX;
+    touchStartY = e.changedTouches[0].screenY;
+  }, {passive: true});
+
+  gridElement.addEventListener('touchend', e => {
+    touchEndX = e.changedTouches[0].screenX;
+    touchEndY = e.changedTouches[0].screenY;
+    handleSwipe();
+  }, {passive: true});
+
+  function handleSwipe() {
+    const xDiff = touchStartX - touchEndX;
+    const yDiff = touchStartY - touchEndY;
+    // Umbral de 50px y aseguramos que el movimiento sea más horizontal que vertical
+    if (Math.abs(xDiff) > Math.abs(yDiff) && Math.abs(xDiff) > 50) {
+      if (xDiff > 0) {
+        // Deslizar izquierda -> Siguiente mes
+        document.getElementById("next-period").click();
+      } else {
+        // Deslizar derecha -> Mes anterior
+        document.getElementById("prev-period").click();
+      }
+    }
+  }
+
+  // --- AUTH ---
   auth.onAuthStateChanged(async (user) => {
     const loginView = document.getElementById("login-view");
     const appRoot = document.getElementById("app-root");
-
     if (user) {
       currentUser = user;
       try {
@@ -524,29 +474,15 @@
         if (snap.exists) {
           const data = snap.data();
           currentRole = data.role;
-          
           document.getElementById("user-role-label").textContent = currentRole === "padre" ? "Padre 👨" : "Madre 👩";
           document.getElementById("whoami-label").innerHTML = currentRole === "padre" ? "Padre 👨" : "Madre 👩";
-
-          loginView.classList.add("hidden");
-          appRoot.classList.remove("hidden");
-
-          initDataListeners();
-          renderCalendar();
-        } else {
-          alert(`ERROR: Usuario logueado pero sin perfil en DB. ID: ${user.uid}`);
-          auth.signOut();
-        }
-      } catch (e) {
-        console.error("Error obteniendo usuario:", e);
-        alert("Error de conexión con la base de datos.");
-        auth.signOut();
-      }
+          loginView.classList.add("hidden"); appRoot.classList.remove("hidden");
+          initDataListeners(); renderCalendar();
+        } else { alert(`Usuario sin perfil.`); auth.signOut(); }
+      } catch (e) { alert("Error DB."); auth.signOut(); }
     } else {
-      currentUser = null;
-      currentRole = null;
-      loginView.classList.remove("hidden");
-      appRoot.classList.add("hidden");
+      currentUser = null; currentRole = null;
+      loginView.classList.remove("hidden"); appRoot.classList.add("hidden");
     }
   });
 
@@ -554,106 +490,43 @@
     e.preventDefault();
     const btn = document.getElementById("login-submit-btn");
     const errEl = document.getElementById("login-error");
-    
     btn.disabled = true; btn.textContent = "Verificando..."; errEl.textContent = "";
-
-    const email = document.getElementById("login-email").value.trim();
-    const pass = document.getElementById("login-password").value;
-
-    auth.signInWithEmailAndPassword(email, pass)
-      .catch(err => {
-        let msg = "Error al entrar.";
-        if (err.code === 'auth/wrong-password') msg = "Contraseña incorrecta.";
-        if (err.code === 'auth/user-not-found') msg = "Usuario no encontrado.";
-        errEl.textContent = msg;
-      })
+    auth.signInWithEmailAndPassword(document.getElementById("login-email").value, document.getElementById("login-password").value)
+      .catch(err => { errEl.textContent = "Credenciales incorrectas"; })
       .finally(() => { btn.disabled = false; btn.textContent = "Entrar"; });
   });
-
   document.getElementById("logout-btn").addEventListener("click", () => auth.signOut());
 
   function initDataListeners() {
-    db.collection("overrides").onSnapshot(snap => {
-      overrides = {};
-      snap.forEach(doc => overrides[doc.id] = doc.data().owner);
-      renderCalendar();
-      setConnectionStatus("online");
-    }, () => setConnectionStatus("error"));
-
+    db.collection("overrides").onSnapshot(snap => { overrides = {}; snap.forEach(doc => overrides[doc.id] = doc.data().owner); renderCalendar(); setConnectionStatus("online"); });
     db.collection("requests").orderBy("createdAt", "desc").onSnapshot(snap => {
-      pendingRequests = [];
-      historyRequests = [];
-      snap.forEach(doc => {
-        const d = doc.data();
-        const item = { id: doc.id, ...d };
-        if(item.status === "pendiente") pendingRequests.push(item);
-        else historyRequests.push(item);
-      });
+      pendingRequests = []; historyRequests = [];
+      snap.forEach(doc => { const d = doc.data(); const i = { id: doc.id, ...d }; if(i.status === "pendiente") pendingRequests.push(i); else historyRequests.push(i); });
       renderRequestsList();
     });
   }
 
-  // --- EVENTS ---
-  document.getElementById("year-select").addEventListener("change", (e) => {
-    currentYear = parseInt(e.target.value);
-    renderCalendar();
-  });
-
-  document.getElementById("prev-period").addEventListener("click", () => {
-    currentMonth--;
-    if(currentMonth < 0) { currentMonth = 11; currentYear--; document.getElementById("year-select").value = currentYear; }
-    renderCalendar();
-  });
-
-  document.getElementById("next-period").addEventListener("click", () => {
-    currentMonth++;
-    if(currentMonth > 11) { currentMonth = 0; currentYear++; document.getElementById("year-select").value = currentYear; }
-    renderCalendar();
-  });
-
+  document.getElementById("year-select").addEventListener("change", (e) => { currentYear = parseInt(e.target.value); renderCalendar(); });
+  document.getElementById("prev-period").addEventListener("click", () => { currentMonth--; if(currentMonth < 0) { currentMonth = 11; currentYear--; document.getElementById("year-select").value = currentYear; } renderCalendar(); });
+  document.getElementById("next-period").addEventListener("click", () => { currentMonth++; if(currentMonth > 11) { currentMonth = 0; currentYear++; document.getElementById("year-select").value = currentYear; } renderCalendar(); });
   document.getElementById("request-form").addEventListener("submit", async (e) => {
     e.preventDefault();
-    if (!currentUser || !currentRole) return showToast("Debes iniciar sesión.", "error");
-
-    const sd = document.getElementById("start-date").value;
-    const ed = document.getElementById("end-date").value;
-    const reason = document.getElementById("reason").value.trim();
-
-    if (!sd || !ed || !reason) return showToast("Completa todos los campos.", "error");
-
+    if (!currentUser || !currentRole) return;
     try {
       await db.collection("requests").add({
-        requesterUid: currentUser.uid,
-        requesterRole: currentRole, // IMPORTANTE para evitar undefined
-        startDate: sd,
-        endDate: ed,
-        reason: reason,
-        status: "pendiente",
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        requesterUid: currentUser.uid, requesterRole: currentRole,
+        startDate: document.getElementById("start-date").value, endDate: document.getElementById("end-date").value, reason: document.getElementById("reason").value.trim(),
+        status: "pendiente", createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
-      showToast("Solicitud enviada con éxito.");
-      e.target.reset();
-    } catch (err) {
-      console.error(err);
-      showToast("Error al enviar solicitud.", "error");
-    }
+      showToast("Solicitud enviada"); e.target.reset();
+    } catch (err) { showToast("Error al enviar", "error"); }
   });
-
+  
   document.addEventListener("DOMContentLoaded", () => {
-    const sd = document.getElementById("start-date");
-    const ed = document.getElementById("end-date");
+    const sd = document.getElementById("start-date"), ed = document.getElementById("end-date");
     if(sd && ed) { sd.min = GLOBAL_MIN_DATE; sd.max = GLOBAL_MAX_DATE; ed.min = GLOBAL_MIN_DATE; ed.max = GLOBAL_MAX_DATE; }
-
-    const yearSel = document.getElementById("year-select");
-    if(yearSel) {
-      yearSel.innerHTML = "";
-      [2026, 2027].forEach(y => {
-        const op = document.createElement("option");
-        op.value = y; op.textContent = y;
-        if(y === currentYear) op.selected = true;
-        yearSel.appendChild(op);
-      });
-    }
+    const ys = document.getElementById("year-select");
+    if(ys) { ys.innerHTML = ""; [2026, 2027].forEach(y => { const o = document.createElement("option"); o.value = y; o.textContent = y; if(y === currentYear) o.selected = true; ys.appendChild(o); }); }
     renderCalendar();
   });
 </script>

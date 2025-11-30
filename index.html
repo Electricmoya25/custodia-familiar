@@ -102,6 +102,140 @@
     .logo-icon { width:40px; height:40px; font-size:24px; border-radius:12px; background:var(--accent-soft); display:flex; align-items:center; justify-content:center; }
     .app-name { font-size:1.2rem; font-weight:700; }
 
+    .status-pill {
+      margin-top:4px;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:4px 10px;
+      border-radius:999px;
+      font-size:0.75rem;
+      font-weight:500;
+      background:#e5e7eb;
+      color:#374151;
+    }
+    .status-dot {
+      width:8px;
+      height:8px;
+      border-radius:50%;
+      background:#9ca3af;
+    }
+    .status-online { background:#dcfce7; color:#166534; }
+    .status-online .status-dot { background:#22c55e; }
+    .status-connecting { background:#fef3c7; color:#92400e; }
+    .status-connecting .status-dot { background:#facc15; }
+    .status-error { background:#fee2e2; color:#b91c1c; }
+    .status-error .status-dot { background:#ef4444; }
+
+    .year-select {
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid #e5e7eb;
+      background:#fff;
+      font-size:0.9rem;
+    }
+    .user-info {
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin-left:16px;
+    }
+    .user-role-label {
+      font-size:0.9rem;
+      font-weight:600;
+      color:#374151;
+    }
+    .logout-btn {
+      padding:6px 10px;
+      font-size:0.8rem;
+      border-radius:999px;
+      border:1px solid #e5e7eb;
+      background:#fff;
+      cursor:pointer;
+    }
+
+    .layout {
+      padding:16px;
+      display:grid;
+      grid-template-columns:2fr 1fr;
+      gap:16px;
+    }
+    @media (max-width:900px){
+      .layout {
+        grid-template-columns:1fr;
+      }
+    }
+
+    .side-panel .card {
+      background:#fff;
+      border-radius:20px;
+      box-shadow:var(--shadow-soft);
+      padding:14px 16px;
+    }
+    .panel-title {
+      margin:0 0 10px;
+      font-size:1rem;
+      font-weight:600;
+    }
+    .panel-title.active {
+      color:var(--accent-color);
+    }
+    .card-content {
+      font-size:0.9rem;
+    }
+    .field-group {
+      margin-bottom:12px;
+    }
+    .field-group label {
+      display:block;
+      margin-bottom:4px;
+      font-size:0.85rem;
+      font-weight:500;
+      color:#4b5563;
+    }
+    .field-group input,
+    .field-group textarea {
+      width:100%;
+      padding:8px 10px;
+      border-radius:10px;
+      border:1px solid #d1d5db;
+      font-size:0.9rem;
+    }
+    .field-group textarea {
+      min-height:60px;
+      resize:vertical;
+    }
+    .primary-btn {
+      display:inline-block;
+      margin-top:8px;
+      padding:10px 14px;
+      border-radius:999px;
+      border:none;
+      background:var(--accent-color);
+      color:#fff;
+      font-size:0.9rem;
+      font-weight:600;
+      cursor:pointer;
+    }
+    .helper-text {
+      font-size:0.8rem;
+      color:#6b7280;
+    }
+    .requests-list {
+      max-height:260px;
+      overflow:auto;
+      border-radius:12px;
+      border:1px solid #e5e7eb;
+      padding:8px;
+    }
+    .request-item {
+      border-radius:10px;
+      border:1px solid #e5e7eb;
+      padding:8px 10px;
+      margin-bottom:8px;
+      font-size:0.8rem;
+    }
+
     /* CALENDARIO */
     .calendar-wrapper {
       background:var(--card-bg); border-radius:28px; padding:16px 12px;
@@ -220,7 +354,7 @@
 <!-- APP -->
 <div id="app-root" class="app hidden">
   <header class="topbar">
-    <div class="topbar-left">
+    <div class="topbar-left" style="display:flex;align-items:center;gap:10px;">
       <div class="logo-icon">📅</div>
       <div>
         <div class="app-name">Custodia Familiar</div>
@@ -230,7 +364,7 @@
         </div>
       </div>
     </div>
-    <div class="topbar-right">
+    <div class="topbar-right" style="display:flex;align-items:center;gap:8px;">
       <select id="year-select" class="year-select"></select>
       <div class="user-info">
         <span class="user-role-label" id="user-role-label">Usuario</span>
@@ -384,6 +518,8 @@
   function renderCalendar() {
     const grid = document.getElementById("calendar-grid");
     const titleEl = document.getElementById("calendar-title");
+    if (!grid || !titleEl) return;
+
     grid.classList.add('fading');
 
     setTimeout(() => {
@@ -485,9 +621,31 @@
     }, 300);
   }
 
-  // ... resto de funciones (renderRequestsList, createRequestCard, handleAction, request-form submit, initDataListeners, etc.) igual que antes ...
+  // Render simplificado de solicitudes para evitar errores
+  function renderRequestsList() {
+    const pendingEl = document.getElementById("pending-requests");
+    const historyEl = document.getElementById("history-requests");
+    if (!pendingEl || !historyEl) return;
 
-  // LOGIN 100% FUNCIONAL
+    pendingEl.innerHTML = "";
+    historyEl.innerHTML = "";
+
+    pendingRequests.forEach(req => {
+      const div = document.createElement("div");
+      div.className = "request-item";
+      div.textContent = `${req.startDate} → ${req.endDate} · ${req.reason || ""}`;
+      pendingEl.appendChild(div);
+    });
+
+    historyRequests.forEach(req => {
+      const div = document.createElement("div");
+      div.className = "request-item";
+      div.textContent = `${req.startDate} → ${req.endDate} · ${req.status}`;
+      historyEl.appendChild(div);
+    });
+  }
+
+  // LOGIN
   document.getElementById("login-form").addEventListener("submit", (e) => {
     e.preventDefault();
     const btn = document.getElementById("login-submit-btn");
@@ -500,8 +658,11 @@
     errEl.textContent = "";
 
     auth.signInWithEmailAndPassword(email, pass)
-      .then(() => { /* onAuthStateChanged lo maneja */ })
+      .then(() => {
+        // onAuthStateChanged manejará el cambio de vista
+      })
       .catch(err => {
+        console.error(err);
         let msg = "Credenciales incorrectas o error de conexión.";
         if (err.code === 'auth/user-not-found') msg = "Usuario no encontrado.";
         if (err.code === 'auth/wrong-password') msg = "Contraseña incorrecta.";
@@ -512,6 +673,11 @@
         btn.disabled = false;
         btn.textContent = "Entrar";
       });
+  });
+
+  // Logout
+  document.getElementById("logout-btn").addEventListener("click", () => {
+    auth.signOut();
   });
 
   // Controles de navegación
@@ -537,17 +703,16 @@
     renderCalendar();
   });
 
-  document.getElementById("view-mode").addEventListener("change", (e) => {
-    currentView = e.target.value;
-    renderCalendar();
-  });
-
-  // Inicialización
+  // Inicialización básica
   document.addEventListener("DOMContentLoaded", () => {
-    document.getElementById("start-date").min = GLOBAL_MIN_DATE;
-    document.getElementById("start-date").max = GLOBAL_MAX_DATE;
-    document.getElementById("end-date").min = GLOBAL_MIN_DATE;
-    document.getElementById("end-date").max = GLOBAL_MAX_DATE;
+    const sd = document.getElementById("start-date");
+    const ed = document.getElementById("end-date");
+    if (sd && ed) {
+      sd.min = GLOBAL_MIN_DATE;
+      sd.max = GLOBAL_MAX_DATE;
+      ed.min = GLOBAL_MIN_DATE;
+      ed.max = GLOBAL_MAX_DATE;
+    }
     renderCalendar();
   });
 
@@ -564,7 +729,39 @@
     renderCalendar();
   });
 
-  // Auth listener (completo con fix)
+  // Listener simple del formulario de solicitud (escritura en Firestore opcional)
+  document.getElementById("request-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (!currentUser || !currentRole) {
+      showToast("Debes estar autenticado para enviar solicitudes.", "error");
+      return;
+    }
+    const startDate = document.getElementById("start-date").value;
+    const endDate = document.getElementById("end-date").value;
+    const reason = document.getElementById("reason").value.trim();
+    if (!startDate || !endDate || !reason) {
+      showToast("Rellena todas las fechas y el motivo.", "error");
+      return;
+    }
+    try {
+      await db.collection("requests").add({
+        requesterUid: currentUser.uid,
+        requesterRole: currentRole,
+        startDate,
+        endDate,
+        reason,
+        status: "pendiente",
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      showToast("Solicitud enviada correctamente.");
+      (e.target).reset();
+    } catch (err) {
+      console.error(err);
+      showToast("Error al guardar la solicitud.", "error");
+    }
+  });
+
+  // Auth listener
   auth.onAuthStateChanged(async (user) => {
     const loginView = document.getElementById("login-view");
     const appRoot = document.getElementById("app-root");
@@ -586,10 +783,13 @@
           auth.signOut();
         }
       } catch (e) {
+        console.error(e);
         showToast("Error de conexión. Cerrando sesión.", "error");
         auth.signOut();
       }
     } else {
+      currentUser = null;
+      currentRole = null;
       loginView.classList.remove("hidden");
       appRoot.classList.add("hidden");
     }

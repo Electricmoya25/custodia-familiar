@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Custodia Familiar 2026-2027</title>
+  <style>
+    :root {
+      --father-color: #ffe4e4; /* rojo pastel muy suave */
+      --mother-color: #e4ecff; /* azul pastel muy suave */
+      --border-color: #e3e3ee;
+      --accent-color: #7c3aed;   /* morado principal */
+      --accent-soft: #ede9fe;
+      --text-main: #111827;
+      --text-muted: #6b7280;
+      --bg-main: #f3f4fb;
+      --card-bg: #ffffff;
+      --shadow-soft: 0 16px 40px rgba(15, 23, 42, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      background: var(--bg-main);
+      color: var(--text-main);
+    }
+
+    h1, h2, h3 {
+      margin-top: 0;
+    }
+
+    .app {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 16px 20px 40px;
+    }
+
+    /* =================== TOPBAR =================== */
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 18px;
+      border-radius: 18px;
+      background: #ffffff;
+      box-shadow: 0 8px 25px rgba(15, 23, 42, 0.08);
+      margin-bottom: 18px;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-icon {
+      width: 30px;
+      height: 30px;
+      border-radius: 10px;
+      background: var(--accent-soft);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      color: var(--accent-color);
+    }
+
+    .app-name {
+      font-weight: 600;
+      font-size: 1.05rem;
+      color: var(--text-main);
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 9px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      background: #fef3c7;
+      color: #92400e;
+      margin-top: 2px;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #facc15;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .year-select {
+      padding: 6px 24px 6px 10px;
+      border-radius: 999px;
+      border: 1px solid #d1d5db;
+      background: #ffffff;
+      font-size: 0.85rem;
+      font-family: inherit;
+      outline: none;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .year-select:focus {
+      box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.25);
+      border-color: var(--accent-color);
+    }
+
+    .role-toggle {
+      display: inline-flex;
+      background: #f9fafb;
+      border-radius: 999px;
+      padding: 2px;
+      border: 1px solid #e5e7eb;
+    }
+
+    .role-btn {
+      border: none;
+      background: transparent;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-family: inherit;
+      cursor: pointer;
+      color: var(--text-muted);
+    }
+
+    .role-btn.active {
+      background: var(--accent-soft);
+      color: var(--accent-color);
+      font-weight: 600;
+      box-shadow: 0 0 0 1px rgba(124, 58, 237, 0.4);
+    }
+
+    @media (max-width: 800px) {
+      .topbar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+
+      .topbar-right {
+        width: 100%;
+        justify-content: space-between;
+      }
+    }
+
+    /* =================== LAYOUT PRINCIPAL =================== */
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 2.2fr) minmax(0, 1.15fr);
+      gap: 18px;
+      margin-top: 4px;
+    }
+
+    @media (max-width: 980px) {
+      .layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    /* =================== CALENDARIO =================== */
+
+    .calendar-wrapper {
+      background: var(--card-bg);
+      border-radius: 26px;
+      padding: 18px 18px 20px;
+      box-shadow: var(--shadow-soft);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .calendar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+
+    .month-nav {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+      justify-content: center;
+    }
+
+    .nav-arrow {
+      border-radius: 999px;
+      border: none;
+      width: 26px;
+      height: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      background: #f9fafb;
+      color: #6b7280;
+      font-size: 16px;
+    }
+
+    .nav-arrow:hover {
+      background: #e5e7eb;
+    }
+
+    .calendar-title {
+      font-weight: 600;
+      font-size: 1.05rem;
+    }
+
+    .calendar-title span.year {
+      color: var(--accent-color);
+    }
+
+    .calendar-subheader {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 6px;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .legend-color {
+      width: 14px;
+      height: 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+    }
+
+    .legend-color.mother {
+      background: var(--mother-color);
+    }
+
+    .legend-color.father {
+      background: var(--father-color);
+    }
+
+    .calendar-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.78rem;
+    }
+
+    .calendar-controls label {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .calendar-controls select {
+      font-family: inherit;
+      font-size: 0.78rem;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid #e5e7eb;
+      background: #f9fafb;
+      outline: none;
+    }
+
+    .calendar-controls select:focus {
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 1px rgba(124, 58, 237, 0.25);
+    }
+
+    .calendar-grid {
+      margin-top: 6px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 12px;
+    }
+
+    .month {
+      border-radius: 22px;
+      background: #f9fafc;
+      border: 1px solid rgba(229, 231, 235, 0.8);
+      overflow: hidden;
+    }
+
+    .month-header {
+      text-align: center;
+      padding: 8px 8px 4px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: #4b5563;
+    }
+
+    .month-body {
+      padding: 4px 10px 8px;
+    }
+
+    table.month-table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      font-size: 0.7rem;
+    }
+
+    .month-table th,
+    .month-table td {
+      border: none;
+      text-align: center;
+      vertical-align: top;
+      height: 44px;
+      position: relative;
+      padding: 2px 2px 1px;
+    }
+
+    .month-table th {
+      font-size: 0.68rem;
+      font-weight: 500;
+      color: #9ca3af;
+      padding-bottom: 6px;
+    }
+
+    .month-table td {
+      border-radius: 12px;
+    }
+
+    .day-cell {
+      cursor: default;
+      transition: transform 0.05s ease, box-shadow 0.06s ease;
+    }
+
+    .day-cell:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.15);
+    }
+
+    .day-number {
+      position: absolute;
+      top: 4px;
+      left: 6px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: #4b5563;
+    }
+
+    .owner-pill {
+      position: absolute;
+      bottom: 4px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 2px 9px;
+      border-radius: 999px;
+      font-size: 0.62rem;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      background: rgba(255, 255, 255, 0.8);
+    }
+
+    .owner-pill.madre-pill {
+      color: #4c6fff;
+      border-color: rgba(129, 140, 248, 0.8);
+      background: rgba(239, 246, 255, 0.95);
+    }
+
+    .owner-pill.padre-pill {
+      color: #f97373;
+      border-color: rgba(248, 113, 113, 0.85);
+      background: rgba(254, 242, 242, 0.95);
+    }
+
+    .day-father {
+      background: var(--father-color);
+      background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.82), transparent);
+      box-shadow: inset 0 0 4px rgba(248, 113, 113, 0.2);
+    }
+
+    .day-mother {
+      background: var(--mother-color);
+      background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.85), transparent);
+      box-shadow: inset 0 0 4px rgba(129, 140, 248, 0.18);
+    }
+
+    .day-outside {
+      background: transparent;
+      color: transparent;
+    }
+
+    .day-overridden::after {
+      content: "⇄";
+      position: absolute;
+      top: 4px;
+      right: 6px;
+      font-size: 0.7rem;
+      opacity: 0.85;
+      color: #6b7280;
+    }
+
+    /* =================== PANEL DERECHO =================== */
+
+    .side-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 24px;
+      padding: 12px 14px 14px;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .new-request-card {
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .new-request-header {
+      background: var(--accent-color);
+      color: #ffffff;
+      border-radius: 24px 24px 0 0;
+      padding: 10px 14px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .new-request-header span.icon {
+      font-size: 1rem;
+    }
+
+    .new-request-body {
+      padding: 10px 14px 14px;
+      background: #f9fafb;
+    }
+
+    .card h3 {
+      font-size: 0.95rem;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .card h3::before {
+      content: "";
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #e5e7eb;
+    }
+
+    .card h3.highlight::before {
+      background: #facc15;
+    }
+
+    .field-group {
+      margin-bottom: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    label {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    input[type="date"],
+    select,
+    textarea {
+      font-family: inherit;
+      font-size: 0.8rem;
+      padding: 6px 8px;
+      border-radius: 9px;
+      border: 1px solid #d1d5db;
+      width: 100%;
+      background: #ffffff;
+    }
+
+    input[type="date"]:focus,
+    select:focus,
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 1px rgba(124, 58, 237, 0.25);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 55px;
+    }
+
+    button {
+      font-family: inherit;
+      font-size: 0.8rem;
+      border-radius: 999px;
+      border: none;
+      padding: 7px 14px;
+      cursor: pointer;
+      background: var(--accent-color);
+      color: #fff;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    button.secondary {
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    button.small {
+      padding: 4px 10px;
+      font-size: 0.75rem;
+    }
+
+    button:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+
+    .requests-section {
+      font-size: 0.78rem;
+      max-height: 230px;
+      overflow-y: auto;
+      padding-right: 4px;
+      margin-top: 4px;
+    }
+
+    .request-item {
+      border-radius: 12px;
+      border: 1px solid #e5e7eb;
+      padding: 6px 8px;
+      margin-bottom: 6px;
+      background: #f9fafb;
+    }
+
+    .request-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2px;
+    }
+
+    .request-parties {
+      font-weight: 600;
+      font-size: 0.8rem;
+    }
+
+    .request-dates {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+    }
+
+    .request-reason {
+      margin-top: 2px;
+      font-size: 0.76rem;
+      color: #374151;
+    }
+
+    .request-actions {
+      margin-top: 4px;
+      display: flex;
+      gap: 6px;
+    }
+
+    .status-pill-mini {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 0.68rem;
+      font-weight: 600;
+    }
+
+    .status-pendiente {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .status-aceptado {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .status-rechazado {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .empty-text {
+      font-size: 0.76rem;
+      color: #9ca3af;
+      font-style: italic;
+      padding: 4px 0;
+    }
+
+    .helper-text {
+      font-size: 0.73rem;
+      color: #9ca3af;
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="logo-icon">📅</div>
+      <div>
+        <div class="app-name">Custodia Familiar</div>
+        <div class="status-pill">
+          <span class="status-dot"></span>
+          Conectando...
+        </div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <select id="year-select" class="year-select"></select>
+      <div class="role-toggle">
+        <button type="button" id="btnSoyMadre" class="role-btn active">Soy Madre</button>
+        <button type="button" id="btnSoyPadre" class="role-btn">Soy Padre</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <!-- CALENDARIO -->
+    <section class="calendar-wrapper">
+      <div class="calendar-header">
+        <button id="prev-period" class="nav-arrow" title="Anterior">‹</button>
+        <div class="month-nav">
+          <div class="calendar-title" id="calendar-title"></div>
+        </div>
+        <button id="next-period" class="nav-arrow" title="Siguiente">›</button>
+      </div>
+
+      <div class="calendar-subheader">
+        <div class="legend">
+          <span class="legend-item">
+            <span class="legend-color mother"></span> Madre
+          </span>
+          <span class="legend-item">
+            <span class="legend-color father"></span> Padre
+          </span>
+          <span class="legend-item">⇄ día modificado</span>
+        </div>
+        <div class="calendar-controls">
+          <label>
+            Vista
+            <select id="view-mode">
+              <option value="month">Mes</option>
+              <option value="year">Año completo</option>
+            </select>
+          </label>
+          <label id="month-select-wrapper">
+            Mes
+            <select id="month-select">
+              <option value="0">Enero</option>
+              <option value="1">Febrero</option>
+              <option value="2">Marzo</option>
+              <option value="3">Abril</option>
+              <option value="4">Mayo</option>
+              <option value="5">Junio</option>
+              <option value="6">Julio</option>
+              <option value="7">Agosto</option>
+              <option value="8">Septiembre</option>
+              <option value="9">Octubre</option>
+              <option value="10">Noviembre</option>
+              <option value="11">Diciembre</option>
+            </select>
+          </label>
+        </div>
+      </div>
+
+      <div id="calendar-grid" class="calendar-grid"></div>
+    </section>
+
+    <!-- PANEL DERECHO -->
+    <aside class="side-panel">
+      <!-- Nueva solicitud -->
+      <section class="card new-request-card">
+        <div class="new-request-header">
+          <span class="icon">➕</span>
+          <span> Nueva solicitud</span>
+        </div>
+        <div class="new-request-body">
+          <form id="request-form">
+            <div class="field-group">
+              <label for="requester">¿Quién solicita el cambio?</label>
+              <select id="requester" required>
+                <option value="madre">Madre</option>
+                <option value="padre">Padre</option>
+              </select>
+            </div>
+
+            <div class="field-group">
+              <label>Rango de fechas (entre 2026 y 2027)</label>
+              <div style="display:flex; gap:6px;">
+                <input type="date" id="start-date" required>
+                <input type="date" id="end-date" required>
+              </div>
+              <div class="helper-text">
+                La custodia para esos días pasará al progenitor solicitante si el otro acepta.
+              </div>
+            </div>
+
+            <div class="field-group">
+              <label for="reason">Motivo del cambio</label>
+              <textarea id="reason" placeholder="Ej: Viaje de trabajo, evento familiar, vacaciones..." required></textarea>
+            </div>
+
+            <button type="submit">
+              Crear solicitud
+            </button>
+          </form>
+        </div>
+      </section>
+
+      <!-- Pendientes -->
+      <section class="card">
+        <h3 class="highlight">Solicitudes pendientes</h3>
+        <div class="requests-section" id="pending-requests"></div>
+        <p class="helper-text">
+          Para simular que el otro progenitor responde, haz clic en <strong>Aceptar</strong> o <strong>Rechazar</strong>.
+        </p>
+      </section>
+
+      <!-- Historial -->
+      <section class="card">
+        <h3>Historial</h3>
+        <div class="requests-section" id="history-requests"></div>
+      </section>
+    </aside>
+  </div>
+</div>
+
+<!-- Firebase compat (v9) -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+<script>
+  // =================== CONFIGURACIÓN FIREBASE ===================
+  // 1) En la consola de Firebase, copia el objeto firebaseConfig
+  // 2) Pégalo aquí sustituyendo los valores de ejemplo.
+
+  const firebaseConfig = {
+    apiKey: "PEGAR_AQUI_TU_API_KEY",
+    authDomain: "PEGAR_AQUI_TU_AUTH_DOMAIN",
+    projectId: "PEGAR_AQUI_TU_PROJECT_ID",
+    storageBucket: "PEGAR_AQUI_TU_STORAGE_BUCKET",
+    messagingSenderId: "PEGAR_AQUI_TU_SENDER_ID",
+    appId: "PEGAR_AQUI_TU_APP_ID"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
+  // Nota: para pruebas sencillas, en las reglas de Firestore puedes usar:
+  // allow read, write: if true;
+  // (Solo si es un proyecto personal y privado; no es seguro para producción)
+</script>
+
+<script>
+  // ================= CONFIGURACIÓN BÁSICA =================
+
+  const MIN_YEAR = 2026;
+  const MAX_YEAR = 2027;
+  const GLOBAL_MIN_DATE = `${MIN_YEAR}-01-01`;
+  const GLOBAL_MAX_DATE = `${MAX_YEAR}-12-31`;
+
+  let currentYear = 2026;
+  let currentView = "month";    // "month" | "year"
+  let currentMonth = 0;         // 0-11
+
+  const monthNames = [
+    "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+    "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+  ];
+
+  const weekDayNames = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
+
+  // Estado local (se rellena desde Firestore)
+  let overrides = {};          // dateKey -> "padre" | "madre"
+  let pendingRequests = [];    // solicitudes con status pendiente
+  let historyRequests = [];    // resto de solicitudes
+  let firebaseReady = false;
+
+  // ================= UTILIDADES DE FECHA =================
+
+  function parseDateStr(str) {
+    const [y, m, d] = str.split("-").map(Number);
+    return new Date(y, m - 1, d);
+  }
+
+  function clampToRange(date) {
+    const min = parseDateStr(GLOBAL_MIN_DATE).getTime();
+    const max = parseDateStr(GLOBAL_MAX_DATE).getTime();
+    const t = Math.min(Math.max(date.getTime(), min), max);
+    return new Date(t);
+  }
+
+  function formatDateKey(year, monthIndex, day) {
+    const m = String(monthIndex + 1).padStart(2, "0");
+    const d = String(day).padStart(2, "0");
+    return `${year}-${m}-${d}`;
+  }
+
+  // lunes de la semana que contiene el 1 de enero de ese año
+  function getCycleStartMonday(year) {
+    const jan1 = new Date(year, 0, 1);
+    const day = jan1.getDay(); // 0=Domingo...6=Sábado
+    let diff;
+    if (day === 1) diff = 0;       // lunes
+    else if (day === 0) diff = -6; // domingo
+    else diff = 1 - day;
+    jan1.setDate(jan1.getDate() + diff);
+    return jan1;
+  }
+
+  // Semana 0 = madre, 1 = padre, etc.
+  function getBaseOwner(year, monthIndex, day) {
+    if (year < MIN_YEAR || year > MAX_YEAR) return null;
+    const date = new Date(year, monthIndex, day);
+    const startMonday = getCycleStartMonday(year);
+    const diffMs = date - startMonday;
+    const diffDays = Math.floor(diffMs / 86400000);
+    const weekIndex = Math.floor(diffDays / 7);
+    return weekIndex % 2 === 0 ? "madre" : "padre";
+  }
+
+  // ================= RENDER DEL CALENDARIO =================
+
+  function renderCalendar() {
+    const grid = document.getElementById("calendar-grid");
+    if (!grid) return;
+    grid.innerHTML = "";
+
+    const titleEl = document.getElementById("calendar-title");
+    if (currentView === "year") {
+      titleEl.innerHTML = `Año <span class="year">${currentYear}</span>`;
+    } else {
+      titleEl.innerHTML = `${monthNames[currentMonth]} <span class="year">${currentYear}</span>`;
+    }
+
+    const monthsToRender =
+      currentView === "year" ? [...Array(12).keys()] : [currentMonth];
+
+    monthsToRender.forEach((monthIndex) => {
+      const monthDiv = document.createElement("div");
+      monthDiv.className = "month";
+
+      const header = document.createElement("div");
+      header.className = "month-header";
+      header.textContent = `${monthNames[monthIndex]} ${currentYear}`;
+      monthDiv.appendChild(header);
+
+      const body = document.createElement("div");
+      body.className = "month-body";
+
+      const table = document.createElement("table");
+      table.className = "month-table";
+
+      const thead = document.createElement("thead");
+      const headRow = document.createElement("tr");
+      weekDayNames.forEach((d) => {
+        const th = document.createElement("th");
+        th.textContent = d;
+        headRow.appendChild(th);
+      });
+      thead.appendChild(headRow);
+      table.appendChild(thead);
+
+      const year = currentYear;
+      const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+      const firstDay = new Date(year, monthIndex, 1);
+      let dayOfWeek = firstDay.getDay(); // 0=Domingo...6=Sábado
+      dayOfWeek = (dayOfWeek + 6) % 7;   // lunes=0
+
+      const tbody = document.createElement("tbody");
+      let currentDay = 1;
+      let done = false;
+
+      while (!done) {
+        const row = document.createElement("tr");
+
+        for (let col = 0; col < 7; col++) {
+          const cell = document.createElement("td");
+
+          if ((currentDay === 1 && col < dayOfWeek) || currentDay > daysInMonth) {
+            cell.classList.add("day-outside");
+          } else {
+            const day = currentDay;
+            const dateKey = formatDateKey(year, monthIndex, day);
+
+            const baseOwner = getBaseOwner(year, monthIndex, day);
+            const finalOwner = overrides[dateKey] || baseOwner;
+
+            cell.classList.add("day-cell");
+            if (finalOwner === "padre") {
+              cell.classList.add("day-father");
+            } else if (finalOwner === "madre") {
+              cell.classList.add("day-mother");
+            }
+
+            if (overrides[dateKey]) {
+              cell.classList.add("day-overridden");
+            }
+
+            const numSpan = document.createElement("span");
+            numSpan.className = "day-number";
+            numSpan.textContent = String(day);
+            cell.appendChild(numSpan);
+
+            const ownerSpan = document.createElement("span");
+            ownerSpan.className =
+              "owner-pill " + (finalOwner === "madre" ? "madre-pill" : "padre-pill");
+            ownerSpan.textContent = finalOwner === "padre" ? "PADRE" : "MADRE";
+            cell.appendChild(ownerSpan);
+
+            cell.title = `${dateKey} • Custodia: ${
+              finalOwner === "padre" ? "Padre" : "Madre"
+            }`;
+
+            currentDay++;
+          }
+
+          row.appendChild(cell);
+        }
+
+        tbody.appendChild(row);
+
+        if (currentDay > daysInMonth) {
+          done = true;
+        }
+      }
+
+      table.appendChild(tbody);
+      body.appendChild(table);
+      monthDiv.appendChild(body);
+      grid.appendChild(monthDiv);
+    });
+  }
+
+  // ================= SOLICITUDES (Firestore) =================
+
+  function addRequest(requester, startDateStr, endDateStr, reason) {
+    const target = requester === "padre" ? "madre" : "padre";
+
+    db.collection("requests")
+      .add({
+        requester,
+        target,
+        startDate: startDateStr,
+        endDate: endDateStr,
+        reason,
+        status: "pendiente",
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      })
+      .catch((err) => {
+        console.error("Error al crear la solicitud:", err);
+        alert("Error al guardar la solicitud en la nube.");
+      });
+  }
+
+  function acceptRequest(req) {
+    db.collection("requests")
+      .doc(req.id)
+      .update({ status: "aceptado" })
+      .then(() => {
+        applyOverrideForRequest(req);
+      })
+      .catch((err) => {
+        console.error("Error al aceptar solicitud:", err);
+        alert("No se ha podido aceptar la solicitud.");
+      });
+  }
+
+  function rejectRequest(req) {
+    db.collection("requests")
+      .doc(req.id)
+      .update({ status: "rechazado" })
+      .catch((err) => {
+        console.error("Error al rechazar solicitud:", err);
+        alert("No se ha podido rechazar la solicitud.");
+      });
+  }
+
+  function applyOverrideForRequest(req) {
+    const { requester, startDate, endDate } = req;
+    const start = clampToRange(parseDateStr(startDate));
+    const end = clampToRange(parseDateStr(endDate));
+
+    let current = new Date(start.getTime());
+    const batch = db.batch();
+
+    while (current.getTime() <= end.getTime()) {
+      const year = current.getFullYear();
+      if (year >= MIN_YEAR && year <= MAX_YEAR) {
+        const key = formatDateKey(
+          current.getFullYear(),
+          current.getMonth(),
+          current.getDate()
+        );
+        const ref = db.collection("overrides").doc(key);
+        batch.set(ref, { owner: requester });
+      }
+      current.setDate(current.getDate() + 1);
+    }
+
+    batch
+      .commit()
+      .catch((err) => {
+        console.error("Error al aplicar overrides:", err);
+        alert("Los cambios se han aceptado, pero hubo un problema al guardarlos.");
+      });
+  }
+
+  // ================= LISTAS DE SOLICITUDES =================
+
+  function renderRequests() {
+    const pendingContainer = document.getElementById("pending-requests");
+    const historyContainer = document.getElementById("history-requests");
+    if (!pendingContainer || !historyContainer) return;
+
+    pendingContainer.innerHTML = "";
+    if (pendingRequests.length === 0) {
+      const p = document.createElement("p");
+      p.className = "empty-text";
+      p.textContent = "No tienes solicitudes nuevas.";
+      pendingContainer.appendChild(p);
+    } else {
+      pendingRequests.forEach((req) => {
+        pendingContainer.appendChild(createRequestElement(req, true));
+      });
+    }
+
+    historyContainer.innerHTML = "";
+    if (historyRequests.length === 0) {
+      const p = document.createElement("p");
+      p.className = "empty-text";
+      p.textContent = "Sin actividad.";
+      historyContainer.appendChild(p);
+    } else {
+      historyRequests.forEach((req) => {
+        historyContainer.appendChild(createRequestElement(req, false));
+      });
+    }
+  }
+
+  function createRequestElement(req, isPendingList) {
+    const container = document.createElement("div");
+    container.className = "request-item";
+
+    const header = document.createElement("div");
+    header.className = "request-header";
+
+    const parties = document.createElement("div");
+    parties.className = "request-parties";
+    const requesterName = req.requester === "padre" ? "Padre" : "Madre";
+    const targetName = req.target === "padre" ? "Padre" : "Madre";
+    parties.textContent = `${requesterName} → ${targetName}`;
+
+    const status = document.createElement("span");
+    status.className =
+      "status-pill-mini " +
+      (req.status === "pendiente"
+        ? "status-pendiente"
+        : req.status === "aceptado"
+        ? "status-aceptado"
+        : "status-rechazado");
+    status.textContent =
+      req.status === "pendiente"
+        ? "Pendiente"
+        : req.status === "aceptado"
+        ? "Aceptado"
+        : "Rechazado";
+
+    header.appendChild(parties);
+    header.appendChild(status);
+
+    const dates = document.createElement("div");
+    dates.className = "request-dates";
+    dates.textContent = `${req.startDate} a ${req.endDate}`;
+
+    const reason = document.createElement("div");
+    reason.className = "request-reason";
+    reason.textContent = `Motivo: ${req.reason}`;
+
+    container.appendChild(header);
+    container.appendChild(dates);
+    container.appendChild(reason);
+
+    if (isPendingList) {
+      const actions = document.createElement("div");
+      actions.className = "request-actions";
+
+      const acceptBtn = document.createElement("button");
+      acceptBtn.type = "button";
+      acceptBtn.className = "small";
+      acceptBtn.textContent = "Aceptar";
+      acceptBtn.addEventListener("click", () => acceptRequest(req));
+
+      const rejectBtn = document.createElement("button");
+      rejectBtn.type = "button";
+      rejectBtn.className = "small secondary";
+      rejectBtn.textContent = "Rechazar";
+      rejectBtn.addEventListener("click", () => rejectRequest(req));
+
+      actions.appendChild(acceptBtn);
+      actions.appendChild(rejectBtn);
+      container.appendChild(actions);
+    }
+
+    return container;
+  }
+
+  // ================= FORMULARIO =================
+
+  function setupForm() {
+    const form = document.getElementById("request-form");
+    const requesterEl = document.getElementById("requester");
+    const startEl = document.getElementById("start-date");
+    const endEl = document.getElementById("end-date");
+    const reasonEl = document.getElementById("reason");
+
+    startEl.min = GLOBAL_MIN_DATE;
+    startEl.max = GLOBAL_MAX_DATE;
+    endEl.min = GLOBAL_MIN_DATE;
+    endEl.max = GLOBAL_MAX_DATE;
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      const requester = requesterEl.value;
+      let startStr = startEl.value;
+      let endStr = endEl.value;
+      const reason = reasonEl.value.trim();
+
+      if (!startStr || !endStr || !reason) {
+        alert("Por favor, rellena todas las casillas.");
+        return;
+      }
+
+      const start = parseDateStr(startStr);
+      const end = parseDateStr(endStr);
+
+      if (end < start) {
+        alert("La fecha de fin no puede ser anterior a la fecha de inicio.");
+        return;
+      }
+
+      const clampedStart = clampToRange(start);
+      const clampedEnd = clampToRange(end);
+
+      startStr = `${clampedStart.getFullYear()}-${String(
+        clampedStart.getMonth() + 1
+      ).padStart(2, "0")}-${String(clampedStart.getDate()).padStart(2, "0")}`;
+
+      endStr = `${clampedEnd.getFullYear()}-${String(
+        clampedEnd.getMonth() + 1
+      ).padStart(2, "0")}-${String(clampedEnd.getDate()).padStart(2, "0")}`;
+
+      addRequest(requester, startStr, endStr, reason);
+
+      form.reset();
+      requesterEl.value = "madre";
+    });
+  }
+
+  // ================= CONTROLES (AÑO / VISTA / MES / NAVEGACIÓN) =================
+
+  function setupControls() {
+    const yearSelect = document.getElementById("year-select");
+    const viewModeSelect = document.getElementById("view-mode");
+    const monthSelect = document.getElementById("month-select");
+    const monthWrapper = document.getElementById("month-select-wrapper");
+    const prevBtn = document.getElementById("prev-period");
+    const nextBtn = document.getElementById("next-period");
+
+    for (let y = MIN_YEAR; y <= MAX_YEAR; y++) {
+      const opt = document.createElement("option");
+      opt.value = String(y);
+      opt.textContent = String(y);
+      if (y === currentYear) opt.selected = true;
+      yearSelect.appendChild(opt);
+    }
+
+    function updateMonthVisibility() {
+      if (viewModeSelect.value === "month") {
+        monthWrapper.style.display = "inline-flex";
+      } else {
+        monthWrapper.style.display = "none";
+      }
+    }
+
+    viewModeSelect.value = currentView;
+    updateMonthVisibility();
+
+    viewModeSelect.addEventListener("change", () => {
+      currentView = viewModeSelect.value;
+      updateMonthVisibility();
+      renderCalendar();
+    });
+
+    yearSelect.addEventListener("change", () => {
+      currentYear = parseInt(yearSelect.value, 10);
+      renderCalendar();
+    });
+
+    monthSelect.value = String(currentMonth);
+    monthSelect.addEventListener("change", () => {
+      currentMonth = parseInt(monthSelect.value, 10);
+      renderCalendar();
+    });
+
+    prevBtn.addEventListener("click", () => {
+      if (currentView === "month") {
+        currentMonth--;
+        if (currentMonth < 0) {
+          currentMonth = 11;
+          currentYear = Math.max(MIN_YEAR, currentYear - 1);
+          yearSelect.value = String(currentYear);
+        }
+        monthSelect.value = String(currentMonth);
+      } else {
+        currentYear = Math.max(MIN_YEAR, currentYear - 1);
+        yearSelect.value = String(currentYear);
+      }
+      renderCalendar();
+    });
+
+    nextBtn.addEventListener("click", () => {
+      if (currentView === "month") {
+        currentMonth++;
+        if (currentMonth > 11) {
+          currentMonth = 0;
+          currentYear = Math.min(MAX_YEAR, currentYear + 1);
+          yearSelect.value = String(currentYear);
+        }
+        monthSelect.value = String(currentMonth);
+      } else {
+        currentYear = Math.min(MAX_YEAR, currentYear + 1);
+        yearSelect.value = String(currentYear);
+      }
+      renderCalendar();
+    });
+  }
+
+  // ================= TOGGLE ROL (SOLO ESTILO) =================
+
+  function setupRoleToggle() {
+    const btnMadre = document.getElementById("btnSoyMadre");
+    const btnPadre = document.getElementById("btnSoyPadre");
+
+    function setActive(active) {
+      if (active === "madre") {
+        btnMadre.classList.add("active");
+        btnPadre.classList.remove("active");
+      } else {
+        btnPadre.classList.add("active");
+        btnMadre.classList.remove("active");
+      }
+    }
+
+    btnMadre.addEventListener("click", () => setActive("madre"));
+    btnPadre.addEventListener("click", () => setActive("padre"));
+  }
+
+  // ================= LISTENERS FIREBASE (Tiempo real) =================
+
+  function setupFirebaseListeners() {
+    // Overrides (días modificados)
+    db.collection("overrides").onSnapshot(
+      (snapshot) => {
+        overrides = {};
+        snapshot.forEach((doc) => {
+          const data = doc.data();
+          if (data && data.owner) {
+            overrides[doc.id] = data.owner;
+          }
+        });
+        renderCalendar();
+      },
+      (err) => {
+        console.error("Error escuchando overrides:", err);
+      }
+    );
+
+    // Solicitudes
+    db.collection("requests")
+      .orderBy("createdAt", "desc")
+      .onSnapshot(
+        (snapshot) => {
+          pendingRequests = [];
+          historyRequests = [];
+          snapshot.forEach((doc) => {
+            const data = doc.data();
+            const req = {
+              id: doc.id,
+              requester: data.requester,
+              target: data.target,
+              startDate: data.startDate,
+              endDate: data.endDate,
+              reason: data.reason,
+              status: data.status || "pendiente",
+              createdAt: data.createdAt ? data.createdAt.toDate() : null
+            };
+            if (req.status === "pendiente") {
+              pendingRequests.push(req);
+            } else {
+              historyRequests.push(req);
+            }
+          });
+          renderRequests();
+        },
+        (err) => {
+          console.error("Error escuchando requests:", err);
+        }
+      );
+  }
+
+  // ================= INICIALIZACIÓN =================
+
+  document.addEventListener("DOMContentLoaded", () => {
+    setupControls();
+    setupForm();
+    setupRoleToggle();
+    setupFirebaseListeners();
+    renderCalendar();
+    renderRequests();
+  });
+</script>
+</body>
+</html>

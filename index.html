@@ -1,9 +1,14 @@
-<!DOCTYPE html>
+v<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <title>Custodia Familiar 2026-2027</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- FAVICON / ICONO DE LA WEB -->
+  <link rel="icon"
+        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' x='0.1em' font-size='80'%3E%F0%9F%93%85%3C/text%3E%3C/svg%3E">
+
   <style>
     :root {
       --father-color: #ffe4e4; /* rojo pastel muy suave */
@@ -18,9 +23,7 @@
       --shadow-soft: 0 16px 40px rgba(15, 23, 42, 0.12);
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -30,13 +33,9 @@
       color: var(--text-main);
     }
 
-    h1, h2, h3 {
-      margin-top: 0;
-    }
+    h1, h2, h3 { margin-top: 0; }
 
-    .hidden {
-      display: none !important;
-    }
+    .hidden { display: none !important; }
 
     /* ========== LOGIN ========== */
 
@@ -67,9 +66,7 @@
       gap: 8px;
     }
 
-    .login-title span.icon {
-      font-size: 1.3rem;
-    }
+    .login-title span.icon { font-size: 1.3rem; }
 
     .login-subtitle {
       font-size: 0.8rem;
@@ -204,13 +201,8 @@
       color: #991b1b;
     }
 
-    .status-pill.status-online .status-dot {
-      background: #22c55e;
-    }
-
-    .status-pill.status-error .status-dot {
-      background: #ef4444;
-    }
+    .status-pill.status-online .status-dot { background: #22c55e; }
+    .status-pill.status-error .status-dot { background: #ef4444; }
 
     .topbar-right {
       display: flex;
@@ -248,9 +240,7 @@
       border: 1px solid #e5e7eb;
     }
 
-    .user-role-label {
-      font-weight: 600;
-    }
+    .user-role-label { font-weight: 600; }
 
     .logout-btn {
       padding: 4px 9px;
@@ -268,7 +258,6 @@
         align-items: flex-start;
         gap: 8px;
       }
-
       .topbar-right {
         width: 100%;
         justify-content: space-between;
@@ -276,21 +265,10 @@
     }
 
     @media (max-width: 480px) {
-      .app {
-        padding: 8px 8px 24px;
-      }
-
-      .topbar {
-        padding: 8px 10px;
-      }
-
-      .app-name {
-        font-size: 0.95rem;
-      }
-
-      .status-pill {
-        font-size: 0.65rem;
-      }
+      .app { padding: 8px 8px 24px; }
+      .topbar { padding: 8px 10px; }
+      .app-name { font-size: 0.95rem; }
+      .status-pill { font-size: 0.65rem; }
     }
 
     /* =================== LAYOUT PRINCIPAL =================== */
@@ -351,23 +329,17 @@
       flex-shrink: 0;
     }
 
-    .nav-arrow:hover {
-      background: #e5e7eb;
-    }
+    .nav-arrow:hover { background: #e5e7eb; }
 
     .calendar-title {
       font-weight: 600;
       font-size: 1.02rem;
     }
 
-    .calendar-title span.year {
-      color: var(--accent-color);
-    }
+    .calendar-title span.year { color: var(--accent-color); }
 
     @media (max-width: 480px) {
-      .calendar-title {
-        font-size: 0.95rem;
-      }
+      .calendar-title { font-size: 0.95rem; }
     }
 
     .calendar-subheader {
@@ -401,13 +373,8 @@
       border: 1px solid rgba(0, 0, 0, 0.06);
     }
 
-    .legend-color.mother {
-      background: var(--mother-color);
-    }
-
-    .legend-color.father {
-      background: var(--father-color);
-    }
+    .legend-color.mother { background: var(--mother-color); }
+    .legend-color.father { background: var(--father-color); }
 
     .calendar-controls {
       display: flex;
@@ -446,9 +413,7 @@
     }
 
     @media (max-width: 600px) {
-      .calendar-grid {
-        grid-template-columns: 1fr;
-      }
+      .calendar-grid { grid-template-columns: 1fr; }
     }
 
     .month {
@@ -466,9 +431,7 @@
       color: #4b5563;
     }
 
-    .month-body {
-      padding: 4px 8px 6px;
-    }
+    .month-body { padding: 4px 8px 6px; }
 
     table.month-table {
       width: 100%;
@@ -494,9 +457,7 @@
       padding-bottom: 4px;
     }
 
-    .month-table td {
-      border-radius: 10px;
-    }
+    .month-table td { border-radius: 10px; }
 
     .day-cell {
       cursor: default;
@@ -580,9 +541,7 @@
     }
 
     @media (max-width: 900px) {
-      .side-panel {
-        grid-template-columns: 1fr;
-      }
+      .side-panel { grid-template-columns: 1fr; }
     }
 
     .card {
@@ -610,9 +569,7 @@
       font-weight: 600;
     }
 
-    .new-request-header span.icon {
-      font-size: 1rem;
-    }
+    .new-request-header span.icon { font-size: 1rem; }
 
     .new-request-body {
       padding: 8px 12px 12px;
@@ -635,9 +592,7 @@
       background: #e5e7eb;
     }
 
-    .card h3.highlight::before {
-      background: #facc15;
-    }
+    .card h3.highlight::before { background: #facc15; }
 
     .field-group {
       margin-bottom: 7px;
@@ -934,6 +889,12 @@
               <textarea id="reason" placeholder="Ej: Viaje de trabajo, evento familiar, vacaciones..." required></textarea>
             </div>
 
+            <p class="helper-text">
+              Cuando crees una nueva solicitud se guardará en la nube y (con las Cloud Functions configuradas)
+              se enviará un correo a <strong>electricmoya@gmail.com</strong> y
+              <strong>alessia.antonaci@gmail.com</strong>.
+            </p>
+
             <button type="submit">
               Crear solicitud
             </button>
@@ -965,7 +926,7 @@
 <!-- Firebase compat (v9) -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 
 <script>
   // =================== CONFIGURACIÓN FIREBASE ===================
@@ -1062,27 +1023,24 @@
     return `${year}-${m}-${d}`;
   }
 
-  function getCycleStartMonday(year) {
-    const jan1 = new Date(year, 0, 1);
-    const day = jan1.getDay();
-    let diff;
-    if (day === 1) diff = 0;
-    else if (day === 0) diff = -6;
-    else diff = 1 - day;
-    jan1.setDate(jan1.getDate() + diff);
-    return jan1;
-  }
+  // Lunes base a partir del que contamos las semanas de custodia.
+  // Primera semana de custodia completa (lunes-domingo) para la MADRE.
+  const BASE_MONDAY = new Date(2026, 0, 5); // 5 enero 2026, lunes
 
   function getBaseOwner(year, monthIndex, day) {
-    if (year < MIN_YEAR || year > MAX_YEAR) return null;
     const date = new Date(year, monthIndex, day);
-    const startMonday = getCycleStartMonday(year);
-    const diffMs = date - startMonday;
+
+    const minDate = new Date(MIN_YEAR, 0, 1);
+    const maxDate = new Date(MAX_YEAR, 11, 31);
+    if (date < minDate || date > maxDate) return null;
+
+    const diffMs = date - BASE_MONDAY;
     const diffDays = Math.floor(diffMs / 86400000);
     const weekIndex = Math.floor(diffDays / 7);
-    // Semana 1 del año (empezando lunes): MADRE
-    // Semana 2: PADRE
-    return weekIndex % 2 === 0 ? "madre" : "padre";
+
+    const isEven = weekIndex % 2 === 0;
+    // Semana par: madre, semana impar: padre
+    return isEven ? "madre" : "padre";
   }
 
   // ================= RENDER DEL CALENDARIO =================
@@ -1130,7 +1088,7 @@
       const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
       const firstDay = new Date(year, monthIndex, 1);
       let dayOfWeek = firstDay.getDay();
-      dayOfWeek = (dayOfWeek + 6) % 7;
+      dayOfWeek = (dayOfWeek + 6) % 7; // 0 => lunes, 6 => domingo
 
       const tbody = document.createElement("tbody");
       let currentDay = 1;
@@ -1217,10 +1175,11 @@
         alert("Error al guardar la solicitud en la nube.");
         setConnectionStatus("error");
       });
+    // Un Cloud Function en el backend escucha los nuevos documentos en "requests"
+    // y envía emails a electricmoya@gmail.com y alessia.antonaci@gmail.com.
   }
 
   function acceptRequest(req) {
-    // Solo debe aceptar el progenitor destinatario (target)
     if (!currentRole || req.target !== currentRole) {
       alert("No puedes aceptar esta solicitud: pertenece al otro progenitor.");
       return;
@@ -1365,7 +1324,6 @@
       const actions = document.createElement("div");
       actions.className = "request-actions";
 
-      // Solo mostramos botones si el usuario actual ES el target de esa solicitud
       if (currentRole && req.target === currentRole) {
         const acceptBtn = document.createElement("button");
         acceptBtn.type = "button";

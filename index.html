@@ -621,7 +621,7 @@
     }, 300);
   }
 
-  // Render simplificado de solicitudes para evitar errores
+  // Render simplificado de solicitudes
   function renderRequestsList() {
     const pendingEl = document.getElementById("pending-requests");
     const historyEl = document.getElementById("history-requests");
@@ -729,7 +729,7 @@
     renderCalendar();
   });
 
-  // Listener simple del formulario de solicitud (escritura en Firestore opcional)
+  // Listener simple del formulario de solicitud
   document.getElementById("request-form").addEventListener("submit", async (e) => {
     e.preventDefault();
     if (!currentUser || !currentRole) {

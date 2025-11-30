@@ -516,51 +516,19 @@
   document.getElementById("next-period").addEventListener("click", () => { currentMonth++; if(currentMonth > 11) { currentMonth = 0; currentYear++; document.getElementById("year-select").value = currentYear; } renderCalendar(); });
 
   // ---------------------------------------------------------
-  // MODIFICACIÓN: ENVÍO DE SOLICITUD + NOTIFICACIÓN TELEGRAM
+  // VERSIÓN SEGURA: SOLO FIREBASE (La notificación la hace el Backend)
   // ---------------------------------------------------------
   document.getElementById("request-form").addEventListener("submit", async (e) => {
     e.preventDefault();
     if (!currentUser || !currentRole) return;
-
-    // CONFIGURACIÓN DE TELEGRAM
-    const TELEGRAM_TOKEN = "8556115664:AAGG4iOFmY7s75GX5BOJsgBJIb0E4FXRVZU";
-    const TELEGRAM_CHAT_ID = "-5043560391"; 
-
-    // Datos del formulario
-    const startDate = document.getElementById("start-date").value;
-    const endDate = document.getElementById("end-date").value;
-    const reason = document.getElementById("reason").value.trim();
-    const who = currentRole === "padre" ? "👨 El Padre" : "👩 La Madre";
-
     try {
-      // 1. Guardar en Firebase (Base de datos original)
       await db.collection("requests").add({
         requesterUid: currentUser.uid, requesterRole: currentRole,
-        startDate: startDate, endDate: endDate, reason: reason,
+        startDate: document.getElementById("start-date").value, endDate: document.getElementById("end-date").value, reason: document.getElementById("reason").value.trim(),
         status: "pendiente", createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
-
-      // 2. Enviar a Telegram
-      const text = `📅 *Nueva Solicitud de Custodia*\n\nSolicita: *${who}*\nDesde: ${startDate}\nHasta: ${endDate}\nMotivo: _${reason}_\n\nRevisa la app para gestionar.`;
-      
-      // Llamada a la API de Telegram (sin await para no bloquear)
-      fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({
-          chat_id: TELEGRAM_CHAT_ID,
-          text: text,
-          parse_mode: 'Markdown'
-        })
-      }).then(res => {
-          if(!res.ok) console.error("Error Telegram:", res.status);
-      }).catch(err => console.error("Error red Telegram:", err));
-
-      showToast("Solicitud enviada y notificada"); e.target.reset();
-    } catch (err) { 
-        console.error(err);
-        showToast("Error al enviar", "error"); 
-    }
+      showToast("Solicitud enviada"); e.target.reset();
+    } catch (err) { showToast("Error al enviar", "error"); }
   });
 
   document.addEventListener("DOMContentLoaded", () => {

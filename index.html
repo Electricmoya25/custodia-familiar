@@ -1,813 +1,339 @@
-v<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <title>Custodia Familiar 2026-2027</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-  <!-- FAVICON / ICONO DE LA WEB -->
-  <link rel="icon"
-        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' x='0.1em' font-size='80'%3E%F0%9F%93%85%3C/text%3E%3C/svg%3E">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' x='0.1em' font-size='80'%3E%F0%9F%93%85%3C/text%3E%3C/svg%3E">
 
   <style>
     :root {
-      --father-color: #ffe4e4; /* rojo pastel muy suave */
-      --mother-color: #e4ecff; /* azul pastel muy suave */
+      --father-color: #ffe4e4;
+      --mother-color: #e4ecff;
       --border-color: #e3e3ee;
-      --accent-color: #7c3aed;   /* morado principal */
+      --accent-color: #7c3aed;
       --accent-soft: #ede9fe;
       --text-main: #111827;
       --text-muted: #6b7280;
       --bg-main: #f3f4fb;
       --card-bg: #ffffff;
-      --shadow-soft: 0 16px 40px rgba(15, 23, 42, 0.12);
+      --shadow-soft: 0 16px 40px rgba(15, 23, 42, 0.08);
+      --success: #10b981;
+      --error: #ef4444;
     }
 
-    * { box-sizing: border-box; }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
     body {
       margin: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-        sans-serif;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background: var(--bg-main);
       color: var(--text-main);
+      padding-bottom: 40px;
     }
 
-    h1, h2, h3 { margin-top: 0; }
-
+    h1, h2, h3 { margin-top: 0; color: #1f2937; }
     .hidden { display: none !important; }
 
-    /* ========== LOGIN ========== */
+    /* ========== TOAST NOTIFICATIONS ========== */
+    .toast-container {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: none;
+    }
+    .toast {
+      background: #333;
+      color: #fff;
+      padding: 12px 24px;
+      border-radius: 50px;
+      font-size: 0.9rem;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .toast.visible { opacity: 1; transform: translateY(0); }
+    .toast.success { background: var(--success); }
+    .toast.error { background: var(--error); }
 
+    /* ========== LOGIN ========== */
     .login-wrapper {
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 16px;
-      background: radial-gradient(circle at top, #ede9fe, #e5e7eb);
+      background: radial-gradient(circle at top, #ede9fe, #f3f4fb);
     }
 
     .login-card {
       background: #ffffff;
       max-width: 380px;
       width: 100%;
-      border-radius: 20px;
-      box-shadow: 0 20px 45px rgba(15, 23, 42, 0.2);
-      padding: 18px 18px 16px;
+      border-radius: 24px;
+      box-shadow: 0 20px 45px rgba(15, 23, 42, 0.15);
+      padding: 24px;
     }
 
     .login-title {
-      font-size: 1.1rem;
-      font-weight: 600;
-      margin-bottom: 4px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .login-title span.icon { font-size: 1.3rem; }
-
-    .login-subtitle {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      margin-bottom: 10px;
-    }
-
-    .login-field {
+      font-size: 1.25rem;
+      font-weight: 700;
       margin-bottom: 8px;
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-    }
-
-    .login-field label {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-    }
-
-    .login-field input {
-      font-family: inherit;
-      font-size: 0.85rem;
-      padding: 7px 9px;
-      border-radius: 10px;
-      border: 1px solid #d1d5db;
-      width: 100%;
-    }
-
-    .login-field input:focus {
-      outline: none;
-      border-color: var(--accent-color);
-      box-shadow: 0 0 0 1px rgba(124, 58, 237, 0.3);
-    }
-
-    .login-btn {
-      margin-top: 8px;
-      width: 100%;
-      justify-content: center;
-    }
-
-    .login-error {
-      color: #b91c1c;
-      font-size: 0.7rem;
-      margin-top: 4px;
-      min-height: 14px;
-    }
-
-    .login-hint {
-      margin-top: 8px;
-      font-size: 0.7rem;
-      color: #6b7280;
-    }
-
-    /* ========== APP PRINCIPAL ========== */
-
-    .app {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 12px 12px 32px;
-    }
-
-    /* =================== TOPBAR =================== */
-
-    .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 14px;
-      border-radius: 18px;
-      background: #ffffff;
-      box-shadow: 0 8px 25px rgba(15, 23, 42, 0.08);
-      margin-bottom: 14px;
-    }
-
-    .topbar-left {
       display: flex;
       align-items: center;
       gap: 10px;
-    }
-
-    .logo-icon {
-      width: 28px;
-      height: 28px;
-      border-radius: 10px;
-      background: var(--accent-soft);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
       color: var(--accent-color);
     }
 
-    .app-name {
-      font-weight: 600;
-      font-size: 1rem;
-      color: var(--text-main);
+    .login-subtitle {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+      line-height: 1.5;
     }
 
+    .login-field { margin-bottom: 14px; display: flex; flex-direction: column; gap: 6px; }
+    .login-field label { font-size: 0.8rem; font-weight: 500; color: #4b5563; }
+    .login-field input {
+      font-family: inherit; font-size: 0.95rem; padding: 10px 12px;
+      border-radius: 12px; border: 1px solid #d1d5db; width: 100%;
+      transition: border-color 0.2s;
+    }
+    .login-field input:focus { outline: none; border-color: var(--accent-color); box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1); }
+
+    .login-btn {
+      margin-top: 10px; width: 100%; justify-content: center; padding: 12px;
+      font-size: 0.95rem; font-weight: 600;
+    }
+
+    .login-error { color: #dc2626; font-size: 0.8rem; margin-top: 10px; min-height: 1.2em; text-align: center; }
+    .login-hint { margin-top: 20px; font-size: 0.75rem; color: #9ca3af; text-align: center; border-top: 1px solid #f3f4f6; padding-top: 10px; }
+
+    /* ========== APP ========== */
+    .app { max-width: 1200px; margin: 0 auto; padding: 12px; opacity: 1; transition: opacity 0.3s ease; }
+    
+    /* TOPBAR */
+    .topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 16px; border-radius: 20px; background: #ffffff;
+      box-shadow: var(--shadow-soft); margin-bottom: 16px;
+    }
+    .topbar-left { display: flex; align-items: center; gap: 12px; }
+    .logo-icon {
+      width: 32px; height: 32px; border-radius: 10px; background: var(--accent-soft);
+      display: flex; align-items: center; justify-content: center; font-size: 20px;
+    }
+    .app-name { font-weight: 700; font-size: 1.05rem; color: #1f2937; }
     .status-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      padding: 3px 8px;
-      border-radius: 999px;
-      font-size: 0.7rem;
-      margin-top: 2px;
-      background: #fef3c7;
-      color: #92400e;
-      transition: background 0.2s ease, color 0.2s ease;
+      display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px;
+      border-radius: 20px; font-size: 0.7rem; font-weight: 600;
+      background: #f3f4f6; color: #6b7280; margin-top: 2px;
     }
+    .status-dot { width: 6px; height: 6px; border-radius: 50%; background: #9ca3af; }
+    
+    .status-connecting { background: #fff7ed; color: #c2410c; } .status-connecting .status-dot { background: #f97316; }
+    .status-online { background: #ecfdf5; color: #047857; } .status-online .status-dot { background: #10b981; }
+    .status-error { background: #fef2f2; color: #b91c1c; } .status-error .status-dot { background: #ef4444; }
 
-    .status-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: #facc15;
-      transition: background 0.2s ease;
-    }
-
-    .status-pill.status-connecting {
-      background: #fef3c7;
-      color: #92400e;
-    }
-
-    .status-pill.status-online {
-      background: #dcfce7;
-      color: #166534;
-    }
-
-    .status-pill.status-error {
-      background: #fee2e2;
-      color: #991b1b;
-    }
-
-    .status-pill.status-online .status-dot { background: #22c55e; }
-    .status-pill.status-error .status-dot { background: #ef4444; }
-
-    .topbar-right {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
-
+    .topbar-right { display: flex; align-items: center; gap: 10px; }
     .year-select {
-      padding: 6px 16px 6px 10px;
-      border-radius: 999px;
-      border: 1px solid #d1d5db;
-      background: #ffffff;
-      font-size: 0.8rem;
-      font-family: inherit;
-      outline: none;
-      cursor: pointer;
-      position: relative;
+      padding: 6px 30px 6px 12px; border-radius: 20px; border: 1px solid #e5e7eb;
+      background: #f9fafb url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E") no-repeat right 8px center;
+      background-size: 14px; appearance: none; font-size: 0.85rem; font-weight: 600; cursor: pointer;
     }
-
-    .year-select:focus {
-      box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.25);
-      border-color: var(--accent-color);
-    }
-
     .user-info {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.75rem;
-      background: #f9fafb;
-      border-radius: 999px;
-      padding: 4px 6px 4px 10px;
-      border: 1px solid #e5e7eb;
+      display: flex; align-items: center; gap: 8px; font-size: 0.8rem;
+      background: #f3f4f6; padding: 4px 4px 4px 12px; border-radius: 20px;
+    }
+    .user-role-label { font-weight: 600; color: var(--text-main); }
+    .logout-btn { padding: 4px 12px; font-size: 0.75rem; background: #ffffff; color: #ef4444; border-radius: 16px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: all 0.2s; }
+    .logout-btn:hover { background: #fee2e2; }
+
+    @media (max-width: 640px) {
+      .topbar { flex-direction: column; align-items: flex-start; gap: 12px; padding: 12px; }
+      .topbar-right { width: 100%; justify-content: space-between; }
     }
 
-    .user-role-label { font-weight: 600; }
+    /* LAYOUT */
+    .layout { display: flex; flex-direction: column; gap: 16px; }
 
-    .logout-btn {
-      padding: 4px 9px;
-      font-size: 0.72rem;
-      background: #e5e7eb;
-      color: #111827;
-      border-radius: 999px;
-      border: none;
-      cursor: pointer;
-    }
-
-    @media (max-width: 800px) {
-      .topbar {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 8px;
-      }
-      .topbar-right {
-        width: 100%;
-        justify-content: space-between;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .app { padding: 8px 8px 24px; }
-      .topbar { padding: 8px 10px; }
-      .app-name { font-size: 0.95rem; }
-      .status-pill { font-size: 0.65rem; }
-    }
-
-    /* =================== LAYOUT PRINCIPAL =================== */
-
-    .layout {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      margin-top: 2px;
-    }
-
-    /* =================== CALENDARIO =================== */
-
+    /* CALENDARIO */
     .calendar-wrapper {
-      background: var(--card-bg);
-      border-radius: 26px;
-      padding: 14px 14px 16px;
-      box-shadow: var(--shadow-soft);
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
+      background: var(--card-bg); border-radius: 24px; padding: 20px;
+      box-shadow: var(--shadow-soft); display: flex; flex-direction: column; gap: 12px;
     }
-
-    @media (max-width: 480px) {
-      .calendar-wrapper {
-        padding: 10px 10px 12px;
-        border-radius: 20px;
-      }
-    }
-
-    .calendar-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 4px;
-    }
-
-    .month-nav {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex: 1;
-      justify-content: center;
-    }
-
+    .calendar-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .month-nav { display: flex; align-items: center; justify-content: center; flex: 1; }
     .nav-arrow {
-      border-radius: 999px;
-      border: none;
-      width: 26px;
-      height: 26px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      background: #f9fafb;
-      color: #6b7280;
-      font-size: 16px;
-      flex-shrink: 0;
+      border-radius: 50%; border: 1px solid #e5e7eb; width: 32px; height: 32px;
+      display: flex; align-items: center; justify-content: center; cursor: pointer;
+      background: #fff; color: #374151; font-size: 18px; transition: all 0.2s;
     }
-
-    .nav-arrow:hover { background: #e5e7eb; }
-
-    .calendar-title {
-      font-weight: 600;
-      font-size: 1.02rem;
-    }
-
+    .nav-arrow:hover { background: #f3f4f6; border-color: #d1d5db; }
+    .calendar-title { font-weight: 700; font-size: 1.2rem; text-transform: capitalize; }
     .calendar-title span.year { color: var(--accent-color); }
 
-    @media (max-width: 480px) {
-      .calendar-title { font-size: 0.95rem; }
-    }
-
     .calendar-subheader {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      margin-bottom: 4px;
-      font-size: 0.76rem;
-      color: var(--text-muted);
-      flex-wrap: wrap;
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
+      padding-bottom: 10px; border-bottom: 1px solid #f3f4f6;
     }
-
-    .legend {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      align-items: center;
-    }
-
-    .legend-item {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .legend-color {
-      width: 12px;
-      height: 12px;
-      border-radius: 999px;
-      border: 1px solid rgba(0, 0, 0, 0.06);
-    }
-
-    .legend-color.mother { background: var(--mother-color); }
-    .legend-color.father { background: var(--father-color); }
-
-    .calendar-controls {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.75rem;
-      flex-wrap: wrap;
-    }
-
-    .calendar-controls label {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-    }
+    .legend { display: flex; gap: 12px; font-size: 0.8rem; color: var(--text-muted); }
+    .legend-item { display: flex; align-items: center; gap: 6px; }
+    .legend-color { width: 12px; height: 12px; border-radius: 4px; }
+    .legend-color.mother { background: var(--mother-color); border: 1px solid #dbeafe; }
+    .legend-color.father { background: var(--father-color); border: 1px solid #fee2e2; }
 
     .calendar-controls select {
-      font-family: inherit;
-      font-size: 0.74rem;
-      padding: 3px 9px;
-      border-radius: 999px;
-      border: 1px solid #e5e7eb;
-      background: #f9fafb;
-      outline: none;
+      padding: 4px 24px 4px 10px; border-radius: 12px; border: 1px solid #e5e7eb;
+      font-size: 0.8rem; background-color: #f9fafb; appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239ca3af'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 6px center; background-size: 12px;
     }
 
-    .calendar-controls select:focus {
-      border-color: var(--accent-color);
-      box-shadow: 0 0 0 1px rgba(124, 58, 237, 0.25);
+    .calendar-grid { margin-top: 10px; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+    .month { border-radius: 16px; background: #ffffff; border: 1px solid #f3f4f6; overflow: hidden; }
+    .month-header { text-align: center; padding: 8px; background: #f9fafb; font-weight: 600; font-size: 0.9rem; color: #374151; border-bottom: 1px solid #f3f4f6; }
+    .month-body { padding: 8px; }
+
+    table.month-table { width: 100%; border-collapse: separate; border-spacing: 2px; table-layout: fixed; }
+    .month-table th { font-size: 0.7rem; color: #9ca3af; font-weight: 500; padding-bottom: 4px; }
+    .month-table td { height: 42px; vertical-align: top; position: relative; border-radius: 8px; transition: transform 0.1s; }
+    .day-cell:hover { z-index: 2; transform: scale(1.05); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+
+    .day-number { position: absolute; top: 4px; left: 4px; font-size: 0.7rem; font-weight: 600; color: #4b5563; z-index: 1; }
+    .today-marker {
+      position: absolute; top: 3px; right: 3px; width: 6px; height: 6px; 
+      background: var(--accent-color); border-radius: 50%; box-shadow: 0 0 0 2px rgba(255,255,255,0.8);
     }
-
-    .calendar-grid {
-      margin-top: 4px;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 10px;
-    }
-
-    @media (max-width: 600px) {
-      .calendar-grid { grid-template-columns: 1fr; }
-    }
-
-    .month {
-      border-radius: 18px;
-      background: #f9fafc;
-      border: 1px solid rgba(229, 231, 235, 0.8);
-      overflow: hidden;
-    }
-
-    .month-header {
-      text-align: center;
-      padding: 6px 6px 3px;
-      font-weight: 600;
-      font-size: 0.86rem;
-      color: #4b5563;
-    }
-
-    .month-body { padding: 4px 8px 6px; }
-
-    table.month-table {
-      width: 100%;
-      border-collapse: collapse;
-      table-layout: fixed;
-      font-size: 0.66rem;
-    }
-
-    .month-table th,
-    .month-table td {
-      border: none;
-      text-align: center;
-      vertical-align: top;
-      height: 38px;
-      position: relative;
-      padding: 1px 1px;
-    }
-
-    .month-table th {
-      font-size: 0.64rem;
-      font-weight: 500;
-      color: #9ca3af;
-      padding-bottom: 4px;
-    }
-
-    .month-table td { border-radius: 10px; }
-
-    .day-cell {
-      cursor: default;
-      transition: transform 0.05s ease, box-shadow 0.06s ease;
-    }
-
-    .day-cell:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.15);
-    }
-
-    .day-number {
-      position: absolute;
-      top: 3px;
-      left: 5px;
-      font-size: 0.65rem;
-      font-weight: 600;
-      color: #4b5563;
-    }
-
+    
     .owner-pill {
-      position: absolute;
-      bottom: 3px;
-      left: 50%;
-      transform: translateX(-50%);
-      padding: 1px 7px;
-      border-radius: 999px;
-      font-size: 0.6rem;
-      font-weight: 600;
-      letter-spacing: 0.03em;
-      text-transform: uppercase;
-      border: 1px solid rgba(148, 163, 184, 0.6);
-      background: rgba(255, 255, 255, 0.8);
+      position: absolute; bottom: 4px; width: calc(100% - 8px); left: 4px;
+      text-align: center; font-size: 0.6rem; font-weight: 700; text-transform: uppercase;
+      border-radius: 4px; padding: 1px 0; letter-spacing: 0.5px;
     }
+    .owner-pill.madre-pill { color: #2563eb; background: rgba(255,255,255,0.6); }
+    .owner-pill.padre-pill { color: #dc2626; background: rgba(255,255,255,0.6); }
 
-    .owner-pill.madre-pill {
-      color: #4c6fff;
-      border-color: rgba(129, 140, 248, 0.8);
-      background: rgba(239, 246, 255, 0.95);
+    .day-father { background: var(--father-color); }
+    .day-mother { background: var(--mother-color); }
+    .day-overridden { box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1); }
+    .day-overridden::after { content: "⇄"; position: absolute; top: 2px; right: 4px; font-size: 0.7rem; color: #6b7280; opacity: 0.7; }
+
+    /* SIDE PANEL */
+    .side-panel { display: grid; grid-template-columns: 1.2fr 1fr; gap: 16px; }
+    @media (max-width: 900px) { .side-panel { grid-template-columns: 1fr; } }
+
+    .card { background: #ffffff; border-radius: 20px; box-shadow: var(--shadow-soft); overflow: hidden; border: 1px solid #f3f4f6; }
+    .card-content { padding: 16px; }
+
+    /* NEW REQUEST */
+    .new-request-header { background: linear-gradient(135deg, #7c3aed, #6d28d9); color: #fff; padding: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .field-group { margin-bottom: 12px; }
+    .field-group label { display: block; margin-bottom: 4px; font-size: 0.8rem; color: #4b5563; font-weight: 500; }
+    
+    input[type="date"], textarea {
+      width: 100%; padding: 8px 10px; border-radius: 10px; border: 1px solid #d1d5db;
+      font-family: inherit; font-size: 0.85rem; background: #fff;
     }
+    input[type="date"]:focus, textarea:focus { outline: none; border-color: var(--accent-color); box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1); }
+    textarea { resize: vertical; min-height: 60px; }
 
-    .owner-pill.padre-pill {
-      color: #f97373;
-      border-color: rgba(248, 113, 113, 0.85);
-      background: rgba(254, 242, 242, 0.95);
+    button.primary-btn {
+      background: var(--accent-color); color: #fff; border: none; padding: 10px 16px;
+      border-radius: 20px; font-weight: 600; font-size: 0.85rem; cursor: pointer; width: 100%;
+      transition: background 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px;
     }
+    button.primary-btn:hover { background: #6d28d9; }
+    button:disabled { opacity: 0.6; cursor: not-allowed; }
 
-    .day-father {
-      background: var(--father-color);
-      background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.82), transparent);
-      box-shadow: inset 0 0 4px rgba(248, 113, 113, 0.2);
-    }
+    /* REQUEST LISTS */
+    .requests-list { max-height: 300px; overflow-y: auto; padding-right: 4px; margin-top: 8px; }
+    
+    /* Scrollbar styling */
+    .requests-list::-webkit-scrollbar { width: 6px; }
+    .requests-list::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+    .requests-list::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
+    .requests-list::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
 
-    .day-mother {
-      background: var(--mother-color);
-      background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.85), transparent);
-      box-shadow: inset 0 0 4px rgba(129, 140, 248, 0.18);
-    }
+    .request-item { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 12px; padding: 10px; margin-bottom: 8px; }
+    .request-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+    .req-parties { font-weight: 700; font-size: 0.8rem; color: #374151; }
+    .req-date { font-size: 0.75rem; color: #6b7280; font-family: monospace; }
+    .req-reason { font-size: 0.8rem; margin: 4px 0; color: #1f2937; }
+    
+    .req-actions { display: flex; gap: 8px; margin-top: 8px; }
+    .btn-xs { padding: 4px 10px; border-radius: 12px; font-size: 0.7rem; border: none; font-weight: 600; cursor: pointer; }
+    .btn-accept { background: #dcfce7; color: #166534; } .btn-accept:hover { background: #bbf7d0; }
+    .btn-reject { background: #fee2e2; color: #991b1b; } .btn-reject:hover { background: #fecaca; }
 
-    .day-outside {
-      background: transparent;
-      color: transparent;
-    }
+    .empty-state { text-align: center; padding: 20px 0; color: #9ca3af; font-size: 0.85rem; font-style: italic; }
+    
+    h3.panel-title { font-size: 0.95rem; display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+    h3.panel-title::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: #d1d5db; }
+    h3.panel-title.active::before { background: #f59e0b; box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2); }
 
-    .day-overridden::after {
-      content: "⇄";
-      position: absolute;
-      top: 3px;
-      right: 5px;
-      font-size: 0.68rem;
-      opacity: 0.85;
-      color: #6b7280;
-    }
-
-    /* =================== PANEL DEBAJO =================== */
-
-    .side-panel {
-      display: grid;
-      grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
-      gap: 12px;
-    }
-
-    @media (max-width: 900px) {
-      .side-panel { grid-template-columns: 1fr; }
-    }
-
-    .card {
-      background: var(--card-bg);
-      border-radius: 22px;
-      padding: 10px 12px 12px;
-      box-shadow: var(--shadow-soft);
-    }
-
-    .new-request-card {
-      padding: 0;
-      overflow: hidden;
-    }
-
-    .new-request-header {
-      background: var(--accent-color);
-      color: #ffffff;
-      border-radius: 22px 22px 0 0;
-      padding: 8px 12px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 8px;
-      font-size: 0.9rem;
-      font-weight: 600;
-    }
-
-    .new-request-header span.icon { font-size: 1rem; }
-
-    .new-request-body {
-      padding: 8px 12px 12px;
-      background: #f9fafb;
-    }
-
-    .card h3 {
-      font-size: 0.9rem;
-      margin-bottom: 4px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .card h3::before {
-      content: "";
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: #e5e7eb;
-    }
-
-    .card h3.highlight::before { background: #facc15; }
-
-    .field-group {
-      margin-bottom: 7px;
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-    }
-
-    label {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-    }
-
-    input[type="date"],
-    textarea {
-      font-family: inherit;
-      font-size: 0.78rem;
-      padding: 6px 8px;
-      border-radius: 8px;
-      border: 1px solid #d1d5db;
-      width: 100%;
-      background: #ffffff;
-    }
-
-    input[type="date"]:focus,
-    textarea:focus {
-      outline: none;
-      border-color: var(--accent-color);
-      box-shadow: 0 0 0 1px rgba(124, 58, 237, 0.25);
-    }
-
-    textarea {
-      resize: vertical;
-      min-height: 55px;
-    }
-
-    button {
-      font-family: inherit;
-      font-size: 0.78rem;
-      border-radius: 999px;
-      border: none;
-      padding: 7px 14px;
-      cursor: pointer;
-      background: var(--accent-color);
-      color: #fff;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    button.secondary {
-      background: #e5e7eb;
-      color: #111827;
-    }
-
-    button.small {
-      padding: 4px 9px;
-      font-size: 0.72rem;
-    }
-
-    button:disabled {
-      opacity: 0.65;
-      cursor: not-allowed;
-    }
-
-    .requests-section {
-      font-size: 0.76rem;
-      max-height: 220px;
-      overflow-y: auto;
-      padding-right: 4px;
-      margin-top: 3px;
-    }
-
-    .request-item {
-      border-radius: 12px;
-      border: 1px solid #e5e7eb;
-      padding: 6px 8px;
-      margin-bottom: 6px;
-      background: #f9fafb;
-    }
-
-    .request-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 2px;
-      gap: 6px;
-    }
-
-    .request-parties {
-      font-weight: 600;
-      font-size: 0.8rem;
-    }
-
-    .request-dates {
-      font-size: 0.74rem;
-      color: var(--text-muted);
-    }
-
-    .request-reason {
-      margin-top: 2px;
-      font-size: 0.74rem;
-      color: #374151;
-    }
-
-    .request-actions {
-      margin-top: 4px;
-      display: flex;
-      gap: 5px;
-      flex-wrap: wrap;
-    }
-
-    .status-pill-mini {
-      display: inline-flex;
-      align-items: center;
-      padding: 2px 7px;
-      border-radius: 999px;
-      font-size: 0.68rem;
-      font-weight: 600;
-    }
-
-    .status-pendiente {
-      background: #fef3c7;
-      color: #92400e;
-    }
-
-    .status-aceptado {
-      background: #dcfce7;
-      color: #166534;
-    }
-
-    .status-rechazado {
-      background: #fee2e2;
-      color: #991b1b;
-    }
-
-    .empty-text {
-      font-size: 0.74rem;
-      color: #9ca3af;
-      font-style: italic;
-      padding: 4px 0;
-    }
-
-    .helper-text {
-      font-size: 0.7rem;
-      color: #9ca3af;
-    }
-
-    .whoami-label {
-      font-size: 0.8rem;
-      font-weight: 500;
-      color: #4b5563;
-    }
+    .helper-text { font-size: 0.75rem; color: #6b7280; margin-top: 4px; line-height: 1.4; }
   </style>
 </head>
 <body>
 
-<!-- VISTA LOGIN -->
+<div class="toast-container" id="toast-container"></div>
+
 <div id="login-view" class="login-wrapper">
   <div class="login-card">
     <div class="login-title">
-      <span class="icon">🔐</span>
-      <span>Acceso a Custodia Familiar</span>
+      <span>🔐</span>
+      <span>Custodia Familiar</span>
     </div>
-    <p class="login-subtitle">
-      Introduce tu correo y contraseña de Firebase. Cada progenitor tiene su propio usuario.
-    </p>
+    <p class="login-subtitle">Introduce tu correo y contraseña para acceder al calendario.</p>
 
     <form id="login-form">
       <div class="login-field">
         <label for="login-email">Correo electrónico</label>
-        <input type="email" id="login-email" required autocomplete="email">
+        <input type="email" id="login-email" required autocomplete="email" placeholder="nombre@ejemplo.com">
       </div>
       <div class="login-field">
         <label for="login-password">Contraseña</label>
-        <input type="password" id="login-password" required autocomplete="current-password">
+        <input type="password" id="login-password" required autocomplete="current-password" placeholder="••••••••">
       </div>
-      <button type="submit" class="login-btn">
-        Entrar
-      </button>
+      <button type="submit" class="login-btn primary-btn">Entrar</button>
       <p id="login-error" class="login-error"></p>
     </form>
-
-    <p class="login-hint">
-      Configura las cuentas en Firebase Authentication (Email/Password) y asigna el rol
-      <strong>"padre"</strong> o <strong>"madre"</strong> en la colección <code>users</code>.
-    </p>
   </div>
 </div>
 
-<!-- APP -->
 <div id="app-root" class="app hidden">
-  <!-- TOPBAR -->
   <header class="topbar">
     <div class="topbar-left">
       <div class="logo-icon">📅</div>
       <div>
         <div class="app-name">Custodia Familiar</div>
-        <div class="status-pill status-connecting">
+        <div class="status-pill status-connecting" id="status-pill">
           <span class="status-dot"></span>
-          <span id="status-text">Conectando…</span>
+          <span id="status-text">Conectando...</span>
         </div>
       </div>
     </div>
     <div class="topbar-right">
       <select id="year-select" class="year-select"></select>
       <div class="user-info">
-        <span class="user-role-label" id="user-role-label">Sin identificar</span>
+        <span class="user-role-label" id="user-role-label">Usuario</span>
         <button type="button" id="logout-btn" class="logout-btn">Salir</button>
       </div>
     </div>
   </header>
 
   <div class="layout">
-    <!-- CALENDARIO -->
     <section class="calendar-wrapper">
       <div class="calendar-header">
         <button id="prev-period" class="nav-arrow" title="Anterior">‹</button>
@@ -819,24 +345,18 @@ v<!DOCTYPE html>
 
       <div class="calendar-subheader">
         <div class="legend">
-          <span class="legend-item">
-            <span class="legend-color mother"></span> Madre
-          </span>
-          <span class="legend-item">
-            <span class="legend-color father"></span> Padre
-          </span>
-          <span class="legend-item">⇄ día modificado</span>
+          <span class="legend-item"><span class="legend-color mother"></span> Madre</span>
+          <span class="legend-item"><span class="legend-color father"></span> Padre</span>
+          <span class="legend-item" style="font-size:0.75rem">⇄ Cambio manual</span>
         </div>
         <div class="calendar-controls">
-          <label>
-            Vista
+          <label>Vista: 
             <select id="view-mode">
               <option value="month">Mes</option>
               <option value="year">Año completo</option>
             </select>
           </label>
-          <label id="month-select-wrapper">
-            Mes
+          <label id="month-select-wrapper">Mes: 
             <select id="month-select">
               <option value="0">Enero</option>
               <option value="1">Febrero</option>
@@ -858,163 +378,135 @@ v<!DOCTYPE html>
       <div id="calendar-grid" class="calendar-grid"></div>
     </section>
 
-    <!-- PANEL SOLICITUDES -->
     <section class="side-panel">
-      <!-- Nueva solicitud -->
-      <section class="card new-request-card">
+      <div class="card">
         <div class="new-request-header">
-          <span class="icon">➕</span>
-          <span> Nueva solicitud</span>
+          <span>➕ Nueva solicitud de cambio</span>
         </div>
-        <div class="new-request-body">
+        <div class="card-content">
           <form id="request-form">
             <div class="field-group">
-              <label>¿Quién solicita el cambio?</label>
-              <span id="whoami-label" class="whoami-label">No identificado</span>
+              <label>Solicitante</label>
+              <div id="whoami-label" style="font-size:0.85rem; font-weight:600; color:#4b5563;">Cargando...</div>
             </div>
 
             <div class="field-group">
-              <label>Rango de fechas (entre 2026 y 2027)</label>
-              <div style="display:flex; gap:6px;">
+              <label>Fechas (2026-2027)</label>
+              <div style="display:flex; gap:8px;">
                 <input type="date" id="start-date" required>
                 <input type="date" id="end-date" required>
               </div>
-              <div class="helper-text">
-                La custodia para esos días pasará al progenitor solicitante si el otro acepta.
-              </div>
             </div>
 
             <div class="field-group">
-              <label for="reason">Motivo del cambio</label>
-              <textarea id="reason" placeholder="Ej: Viaje de trabajo, evento familiar, vacaciones..." required></textarea>
+              <label for="reason">Motivo</label>
+              <textarea id="reason" placeholder="Ej: Viaje de trabajo, cumpleaños..." required></textarea>
             </div>
 
-            <p class="helper-text">
-              Cuando crees una nueva solicitud se guardará en la nube y (con las Cloud Functions configuradas)
-              se enviará un correo a <strong>electricmoya@gmail.com</strong> y
-              <strong>alessia.antonaci@gmail.com</strong>.
+            <button type="submit" class="primary-btn">Enviar Solicitud</button>
+            <p class="helper-text" style="text-align:center; margin-top:8px;">
+              Se enviará una notificación a ambos correos.
             </p>
-
-            <button type="submit">
-              Crear solicitud
-            </button>
           </form>
         </div>
-      </section>
+      </div>
 
-      <!-- Pendientes + Historial -->
-      <div style="display:flex; flex-direction:column; gap:12px;">
-        <!-- Pendientes -->
-        <section class="card">
-          <h3 class="highlight">Solicitudes pendientes</h3>
-          <div class="requests-section" id="pending-requests"></div>
-          <p class="helper-text">
-            Solo podrás aceptar/rechazar las solicitudes donde tú seas el destinatario.
-          </p>
-        </section>
+      <div style="display:flex; flex-direction:column; gap:16px;">
+        <div class="card">
+          <div class="card-content">
+            <h3 class="panel-title active">Solicitudes Pendientes</h3>
+            <div class="requests-list" id="pending-requests">
+              </div>
+            <p class="helper-text">Solo puedes aceptar las que recibes.</p>
+          </div>
+        </div>
 
-        <!-- Historial -->
-        <section class="card">
-          <h3>Historial</h3>
-          <div class="requests-section" id="history-requests"></div>
-        </section>
+        <div class="card">
+          <div class="card-content">
+            <h3 class="panel-title">Historial</h3>
+            <div class="requests-list" id="history-requests">
+              </div>
+          </div>
+        </div>
       </div>
     </section>
   </div>
 </div>
 
-<!-- Firebase compat (v9) -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 
 <script>
-  // =================== CONFIGURACIÓN FIREBASE ===================
+  // =================== 1. CONFIGURACIÓN FIREBASE ===================
+  // NOTA: En producción real, usa Firebase Hosting o variables de entorno.
   const firebaseConfig = {
-  apiKey: "AIzaSyAwgk4_l0zvaCUCgm1CjqqqXjJHr5KPBjc",
-  authDomain: "custodia-familiar.firebaseapp.com",
-  projectId: "custodia-familiar",
-  storageBucket: "custodia-familiar.firebasestorage.app",
-  messagingSenderId: "1038952432258",
-  appId: "1:1038952432258:web:7608d6a48d8ad8308a6a9b"
-};
+    apiKey: "AIzaSyAwgk4_l0zvaCUCgm1CjqqqXjJHr5KPBjc",
+    authDomain: "custodia-familiar.firebaseapp.com",
+    projectId: "custodia-familiar",
+    storageBucket: "custodia-familiar.firebasestorage.app",
+    messagingSenderId: "1038952432258",
+    appId: "1:1038952432258:web:7608d6a48d8ad8308a6a9b"
+  };
 
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
   const auth = firebase.auth();
-</script>
 
-<script>
-  // ================= CONFIGURACIÓN BÁSICA =================
-
+  // =================== 2. ESTADO GLOBAL ===================
   const MIN_YEAR = 2026;
   const MAX_YEAR = 2027;
   const GLOBAL_MIN_DATE = `${MIN_YEAR}-01-01`;
   const GLOBAL_MAX_DATE = `${MAX_YEAR}-12-31`;
 
+  // Variables de estado
   let currentYear = 2026;
-  let currentView = "month";
-  let currentMonth = 0;
-
-  const monthNames = [
-    "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
-    "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
-  ];
-
-  const weekDayNames = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
-
-  let overrides = {};
+  let currentMonth = 0; // 0 = Enero
+  let currentView = "month"; // "month" | "year"
+  let currentUser = null;
+  let currentRole = null; // "padre" | "madre"
+  
+  // Datos
+  let overrides = {}; 
   let pendingRequests = [];
   let historyRequests = [];
 
-  let currentUser = null;       // usuario Firebase
-  let currentRole = null;       // "padre" o "madre"
+  // Constantes fechas
+  const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+  const weekDayNames = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
+  const BASE_MONDAY = new Date(2026, 0, 5, 12, 0, 0); // Lunes 5 enero 2026 (Mediodía para evitar DST)
 
-  const statusPill = document.querySelector(".status-pill");
-  const statusText = document.getElementById("status-text");
+  // =================== 3. UTILIDADES UI ===================
+  function showToast(msg, type = 'success') {
+    const container = document.getElementById('toast-container');
+    const el = document.createElement('div');
+    el.className = `toast ${type}`;
+    el.innerHTML = type === 'success' ? `✅ ${msg}` : `⚠️ ${msg}`;
+    container.appendChild(el);
+    
+    // Animar entrada
+    requestAnimationFrame(() => el.classList.add('visible'));
+    // Remover
+    setTimeout(() => {
+      el.classList.remove('visible');
+      setTimeout(() => el.remove(), 300);
+    }, 4000);
+  }
 
   function setConnectionStatus(state) {
-    statusPill.classList.remove("status-connecting", "status-online", "status-error");
-    statusPill.classList.add("status-" + state);
-
-    if (state === "connecting") {
-      statusText.textContent = "Conectando…";
-    } else if (state === "online") {
-      statusText.textContent = "Conectado";
-    } else if (state === "error") {
-      statusText.textContent = "Error de conexión";
-    }
+    const pill = document.getElementById("status-pill");
+    const text = document.getElementById("status-text");
+    pill.className = `status-pill status-${state}`;
+    if(state === "connecting") text.textContent = "Conectando...";
+    else if(state === "online") text.textContent = "En línea";
+    else text.textContent = "Error";
   }
 
-  setConnectionStatus("connecting");
-
-  function updateUserUI() {
-    const roleLabel = document.getElementById("user-role-label");
-    const whoLabel = document.getElementById("whoami-label");
-
-    if (!currentUser || !currentRole) {
-      if (roleLabel) roleLabel.textContent = "Sin identificar";
-      if (whoLabel) whoLabel.textContent = "No identificado";
-      return;
-    }
-
-    const texto = currentRole === "padre" ? "Padre" : "Madre";
-    if (roleLabel) roleLabel.textContent = texto;
-    if (whoLabel) whoLabel.textContent = "Estás identificado como: " + texto;
-  }
-
-  // ================= UTILIDADES DE FECHA =================
-
+  // =================== 4. LÓGICA DE FECHAS ===================
+  
   function parseDateStr(str) {
     const [y, m, d] = str.split("-").map(Number);
-    return new Date(y, m - 1, d);
-  }
-
-  function clampToRange(date) {
-    const min = parseDateStr(GLOBAL_MIN_DATE).getTime();
-    const max = parseDateStr(GLOBAL_MAX_DATE).getTime();
-    const t = Math.min(Math.max(date.getTime(), min), max);
-    return new Date(t);
+    return new Date(y, m - 1, d, 12, 0, 0);
   }
 
   function formatDateKey(year, monthIndex, day) {
@@ -1023,129 +515,133 @@ script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"><
     return `${year}-${m}-${d}`;
   }
 
-  // Lunes base a partir del que contamos las semanas de custodia.
-  // Primera semana de custodia completa (lunes-domingo) para la MADRE.
-  const BASE_MONDAY = new Date(2026, 0, 5); // 5 enero 2026, lunes
-
+  // Calcula propietario base (pares/impares desde 5 Ene 2026)
   function getBaseOwner(year, monthIndex, day) {
-    const date = new Date(year, monthIndex, day);
+    const date = new Date(year, monthIndex, day, 12, 0, 0);
+    // Limites
+    if (date.getFullYear() < MIN_YEAR || date.getFullYear() > MAX_YEAR) return null;
 
-    const minDate = new Date(MIN_YEAR, 0, 1);
-    const maxDate = new Date(MAX_YEAR, 11, 31);
-    if (date < minDate || date > maxDate) return null;
-
+    // Diferencia en días (usando Math.round y mediodía para saltar problemas de cambio de hora)
     const diffMs = date - BASE_MONDAY;
-    const diffDays = Math.floor(diffMs / 86400000);
+    const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
+    
+    // Calcular índice de semana
     const weekIndex = Math.floor(diffDays / 7);
-
-    const isEven = weekIndex % 2 === 0;
-    // Semana par: madre, semana impar: padre
-    return isEven ? "madre" : "padre";
+    
+    // Semana par = Madre (según tu lógica base), impar = Padre
+    return (weekIndex % 2 === 0) ? "madre" : "padre";
   }
 
-  // ================= RENDER DEL CALENDARIO =================
+  // =================== 5. RENDERIZADO CALENDARIO ===================
 
   function renderCalendar() {
     const grid = document.getElementById("calendar-grid");
-    if (!grid) return;
+    const titleEl = document.getElementById("calendar-title");
+    const monthSelectWrap = document.getElementById("month-select-wrapper");
+    
     grid.innerHTML = "";
 
-    const titleEl = document.getElementById("calendar-title");
+    // Actualizar título y visibilidad selector mes
     if (currentView === "year") {
       titleEl.innerHTML = `Año <span class="year">${currentYear}</span>`;
+      monthSelectWrap.style.display = "none";
     } else {
       titleEl.innerHTML = `${monthNames[currentMonth]} <span class="year">${currentYear}</span>`;
+      monthSelectWrap.style.display = "inline-flex";
     }
 
     const monthsToRender = currentView === "year" ? [...Array(12).keys()] : [currentMonth];
+    const today = new Date();
 
-    monthsToRender.forEach((monthIndex) => {
+    monthsToRender.forEach(mIndex => {
       const monthDiv = document.createElement("div");
       monthDiv.className = "month";
 
+      // Header mes
       const header = document.createElement("div");
       header.className = "month-header";
-      header.textContent = `${monthNames[monthIndex]} ${currentYear}`;
+      header.textContent = `${monthNames[mIndex]}`;
+      if(currentView === "year") header.textContent += ` ${currentYear}`; // mostrar año si es vista anual
       monthDiv.appendChild(header);
 
       const body = document.createElement("div");
       body.className = "month-body";
-
+      
       const table = document.createElement("table");
       table.className = "month-table";
 
+      // Encabezados días (L, M, X...)
       const thead = document.createElement("thead");
-      const headRow = document.createElement("tr");
-      weekDayNames.forEach((d) => {
+      const trHead = document.createElement("tr");
+      weekDayNames.forEach(d => {
         const th = document.createElement("th");
-        th.textContent = d;
-        headRow.appendChild(th);
+        th.textContent = d.charAt(0);
+        trHead.appendChild(th);
       });
-      thead.appendChild(headRow);
+      thead.appendChild(trHead);
       table.appendChild(thead);
 
-      const year = currentYear;
-      const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
-      const firstDay = new Date(year, monthIndex, 1);
-      let dayOfWeek = firstDay.getDay();
-      dayOfWeek = (dayOfWeek + 6) % 7; // 0 => lunes, 6 => domingo
+      // Celdas
+      const daysInMonth = new Date(currentYear, mIndex + 1, 0).getDate();
+      const firstDayInstance = new Date(currentYear, mIndex, 1);
+      let startDay = firstDayInstance.getDay(); // 0=Dom, 1=Lun
+      startDay = (startDay === 0) ? 6 : startDay - 1; // Ajustar a Lunes=0
 
       const tbody = document.createElement("tbody");
-      let currentDay = 1;
-      let done = false;
+      let dayCounter = 1;
+      let finished = false;
 
-      while (!done) {
-        const row = document.createElement("tr");
+      while(!finished) {
+        const tr = document.createElement("tr");
+        for(let i=0; i<7; i++) {
+          const td = document.createElement("td");
+          
+          if(dayCounter <= daysInMonth && (dayCounter > 1 || i >= startDay)) {
+            // Es un día válido
+            const dateKey = formatDateKey(currentYear, mIndex, dayCounter);
+            
+            // Lógica Propietario
+            const base = getBaseOwner(currentYear, mIndex, dayCounter);
+            const override = overrides[dateKey];
+            const final = override || base;
 
-        for (let col = 0; col < 7; col++) {
-          const cell = document.createElement("td");
+            td.className = "day-cell";
+            if(final === "padre") td.classList.add("day-father");
+            else if(final === "madre") td.classList.add("day-mother");
+            if(override) td.classList.add("day-overridden");
 
-          if ((currentDay === 1 && col < dayOfWeek) || currentDay > daysInMonth) {
-            cell.classList.add("day-outside");
+            // Número día
+            const spanNum = document.createElement("span");
+            spanNum.className = "day-number";
+            spanNum.textContent = dayCounter;
+            td.appendChild(spanNum);
+
+            // Marca "Hoy"
+            if(currentYear === today.getFullYear() && mIndex === today.getMonth() && dayCounter === today.getDate()){
+              const todayMark = document.createElement("div");
+              todayMark.className = "today-marker";
+              td.appendChild(todayMark);
+            }
+
+            // Pill Propietario
+            const pill = document.createElement("div");
+            pill.className = `owner-pill ${final === "madre" ? "madre-pill" : "padre-pill"}`;
+            pill.textContent = final === "madre" ? "MAMÁ" : "PAPÁ";
+            td.appendChild(pill);
+            
+            // Tooltip nativo simple
+            td.title = `${dateKey}: ${final.toUpperCase()}`;
+
+            dayCounter++;
           } else {
-            const day = currentDay;
-            const dateKey = formatDateKey(year, monthIndex, day);
-
-            const baseOwner = getBaseOwner(year, monthIndex, day);
-            const finalOwner = overrides[dateKey] || baseOwner;
-
-            cell.classList.add("day-cell");
-            if (finalOwner === "padre") {
-              cell.classList.add("day-father");
-            } else if (finalOwner === "madre") {
-              cell.classList.add("day-mother");
-            }
-
-            if (overrides[dateKey]) {
-              cell.classList.add("day-overridden");
-            }
-
-            const numSpan = document.createElement("span");
-            numSpan.className = "day-number";
-            numSpan.textContent = String(day);
-            cell.appendChild(numSpan);
-
-            const ownerSpan = document.createElement("span");
-            ownerSpan.className =
-              "owner-pill " + (finalOwner === "madre" ? "madre-pill" : "padre-pill");
-            ownerSpan.textContent = finalOwner === "padre" ? "PADRE" : "MADRE";
-            cell.appendChild(ownerSpan);
-
-            cell.title = `${dateKey} • Custodia: ${
-              finalOwner === "padre" ? "Padre" : "Madre"
-            }`;
-
-            currentDay++;
+            // Fuera de rango
+            td.style.background = "transparent";
+            td.style.cursor = "default";
           }
-
-          row.appendChild(cell);
+          tr.appendChild(td);
         }
-
-        tbody.appendChild(row);
-
-        if (currentDay > daysInMonth) {
-          done = true;
-        }
+        tbody.appendChild(tr);
+        if(dayCounter > daysInMonth) finished = true;
       }
 
       table.appendChild(tbody);
@@ -1155,465 +651,275 @@ script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"><
     });
   }
 
-  // ================= SOLICITUDES (Firestore) =================
+  // =================== 6. GESTIÓN SOLICITUDES ===================
+  
+  function renderRequestsList() {
+    const pContainer = document.getElementById("pending-requests");
+    const hContainer = document.getElementById("history-requests");
+    
+    pContainer.innerHTML = "";
+    hContainer.innerHTML = "";
 
-  function addRequest(requester, startDateStr, endDateStr, reason) {
-    const target = requester === "padre" ? "madre" : "padre";
+    if(pendingRequests.length === 0) {
+      pContainer.innerHTML = `<div class="empty-state">No hay solicitudes pendientes.</div>`;
+    }
+    if(historyRequests.length === 0) {
+      hContainer.innerHTML = `<div class="empty-state">No hay historial.</div>`;
+    }
 
-    db.collection("requests")
-      .add({
-        requester,
-        target,
-        startDate: startDateStr,
-        endDate: endDateStr,
-        reason,
+    // Render Pendientes
+    pendingRequests.forEach(req => pContainer.appendChild(createRequestCard(req, true)));
+    // Render Historial
+    historyRequests.forEach(req => hContainer.appendChild(createRequestCard(req, false)));
+  }
+
+  function createRequestCard(req, isPending) {
+    const div = document.createElement("div");
+    div.className = "request-item";
+
+    // Formatear textos
+    const fromName = req.requester === "padre" ? "Padre" : "Madre";
+    const toName = req.target === "padre" ? "Padre" : "Madre";
+    
+    let statusHtml = "";
+    if(!isPending) {
+      const color = req.status === "aceptado" ? "green" : "red";
+      const icon = req.status === "aceptado" ? "✔" : "✘";
+      statusHtml = `<span style="color:${color}; font-weight:700; font-size:0.75rem; margin-left:auto;">${icon} ${req.status.toUpperCase()}</span>`;
+    } else {
+      statusHtml = `<span style="color:#d97706; font-weight:700; font-size:0.75rem; margin-left:auto;">⏳ PENDIENTE</span>`;
+    }
+
+    div.innerHTML = `
+      <div class="request-header">
+        <span class="req-parties">${fromName} ➝ ${toName}</span>
+        ${statusHtml}
+      </div>
+      <div class="req-date">📅 ${req.startDate} al ${req.endDate}</div>
+      <div class="req-reason">"${req.reason}"</div>
+    `;
+
+    // Botones de acción (Solo si soy el destinatario y está pendiente)
+    if(isPending && currentRole && req.target === currentRole) {
+      const actionsDiv = document.createElement("div");
+      actionsDiv.className = "req-actions";
+      
+      const btnAccept = document.createElement("button");
+      btnAccept.className = "btn-xs btn-accept";
+      btnAccept.textContent = "ACEPTAR";
+      btnAccept.onclick = () => handleAction(req.id, "aceptado", req);
+
+      const btnReject = document.createElement("button");
+      btnReject.className = "btn-xs btn-reject";
+      btnReject.textContent = "RECHAZAR";
+      btnReject.onclick = () => handleAction(req.id, "rechazado", req);
+
+      actionsDiv.appendChild(btnAccept);
+      actionsDiv.appendChild(btnReject);
+      div.appendChild(actionsDiv);
+    } else if(isPending) {
+       const info = document.createElement("div");
+       info.className = "helper-text";
+       info.textContent = "Esperando respuesta...";
+       div.appendChild(info);
+    }
+
+    return div;
+  }
+
+  // =================== 7. INTERACCIONES FIREBASE ===================
+
+  async function handleAction(docId, newStatus, reqData) {
+    try {
+      await db.collection("requests").doc(docId).update({ status: newStatus });
+      showToast(`Solicitud ${newStatus}.`);
+
+      if(newStatus === "aceptado") {
+        // Aplicar cambios en overrides
+        const start = parseDateStr(reqData.startDate);
+        const end = parseDateStr(reqData.endDate);
+        const batch = db.batch();
+        
+        let loopDate = new Date(start);
+        while(loopDate <= end) {
+          const key = formatDateKey(loopDate.getFullYear(), loopDate.getMonth(), loopDate.getDate());
+          const ref = db.collection("overrides").doc(key);
+          batch.set(ref, { owner: reqData.requester });
+          loopDate.setDate(loopDate.getDate() + 1);
+        }
+        await batch.commit();
+        showToast("Calendario actualizado exitosamente.");
+      }
+    } catch(err) {
+      console.error(err);
+      showToast("Error al procesar la solicitud.", "error");
+    }
+  }
+
+  // Enviar formulario
+  document.getElementById("request-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if(!currentRole) return showToast("Error: No tienes rol asignado.", "error");
+
+    const sVal = document.getElementById("start-date").value;
+    const eVal = document.getElementById("end-date").value;
+    const reason = document.getElementById("reason").value.trim();
+
+    if(sVal > eVal) return showToast("La fecha fin no puede ser antes de la fecha inicio.", "error");
+
+    try {
+      await db.collection("requests").add({
+        requester: currentRole,
+        target: currentRole === "padre" ? "madre" : "padre",
+        startDate: sVal,
+        endDate: eVal,
+        reason: reason,
         status: "pendiente",
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      })
-      .catch((err) => {
-        console.error("Error al crear la solicitud:", err);
-        alert("Error al guardar la solicitud en la nube.");
-        setConnectionStatus("error");
       });
-    // Un Cloud Function en el backend escucha los nuevos documentos en "requests"
-    // y envía emails a electricmoya@gmail.com y alessia.antonaci@gmail.com.
-  }
-
-  function acceptRequest(req) {
-    if (!currentRole || req.target !== currentRole) {
-      alert("No puedes aceptar esta solicitud: pertenece al otro progenitor.");
-      return;
+      showToast("Solicitud creada correctamente.");
+      e.target.reset();
+    } catch(err) {
+      console.error(err);
+      showToast("Error al guardar solicitud.", "error");
     }
+  });
 
-    db.collection("requests")
-      .doc(req.id)
-      .update({ status: "aceptado" })
-      .then(() => {
-        applyOverrideForRequest(req);
-      })
-      .catch((err) => {
-        console.error("Error al aceptar solicitud:", err);
-        alert("No se ha podido aceptar la solicitud.");
-        setConnectionStatus("error");
-      });
-  }
+  // =================== 8. AUTH Y LISTENERS ===================
 
-  function rejectRequest(req) {
-    if (!currentRole || req.target !== currentRole) {
-      alert("No puedes rechazar esta solicitud: pertenece al otro progenitor.");
-      return;
-    }
-
-    db.collection("requests")
-      .doc(req.id)
-      .update({ status: "rechazado" })
-      .catch((err) => {
-        console.error("Error al rechazar solicitud:", err);
-        alert("No se ha podido rechazar la solicitud.");
-        setConnectionStatus("error");
-      });
-  }
-
-  function applyOverrideForRequest(req) {
-    const { requester, startDate, endDate } = req;
-    const start = clampToRange(parseDateStr(startDate));
-    const end = clampToRange(parseDateStr(endDate));
-
-    let current = new Date(start.getTime());
-    const batch = db.batch();
-
-    while (current.getTime() <= end.getTime()) {
-      const year = current.getFullYear();
-      if (year >= MIN_YEAR && year <= MAX_YEAR) {
-        const key = formatDateKey(
-          current.getFullYear(),
-          current.getMonth(),
-          current.getDate()
-        );
-        const ref = db.collection("overrides").doc(key);
-        batch.set(ref, { owner: requester });
-      }
-      current.setDate(current.getDate() + 1);
-    }
-
-    batch
-      .commit()
-      .catch((err) => {
-        console.error("Error al aplicar overrides:", err);
-        alert("Los cambios se han aceptado, pero hubo un problema al guardarlos.");
-        setConnectionStatus("error");
-      });
-  }
-
-  // ================= LISTAS DE SOLICITUDES =================
-
-  function renderRequests() {
-    const pendingContainer = document.getElementById("pending-requests");
-    const historyContainer = document.getElementById("history-requests");
-    if (!pendingContainer || !historyContainer) return;
-
-    pendingContainer.innerHTML = "";
-    if (pendingRequests.length === 0) {
-      const p = document.createElement("p");
-      p.className = "empty-text";
-      p.textContent = "No tienes solicitudes nuevas.";
-      pendingContainer.appendChild(p);
-    } else {
-      pendingRequests.forEach((req) => {
-        pendingContainer.appendChild(createRequestElement(req, true));
-      });
-    }
-
-    historyContainer.innerHTML = "";
-    if (historyRequests.length === 0) {
-      const p = document.createElement("p");
-      p.className = "empty-text";
-      p.textContent = "Sin actividad.";
-      historyContainer.appendChild(p);
-    } else {
-      historyRequests.forEach((req) => {
-        historyContainer.appendChild(createRequestElement(req, false));
-      });
-    }
-  }
-
-  function createRequestElement(req, isPendingList) {
-    const container = document.createElement("div");
-    container.className = "request-item";
-
-    const header = document.createElement("div");
-    header.className = "request-header";
-
-    const parties = document.createElement("div");
-    parties.className = "request-parties";
-    const requesterName = req.requester === "padre" ? "Padre" : "Madre";
-    const targetName = req.target === "padre" ? "Padre" : "Madre";
-    parties.textContent = `${requesterName} → ${targetName}`;
-
-    const status = document.createElement("span");
-    status.className =
-      "status-pill-mini " +
-      (req.status === "pendiente"
-        ? "status-pendiente"
-        : req.status === "aceptado"
-        ? "status-aceptado"
-        : "status-rechazado");
-    status.textContent =
-      req.status === "pendiente"
-        ? "Pendiente"
-        : req.status === "aceptado"
-        ? "Aceptado"
-        : "Rechazado";
-
-    header.appendChild(parties);
-    header.appendChild(status);
-
-    const dates = document.createElement("div");
-    dates.className = "request-dates";
-    dates.textContent = `${req.startDate} a ${req.endDate}`;
-
-    const reason = document.createElement("div");
-    reason.className = "request-reason";
-    reason.textContent = `Motivo: ${req.reason}`;
-
-    container.appendChild(header);
-    container.appendChild(dates);
-    container.appendChild(reason);
-
-    if (isPendingList) {
-      const actions = document.createElement("div");
-      actions.className = "request-actions";
-
-      if (currentRole && req.target === currentRole) {
-        const acceptBtn = document.createElement("button");
-        acceptBtn.type = "button";
-        acceptBtn.className = "small";
-        acceptBtn.textContent = "Aceptar";
-        acceptBtn.addEventListener("click", () => acceptRequest(req));
-
-        const rejectBtn = document.createElement("button");
-        rejectBtn.type = "button";
-        rejectBtn.className = "small secondary";
-        rejectBtn.textContent = "Rechazar";
-        rejectBtn.addEventListener("click", () => rejectRequest(req));
-
-        actions.appendChild(acceptBtn);
-        actions.appendChild(rejectBtn);
-      } else if (currentRole && req.requester === currentRole) {
-        const info = document.createElement("div");
-        info.className = "helper-text";
-        info.textContent = "Pendiente de respuesta del otro progenitor.";
-        actions.appendChild(info);
-      }
-
-      container.appendChild(actions);
-    }
-
-    return container;
-  }
-
-  // ================= FORMULARIO =================
-
-  function setupForm() {
-    const form = document.getElementById("request-form");
-    const startEl = document.getElementById("start-date");
-    const endEl = document.getElementById("end-date");
-    const reasonEl = document.getElementById("reason");
-
-    startEl.min = GLOBAL_MIN_DATE;
-    startEl.max = GLOBAL_MAX_DATE;
-    endEl.min = GLOBAL_MIN_DATE;
-    endEl.max = GLOBAL_MAX_DATE;
-
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
-
-      if (!currentRole) {
-        alert("Debes iniciar sesión como padre o madre para crear solicitudes.");
-        return;
-      }
-
-      const requester = currentRole; // padre o madre según el login
-      let startStr = startEl.value;
-      let endStr = endEl.value;
-      const reason = reasonEl.value.trim();
-
-      if (!startStr || !endStr || !reason) {
-        alert("Por favor, rellena todas las casillas.");
-        return;
-      }
-
-      const start = parseDateStr(startStr);
-      const end = parseDateStr(endStr);
-
-      if (end < start) {
-        alert("La fecha de fin no puede ser anterior a la fecha de inicio.");
-        return;
-      }
-
-      const clampedStart = clampToRange(start);
-      const clampedEnd = clampToRange(end);
-
-      startStr = `${clampedStart.getFullYear()}-${String(
-        clampedStart.getMonth() + 1
-      ).padStart(2, "0")}-${String(clampedStart.getDate()).padStart(2, "0")}`;
-
-      endStr = `${clampedEnd.getFullYear()}-${String(
-        clampedEnd.getMonth() + 1
-      ).padStart(2, "0")}-${String(clampedEnd.getDate()).padStart(2, "0")}`;
-
-      addRequest(requester, startStr, endStr, reason);
-
-      form.reset();
-    });
-  }
-
-  // ================= CONTROLES CALENDARIO =================
-
-  function setupControls() {
-    const yearSelect = document.getElementById("year-select");
-    const viewModeSelect = document.getElementById("view-mode");
-    const monthSelect = document.getElementById("month-select");
-    const monthWrapper = document.getElementById("month-select-wrapper");
-    const prevBtn = document.getElementById("prev-period");
-    const nextBtn = document.getElementById("next-period");
-
-    for (let y = MIN_YEAR; y <= MAX_YEAR; y++) {
-      const opt = document.createElement("option");
-      opt.value = String(y);
-      opt.textContent = String(y);
-      if (y === currentYear) opt.selected = true;
-      yearSelect.appendChild(opt);
-    }
-
-    function updateMonthVisibility() {
-      if (viewModeSelect.value === "month") {
-        monthWrapper.style.display = "inline-flex";
-      } else {
-        monthWrapper.style.display = "none";
-      }
-    }
-
-    viewModeSelect.value = currentView;
-    updateMonthVisibility();
-
-    viewModeSelect.addEventListener("change", () => {
-      currentView = viewModeSelect.value;
-      updateMonthVisibility();
-      renderCalendar();
-    });
-
-    yearSelect.addEventListener("change", () => {
-      currentYear = parseInt(yearSelect.value, 10);
-      renderCalendar();
-    });
-
-    monthSelect.value = String(currentMonth);
-    monthSelect.addEventListener("change", () => {
-      currentMonth = parseInt(monthSelect.value, 10);
-      renderCalendar();
-    });
-
-    prevBtn.addEventListener("click", () => {
-      if (currentView === "month") {
-        currentMonth--;
-        if (currentMonth < 0) {
-          currentMonth = 11;
-          currentYear = Math.max(MIN_YEAR, currentYear - 1);
-          yearSelect.value = String(currentYear);
-        }
-        monthSelect.value = String(currentMonth);
-      } else {
-        currentYear = Math.max(MIN_YEAR, currentYear - 1);
-        yearSelect.value = String(currentYear);
-      }
-      renderCalendar();
-    });
-
-    nextBtn.addEventListener("click", () => {
-      if (currentView === "month") {
-        currentMonth++;
-        if (currentMonth > 11) {
-          currentMonth = 0;
-          currentYear = Math.min(MAX_YEAR, currentYear + 1);
-          yearSelect.value = String(currentYear);
-        }
-        monthSelect.value = String(currentMonth);
-      } else {
-        currentYear = Math.min(MAX_YEAR, currentYear + 1);
-        yearSelect.value = String(currentYear);
-      }
-      renderCalendar();
-    });
-  }
-
-  // ================= FIREBASE LISTENERS =================
-
-  function setupFirebaseListeners() {
-    db.collection("overrides").onSnapshot(
-      (snapshot) => {
-        overrides = {};
-        snapshot.forEach((doc) => {
-          const data = doc.data();
-          if (data && data.owner) {
-            overrides[doc.id] = data.owner;
-          }
-        });
-        setConnectionStatus("online");
-        renderCalendar();
-      },
-      (err) => {
-        console.error("Error escuchando overrides:", err);
-        setConnectionStatus("error");
-      }
-    );
-
-    db.collection("requests")
-      .orderBy("createdAt", "desc")
-      .onSnapshot(
-        (snapshot) => {
-          pendingRequests = [];
-          historyRequests = [];
-          snapshot.forEach((doc) => {
-            const data = doc.data();
-            const req = {
-              id: doc.id,
-              requester: data.requester,
-              target: data.target,
-              startDate: data.startDate,
-              endDate: data.endDate,
-              reason: data.reason,
-              status: data.status || "pendiente",
-              createdAt: data.createdAt ? data.createdAt.toDate() : null
-            };
-            if (req.status === "pendiente") {
-              pendingRequests.push(req);
-            } else {
-              historyRequests.push(req);
-            }
-          });
-          setConnectionStatus("online");
-          renderRequests();
-        },
-        (err) => {
-          console.error("Error escuchando requests:", err);
-          setConnectionStatus("error");
-        }
-      );
-  }
-
-  // ================= AUTENTICACIÓN =================
-
-  function setupAuth() {
+  auth.onAuthStateChanged(async (user) => {
     const loginView = document.getElementById("login-view");
     const appRoot = document.getElementById("app-root");
-    const loginForm = document.getElementById("login-form");
-    const loginError = document.getElementById("login-error");
-    const logoutBtn = document.getElementById("logout-btn");
-
-    loginForm.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const email = document.getElementById("login-email").value.trim();
-      const password = document.getElementById("login-password").value;
-
-      loginError.textContent = "";
-
-      auth
-        .signInWithEmailAndPassword(email, password)
-        .catch((err) => {
-          console.error("Error login:", err);
-          loginError.textContent = "Correo o contraseña incorrectos.";
-        });
-    });
-
-    logoutBtn.addEventListener("click", () => {
-      auth.signOut();
-    });
-
-    auth.onAuthStateChanged(async (user) => {
-      if (user) {
-        currentUser = user;
-        try {
-          const docSnap = await db.collection("users").doc(user.uid).get();
-          if (docSnap.exists) {
-            const data = docSnap.data();
-            currentRole = data.role; // "padre" o "madre"
-          } else {
-            currentRole = null;
-            alert("Este usuario no tiene rol asignado (padre/madre) en la colección 'users'.");
-          }
-        } catch (e) {
-          console.error("Error leyendo rol:", e);
-          currentRole = null;
+    
+    if (user) {
+      currentUser = user;
+      // Obtener rol
+      try {
+        const snap = await db.collection("users").doc(user.uid).get();
+        if(snap.exists) {
+          currentRole = snap.data().role; // "padre" o "madre"
+          document.getElementById("user-role-label").textContent = currentRole === "padre" ? "Padre" : "Madre";
+          document.getElementById("whoami-label").innerHTML = `Eres: <strong>${currentRole === "padre" ? "Padre" : "Madre"}</strong>`;
+          
+          loginView.classList.add("hidden");
+          appRoot.classList.remove("hidden");
+          
+          // Iniciar listeners de datos
+          initDataListeners();
+          
+        } else {
+          showToast("Tu usuario no tiene configuración (rol) en base de datos.", "error");
+          auth.signOut();
         }
-
-        updateUserUI();
-
-        loginView.classList.add("hidden");
-        appRoot.classList.remove("hidden");
-      } else {
-        currentUser = null;
-        currentRole = null;
-        updateUserUI();
-
-        appRoot.classList.add("hidden");
-        loginView.classList.remove("hidden");
-        setConnectionStatus("connecting");
+      } catch(e) {
+        console.error(e);
+        showToast("Error de conexión al obtener usuario.", "error");
       }
+    } else {
+      currentUser = null;
+      currentRole = null;
+      loginView.classList.remove("hidden");
+      appRoot.classList.add("hidden");
+    }
+  });
+
+  function initDataListeners() {
+    // Escuchar overrides
+    db.collection("overrides").onSnapshot(snap => {
+      overrides = {};
+      snap.forEach(doc => overrides[doc.id] = doc.data().owner);
+      renderCalendar();
+      setConnectionStatus("online");
+    }, err => setConnectionStatus("error"));
+
+    // Escuchar requests
+    db.collection("requests").orderBy("createdAt", "desc").onSnapshot(snap => {
+      pendingRequests = [];
+      historyRequests = [];
+      snap.forEach(doc => {
+        const d = doc.data();
+        const item = { id: doc.id, ...d };
+        if(item.status === "pendiente") pendingRequests.push(item);
+        else historyRequests.push(item);
+      });
+      renderRequestsList();
     });
   }
 
-  // ================= INICIALIZACIÓN =================
+  // Login Form
+  document.getElementById("login-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const email = document.getElementById("login-email").value;
+    const pass = document.getElementById("login-password").value;
+    const errEl = document.getElementById("login-error");
+    errEl.textContent = "";
 
-  document.addEventListener("DOMContentLoaded", () => {
-    setupControls();
-    setupForm();
-    setupFirebaseListeners();
-    setupAuth();
-    renderCalendar();
-    renderRequests();
+    auth.signInWithEmailAndPassword(email, pass).catch(err => {
+      errEl.textContent = "Credenciales incorrectas.";
+    });
   });
+
+  document.getElementById("logout-btn").addEventListener("click", () => auth.signOut());
+
+  // Controles Calendario
+  document.getElementById("view-mode").addEventListener("change", (e) => {
+    currentView = e.target.value;
+    renderCalendar();
+  });
+  
+  const yearSel = document.getElementById("year-select");
+  [2026, 2027].forEach(y => {
+    const op = document.createElement("option");
+    op.value = y; op.textContent = y;
+    if(y === currentYear) op.selected = true;
+    yearSel.appendChild(op);
+  });
+  yearSel.addEventListener("change", (e) => {
+    currentYear = parseInt(e.target.value);
+    renderCalendar();
+  });
+
+  const monthSel = document.getElementById("month-select");
+  monthSel.value = currentMonth;
+  monthSel.addEventListener("change", (e) => {
+    currentMonth = parseInt(e.target.value);
+    renderCalendar();
+  });
+
+  document.getElementById("prev-period").addEventListener("click", () => {
+    if(currentView === "month") {
+      currentMonth--;
+      if(currentMonth < 0) { currentMonth = 11; currentYear--; yearSel.value = currentYear; }
+      monthSel.value = currentMonth;
+    } else {
+      currentYear--;
+      yearSel.value = currentYear;
+    }
+    renderCalendar();
+  });
+
+  document.getElementById("next-period").addEventListener("click", () => {
+    if(currentView === "month") {
+      currentMonth++;
+      if(currentMonth > 11) { currentMonth = 0; currentYear++; yearSel.value = currentYear; }
+      monthSel.value = currentMonth;
+    } else {
+      currentYear++;
+      yearSel.value = currentYear;
+    }
+    renderCalendar();
+  });
+
+  // Init
+  document.addEventListener("DOMContentLoaded", () => {
+    // Set inputs min/max
+    document.getElementById("start-date").min = GLOBAL_MIN_DATE;
+    document.getElementById("start-date").max = GLOBAL_MAX_DATE;
+    document.getElementById("end-date").min = GLOBAL_MIN_DATE;
+    document.getElementById("end-date").max = GLOBAL_MAX_DATE;
+    renderCalendar();
+  });
+
 </script>
 </body>
 </html>
-

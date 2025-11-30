@@ -34,6 +34,97 @@
       margin-top: 0;
     }
 
+    .hidden {
+      display: none !important;
+    }
+
+    /* ========== LOGIN ========== */
+
+    .login-wrapper {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      background: radial-gradient(circle at top, #ede9fe, #e5e7eb);
+    }
+
+    .login-card {
+      background: #ffffff;
+      max-width: 380px;
+      width: 100%;
+      border-radius: 20px;
+      box-shadow: 0 20px 45px rgba(15, 23, 42, 0.2);
+      padding: 18px 18px 16px;
+    }
+
+    .login-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .login-title span.icon {
+      font-size: 1.3rem;
+    }
+
+    .login-subtitle {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+
+    .login-field {
+      margin-bottom: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .login-field label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .login-field input {
+      font-family: inherit;
+      font-size: 0.85rem;
+      padding: 7px 9px;
+      border-radius: 10px;
+      border: 1px solid #d1d5db;
+      width: 100%;
+    }
+
+    .login-field input:focus {
+      outline: none;
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 1px rgba(124, 58, 237, 0.3);
+    }
+
+    .login-btn {
+      margin-top: 8px;
+      width: 100%;
+      justify-content: center;
+    }
+
+    .login-error {
+      color: #b91c1c;
+      font-size: 0.7rem;
+      margin-top: 4px;
+      min-height: 14px;
+    }
+
+    .login-hint {
+      margin-top: 8px;
+      font-size: 0.7rem;
+      color: #6b7280;
+    }
+
+    /* ========== APP PRINCIPAL ========== */
+
     .app {
       max-width: 1200px;
       margin: 0 auto;
@@ -125,6 +216,8 @@
       display: flex;
       align-items: center;
       gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
     }
 
     .year-select {
@@ -144,30 +237,29 @@
       border-color: var(--accent-color);
     }
 
-    .role-toggle {
+    .user-info {
       display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.75rem;
       background: #f9fafb;
       border-radius: 999px;
-      padding: 2px;
+      padding: 4px 6px 4px 10px;
       border: 1px solid #e5e7eb;
     }
 
-    .role-btn {
-      border: none;
-      background: transparent;
-      padding: 6px 12px;
-      border-radius: 999px;
-      font-size: 0.78rem;
-      font-family: inherit;
-      cursor: pointer;
-      color: var(--text-muted);
+    .user-role-label {
+      font-weight: 600;
     }
 
-    .role-btn.active {
-      background: var(--accent-soft);
-      color: var(--accent-color);
-      font-weight: 600;
-      box-shadow: 0 0 0 1px rgba(124, 58, 237, 0.4);
+    .logout-btn {
+      padding: 4px 9px;
+      font-size: 0.72rem;
+      background: #e5e7eb;
+      color: #111827;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
     }
 
     @media (max-width: 800px) {
@@ -179,8 +271,7 @@
 
       .topbar-right {
         width: 100%;
-        justify-content: flex-start;
-        flex-wrap: wrap;
+        justify-content: space-between;
       }
     }
 
@@ -204,7 +295,6 @@
 
     /* =================== LAYOUT PRINCIPAL =================== */
 
-    /* Ahora el layout es vertical: primero calendario (protagonista), luego paneles */
     .layout {
       display: flex;
       flex-direction: column;
@@ -481,7 +571,7 @@
       color: #6b7280;
     }
 
-    /* =================== PANEL DERECHO (DEBAJO DEL CALENDARIO) =================== */
+    /* =================== PANEL DEBAJO =================== */
 
     .side-panel {
       display: grid;
@@ -562,7 +652,6 @@
     }
 
     input[type="date"],
-    select,
     textarea {
       font-family: inherit;
       font-size: 0.78rem;
@@ -574,7 +663,6 @@
     }
 
     input[type="date"]:focus,
-    select:focus,
     textarea:focus {
       outline: none;
       border-color: var(--accent-color);
@@ -697,10 +785,51 @@
       font-size: 0.7rem;
       color: #9ca3af;
     }
+
+    .whoami-label {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: #4b5563;
+    }
   </style>
 </head>
 <body>
-<div class="app">
+
+<!-- VISTA LOGIN -->
+<div id="login-view" class="login-wrapper">
+  <div class="login-card">
+    <div class="login-title">
+      <span class="icon">🔐</span>
+      <span>Acceso a Custodia Familiar</span>
+    </div>
+    <p class="login-subtitle">
+      Introduce tu correo y contraseña de Firebase. Cada progenitor tiene su propio usuario.
+    </p>
+
+    <form id="login-form">
+      <div class="login-field">
+        <label for="login-email">Correo electrónico</label>
+        <input type="email" id="login-email" required autocomplete="email">
+      </div>
+      <div class="login-field">
+        <label for="login-password">Contraseña</label>
+        <input type="password" id="login-password" required autocomplete="current-password">
+      </div>
+      <button type="submit" class="login-btn">
+        Entrar
+      </button>
+      <p id="login-error" class="login-error"></p>
+    </form>
+
+    <p class="login-hint">
+      Configura las cuentas en Firebase Authentication (Email/Password) y asigna el rol
+      <strong>"padre"</strong> o <strong>"madre"</strong> en la colección <code>users</code>.
+    </p>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app-root" class="app hidden">
   <!-- TOPBAR -->
   <header class="topbar">
     <div class="topbar-left">
@@ -715,15 +844,15 @@
     </div>
     <div class="topbar-right">
       <select id="year-select" class="year-select"></select>
-      <div class="role-toggle">
-        <button type="button" id="btnSoyMadre" class="role-btn active">Soy Madre</button>
-        <button type="button" id="btnSoyPadre" class="role-btn">Soy Padre</button>
+      <div class="user-info">
+        <span class="user-role-label" id="user-role-label">Sin identificar</span>
+        <button type="button" id="logout-btn" class="logout-btn">Salir</button>
       </div>
     </div>
   </header>
 
   <div class="layout">
-    <!-- CALENDARIO (PROTAGONISTA, ARRIBA) -->
+    <!-- CALENDARIO -->
     <section class="calendar-wrapper">
       <div class="calendar-header">
         <button id="prev-period" class="nav-arrow" title="Anterior">‹</button>
@@ -774,7 +903,7 @@
       <div id="calendar-grid" class="calendar-grid"></div>
     </section>
 
-    <!-- PANEL DE SOLICITUDES (DEBAJO DEL CALENDARIO) -->
+    <!-- PANEL SOLICITUDES -->
     <section class="side-panel">
       <!-- Nueva solicitud -->
       <section class="card new-request-card">
@@ -785,11 +914,8 @@
         <div class="new-request-body">
           <form id="request-form">
             <div class="field-group">
-              <label for="requester">¿Quién solicita el cambio?</label>
-              <select id="requester" required>
-                <option value="madre">Madre</option>
-                <option value="padre">Padre</option>
-              </select>
+              <label>¿Quién solicita el cambio?</label>
+              <span id="whoami-label" class="whoami-label">No identificado</span>
             </div>
 
             <div class="field-group">
@@ -822,7 +948,7 @@
           <h3 class="highlight">Solicitudes pendientes</h3>
           <div class="requests-section" id="pending-requests"></div>
           <p class="helper-text">
-            Para simular que el otro progenitor responde, haz clic en <strong>Aceptar</strong> o <strong>Rechazar</strong>.
+            Solo podrás aceptar/rechazar las solicitudes donde tú seas el destinatario.
           </p>
         </section>
 
@@ -839,20 +965,22 @@
 <!-- Firebase compat (v9) -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 
 <script>
   // =================== CONFIGURACIÓN FIREBASE ===================
   const firebaseConfig = {
-		apiKey: "AIzaSyAwgk4_l0zvaCUCgm1CjqqqXjJHr5KPBjc",
-		authDomain: "custodia-familiar.firebaseapp.com",
-		projectId: "custodia-familiar",
-		storageBucket: "custodia-familiar.firebasestorage.app",
-		messagingSenderId: "1038952432258",
-		appId: "1:1038952432258:web:7608d6a48d8ad8308a6a9b"
-};
+    apiKey: "PEGAR_AQUI_TU_API_KEY",
+    authDomain: "PEGAR_AQUI_TU_AUTH_DOMAIN",
+    projectId: "PEGAR_AQUI_TU_PROJECT_ID",
+    storageBucket: "PEGAR_AQUI_TU_STORAGE_BUCKET",
+    messagingSenderId: "PEGAR_AQUI_TU_SENDER_ID",
+    appId: "PEGAR_AQUI_TU_APP_ID"
+  };
 
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
+  const auth = firebase.auth();
 </script>
 
 <script>
@@ -878,8 +1006,8 @@
   let pendingRequests = [];
   let historyRequests = [];
 
-  // Rol actual (para sincronizar botón Soy Madre/Padre con el select del formulario)
-  let currentRole = "madre";
+  let currentUser = null;       // usuario Firebase
+  let currentRole = null;       // "padre" o "madre"
 
   const statusPill = document.querySelector(".status-pill");
   const statusText = document.getElementById("status-text");
@@ -898,6 +1026,21 @@
   }
 
   setConnectionStatus("connecting");
+
+  function updateUserUI() {
+    const roleLabel = document.getElementById("user-role-label");
+    const whoLabel = document.getElementById("whoami-label");
+
+    if (!currentUser || !currentRole) {
+      if (roleLabel) roleLabel.textContent = "Sin identificar";
+      if (whoLabel) whoLabel.textContent = "No identificado";
+      return;
+    }
+
+    const texto = currentRole === "padre" ? "Padre" : "Madre";
+    if (roleLabel) roleLabel.textContent = texto;
+    if (whoLabel) whoLabel.textContent = "Estás identificado como: " + texto;
+  }
 
   // ================= UTILIDADES DE FECHA =================
 
@@ -937,6 +1080,8 @@
     const diffMs = date - startMonday;
     const diffDays = Math.floor(diffMs / 86400000);
     const weekIndex = Math.floor(diffDays / 7);
+    // Semana 1 del año (empezando lunes): MADRE
+    // Semana 2: PADRE
     return weekIndex % 2 === 0 ? "madre" : "padre";
   }
 
@@ -1075,6 +1220,12 @@
   }
 
   function acceptRequest(req) {
+    // Solo debe aceptar el progenitor destinatario (target)
+    if (!currentRole || req.target !== currentRole) {
+      alert("No puedes aceptar esta solicitud: pertenece al otro progenitor.");
+      return;
+    }
+
     db.collection("requests")
       .doc(req.id)
       .update({ status: "aceptado" })
@@ -1089,6 +1240,11 @@
   }
 
   function rejectRequest(req) {
+    if (!currentRole || req.target !== currentRole) {
+      alert("No puedes rechazar esta solicitud: pertenece al otro progenitor.");
+      return;
+    }
+
     db.collection("requests")
       .doc(req.id)
       .update({ status: "rechazado" })
@@ -1209,20 +1365,29 @@
       const actions = document.createElement("div");
       actions.className = "request-actions";
 
-      const acceptBtn = document.createElement("button");
-      acceptBtn.type = "button";
-      acceptBtn.className = "small";
-      acceptBtn.textContent = "Aceptar";
-      acceptBtn.addEventListener("click", () => acceptRequest(req));
+      // Solo mostramos botones si el usuario actual ES el target de esa solicitud
+      if (currentRole && req.target === currentRole) {
+        const acceptBtn = document.createElement("button");
+        acceptBtn.type = "button";
+        acceptBtn.className = "small";
+        acceptBtn.textContent = "Aceptar";
+        acceptBtn.addEventListener("click", () => acceptRequest(req));
 
-      const rejectBtn = document.createElement("button");
-      rejectBtn.type = "button";
-      rejectBtn.className = "small secondary";
-      rejectBtn.textContent = "Rechazar";
-      rejectBtn.addEventListener("click", () => rejectRequest(req));
+        const rejectBtn = document.createElement("button");
+        rejectBtn.type = "button";
+        rejectBtn.className = "small secondary";
+        rejectBtn.textContent = "Rechazar";
+        rejectBtn.addEventListener("click", () => rejectRequest(req));
 
-      actions.appendChild(acceptBtn);
-      actions.appendChild(rejectBtn);
+        actions.appendChild(acceptBtn);
+        actions.appendChild(rejectBtn);
+      } else if (currentRole && req.requester === currentRole) {
+        const info = document.createElement("div");
+        info.className = "helper-text";
+        info.textContent = "Pendiente de respuesta del otro progenitor.";
+        actions.appendChild(info);
+      }
+
       container.appendChild(actions);
     }
 
@@ -1233,13 +1398,9 @@
 
   function setupForm() {
     const form = document.getElementById("request-form");
-    const requesterEl = document.getElementById("requester");
     const startEl = document.getElementById("start-date");
     const endEl = document.getElementById("end-date");
     const reasonEl = document.getElementById("reason");
-
-    // sincronizar con el rol actual al cargar
-    requesterEl.value = currentRole;
 
     startEl.min = GLOBAL_MIN_DATE;
     startEl.max = GLOBAL_MAX_DATE;
@@ -1249,7 +1410,12 @@
     form.addEventListener("submit", (e) => {
       e.preventDefault();
 
-      const requester = requesterEl.value;
+      if (!currentRole) {
+        alert("Debes iniciar sesión como padre o madre para crear solicitudes.");
+        return;
+      }
+
+      const requester = currentRole; // padre o madre según el login
       let startStr = startEl.value;
       let endStr = endEl.value;
       const reason = reasonEl.value.trim();
@@ -1281,12 +1447,10 @@
       addRequest(requester, startStr, endStr, reason);
 
       form.reset();
-      // tras enviar, volvemos a dejar seleccionado el rol actual
-      requesterEl.value = currentRole;
     });
   }
 
-  // ================= CONTROLES =================
+  // ================= CONTROLES CALENDARIO =================
 
   function setupControls() {
     const yearSelect = document.getElementById("year-select");
@@ -1365,38 +1529,7 @@
     });
   }
 
-  // ================= TOGGLE ROL (SOLO ESTILO + SINCRONIZAR FORMULARIO) =================
-
-  function setupRoleToggle() {
-    const btnMadre = document.getElementById("btnSoyMadre");
-    const btnPadre = document.getElementById("btnSoyPadre");
-    const requesterSelect = document.getElementById("requester");
-
-    function setActive(active) {
-      currentRole = active; // guardamos el rol actual
-
-      if (active === "madre") {
-        btnMadre.classList.add("active");
-        btnPadre.classList.remove("active");
-      } else {
-        btnPadre.classList.add("active");
-        btnMadre.classList.remove("active");
-      }
-
-      // Sincronizar automáticamente el select del formulario
-      if (requesterSelect) {
-        requesterSelect.value = active;
-      }
-    }
-
-    btnMadre.addEventListener("click", () => setActive("madre"));
-    btnPadre.addEventListener("click", () => setActive("padre"));
-
-    // Estado inicial
-    setActive("madre");
-  }
-
-  // ================= LISTENERS FIREBASE =================
+  // ================= FIREBASE LISTENERS =================
 
   function setupFirebaseListeners() {
     db.collection("overrides").onSnapshot(
@@ -1451,13 +1584,74 @@
       );
   }
 
+  // ================= AUTENTICACIÓN =================
+
+  function setupAuth() {
+    const loginView = document.getElementById("login-view");
+    const appRoot = document.getElementById("app-root");
+    const loginForm = document.getElementById("login-form");
+    const loginError = document.getElementById("login-error");
+    const logoutBtn = document.getElementById("logout-btn");
+
+    loginForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const email = document.getElementById("login-email").value.trim();
+      const password = document.getElementById("login-password").value;
+
+      loginError.textContent = "";
+
+      auth
+        .signInWithEmailAndPassword(email, password)
+        .catch((err) => {
+          console.error("Error login:", err);
+          loginError.textContent = "Correo o contraseña incorrectos.";
+        });
+    });
+
+    logoutBtn.addEventListener("click", () => {
+      auth.signOut();
+    });
+
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        currentUser = user;
+        try {
+          const docSnap = await db.collection("users").doc(user.uid).get();
+          if (docSnap.exists) {
+            const data = docSnap.data();
+            currentRole = data.role; // "padre" o "madre"
+          } else {
+            currentRole = null;
+            alert("Este usuario no tiene rol asignado (padre/madre) en la colección 'users'.");
+          }
+        } catch (e) {
+          console.error("Error leyendo rol:", e);
+          currentRole = null;
+        }
+
+        updateUserUI();
+
+        loginView.classList.add("hidden");
+        appRoot.classList.remove("hidden");
+      } else {
+        currentUser = null;
+        currentRole = null;
+        updateUserUI();
+
+        appRoot.classList.add("hidden");
+        loginView.classList.remove("hidden");
+        setConnectionStatus("connecting");
+      }
+    });
+  }
+
   // ================= INICIALIZACIÓN =================
 
   document.addEventListener("DOMContentLoaded", () => {
     setupControls();
-    setupRoleToggle();
     setupForm();
     setupFirebaseListeners();
+    setupAuth();
     renderCalendar();
     renderRequests();
   });

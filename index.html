@@ -98,7 +98,6 @@
       transition: background 0.2s ease;
     }
 
-    /* Estados de conexión */
     .status-pill.status-connecting {
       background: #fef3c7;
       color: #92400e;
@@ -205,17 +204,12 @@
 
     /* =================== LAYOUT PRINCIPAL =================== */
 
+    /* Ahora el layout es vertical: primero calendario (protagonista), luego paneles */
     .layout {
-      display: grid;
-      grid-template-columns: minmax(0, 2.2fr) minmax(0, 1.15fr);
+      display: flex;
+      flex-direction: column;
       gap: 14px;
       margin-top: 2px;
-    }
-
-    @media (max-width: 980px) {
-      .layout {
-        grid-template-columns: minmax(0, 1fr);
-      }
     }
 
     /* =================== CALENDARIO =================== */
@@ -487,17 +481,17 @@
       color: #6b7280;
     }
 
-    /* =================== PANEL DERECHO =================== */
+    /* =================== PANEL DERECHO (DEBAJO DEL CALENDARIO) =================== */
 
     .side-panel {
-      display: flex;
-      flex-direction: column;
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
       gap: 12px;
     }
 
-    @media (max-width: 980px) {
+    @media (max-width: 900px) {
       .side-panel {
-        order: -1;
+        grid-template-columns: 1fr;
       }
     }
 
@@ -609,11 +603,6 @@
     button.secondary {
       background: #e5e7eb;
       color: #111827;
-    }
-
-    button.danger {
-      background: #ef4444;
-      color: #fff;
     }
 
     button.small {
@@ -734,7 +723,7 @@
   </header>
 
   <div class="layout">
-    <!-- CALENDARIO -->
+    <!-- CALENDARIO (PROTAGONISTA, ARRIBA) -->
     <section class="calendar-wrapper">
       <div class="calendar-header">
         <button id="prev-period" class="nav-arrow" title="Anterior">‹</button>
@@ -785,8 +774,8 @@
       <div id="calendar-grid" class="calendar-grid"></div>
     </section>
 
-    <!-- PANEL DERECHO -->
-    <aside class="side-panel">
+    <!-- PANEL DE SOLICITUDES (DEBAJO DEL CALENDARIO) -->
+    <section class="side-panel">
       <!-- Nueva solicitud -->
       <section class="card new-request-card">
         <div class="new-request-header">
@@ -826,21 +815,24 @@
         </div>
       </section>
 
-      <!-- Pendientes -->
-      <section class="card">
-        <h3 class="highlight">Solicitudes pendientes</h3>
-        <div class="requests-section" id="pending-requests"></div>
-        <p class="helper-text">
-          Para simular que el otro progenitor responde, haz clic en <strong>Aceptar</strong> o <strong>Rechazar</strong>.
-        </p>
-      </section>
+      <!-- Pendientes + Historial -->
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        <!-- Pendientes -->
+        <section class="card">
+          <h3 class="highlight">Solicitudes pendientes</h3>
+          <div class="requests-section" id="pending-requests"></div>
+          <p class="helper-text">
+            Para simular que el otro progenitor responde, haz clic en <strong>Aceptar</strong> o <strong>Rechazar</strong>.
+          </p>
+        </section>
 
-      <!-- Historial -->
-      <section class="card">
-        <h3>Historial</h3>
-        <div class="requests-section" id="history-requests"></div>
-      </section>
-    </aside>
+        <!-- Historial -->
+        <section class="card">
+          <h3>Historial</h3>
+          <div class="requests-section" id="history-requests"></div>
+        </section>
+      </div>
+    </section>
   </div>
 </div>
 
@@ -850,14 +842,13 @@
 
 <script>
   // =================== CONFIGURACIÓN FIREBASE ===================
-  // Sustituye los valores por los de tu consola de Firebase.
   const firebaseConfig = {
-  apiKey: "AIzaSyAwgk4_l0zvaCUCgm1CjqqqXjJHr5KPBjc",
-  authDomain: "custodia-familiar.firebaseapp.com",
-  projectId: "custodia-familiar",
-  storageBucket: "custodia-familiar.firebasestorage.app",
-  messagingSenderId: "1038952432258",
-  appId: "1:1038952432258:web:7608d6a48d8ad8308a6a9b"
+		apiKey: "AIzaSyAwgk4_l0zvaCUCgm1CjqqqXjJHr5KPBjc",
+		authDomain: "custodia-familiar.firebaseapp.com",
+		projectId: "custodia-familiar",
+		storageBucket: "custodia-familiar.firebasestorage.app",
+		messagingSenderId: "1038952432258",
+		appId: "1:1038952432258:web:7608d6a48d8ad8308a6a9b"
 };
 
   firebase.initializeApp(firebaseConfig);
@@ -873,8 +864,8 @@
   const GLOBAL_MAX_DATE = `${MAX_YEAR}-12-31`;
 
   let currentYear = 2026;
-  let currentView = "month";    // "month" | "year"
-  let currentMonth = 0;         // 0-11
+  let currentView = "month";
+  let currentMonth = 0;
 
   const monthNames = [
     "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
@@ -883,16 +874,17 @@
 
   const weekDayNames = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
 
-  let overrides = {};          // dateKey -> "padre" | "madre"
+  let overrides = {};
   let pendingRequests = [];
   let historyRequests = [];
 
-  // ====== Indicador de conexión ======
+  // Rol actual (para sincronizar botón Soy Madre/Padre con el select del formulario)
+  let currentRole = "madre";
+
   const statusPill = document.querySelector(".status-pill");
   const statusText = document.getElementById("status-text");
 
   function setConnectionStatus(state) {
-    // state: "connecting" | "online" | "error"
     statusPill.classList.remove("status-connecting", "status-online", "status-error");
     statusPill.classList.add("status-" + state);
 
@@ -905,7 +897,6 @@
     }
   }
 
-  // Arrancamos como "Conectando…"
   setConnectionStatus("connecting");
 
   // ================= UTILIDADES DE FECHA =================
@@ -930,7 +921,7 @@
 
   function getCycleStartMonday(year) {
     const jan1 = new Date(year, 0, 1);
-    const day = jan1.getDay(); // 0=Domingo...6=Sábado
+    const day = jan1.getDay();
     let diff;
     if (day === 1) diff = 0;
     else if (day === 0) diff = -6;
@@ -963,8 +954,7 @@
       titleEl.innerHTML = `${monthNames[currentMonth]} <span class="year">${currentYear}</span>`;
     }
 
-    const monthsToRender =
-      currentView === "year" ? [...Array(12).keys()] : [currentMonth];
+    const monthsToRender = currentView === "year" ? [...Array(12).keys()] : [currentMonth];
 
     monthsToRender.forEach((monthIndex) => {
       const monthDiv = document.createElement("div");
@@ -994,8 +984,8 @@
       const year = currentYear;
       const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
       const firstDay = new Date(year, monthIndex, 1);
-      let dayOfWeek = firstDay.getDay(); // 0=Domingo...6=Sábado
-      dayOfWeek = (dayOfWeek + 6) % 7;   // lunes=0
+      let dayOfWeek = firstDay.getDay();
+      dayOfWeek = (dayOfWeek + 6) % 7;
 
       const tbody = document.createElement("tbody");
       let currentDay = 1;
@@ -1109,19 +1099,6 @@
       });
   }
 
-  function deleteRequestFromHistory(req) {
-    if (!confirm("¿Eliminar esta solicitud del historial?")) return;
-
-    db.collection("requests")
-      .doc(req.id)
-      .delete()
-      .catch((err) => {
-        console.error("Error al eliminar solicitud:", err);
-        alert("No se ha podido eliminar la solicitud.");
-        setConnectionStatus("error");
-      });
-  }
-
   function applyOverrideForRequest(req) {
     const { requester, startDate, endDate } = req;
     const start = clampToRange(parseDateStr(startDate));
@@ -1228,10 +1205,10 @@
     container.appendChild(dates);
     container.appendChild(reason);
 
-    const actions = document.createElement("div");
-    actions.className = "request-actions";
-
     if (isPendingList) {
+      const actions = document.createElement("div");
+      actions.className = "request-actions";
+
       const acceptBtn = document.createElement("button");
       acceptBtn.type = "button";
       acceptBtn.className = "small";
@@ -1246,16 +1223,8 @@
 
       actions.appendChild(acceptBtn);
       actions.appendChild(rejectBtn);
-    } else {
-      const deleteBtn = document.createElement("button");
-      deleteBtn.type = "button";
-      deleteBtn.className = "small danger";
-      deleteBtn.textContent = "Eliminar";
-      deleteBtn.addEventListener("click", () => deleteRequestFromHistory(req));
-      actions.appendChild(deleteBtn);
+      container.appendChild(actions);
     }
-
-    container.appendChild(actions);
 
     return container;
   }
@@ -1268,6 +1237,9 @@
     const startEl = document.getElementById("start-date");
     const endEl = document.getElementById("end-date");
     const reasonEl = document.getElementById("reason");
+
+    // sincronizar con el rol actual al cargar
+    requesterEl.value = currentRole;
 
     startEl.min = GLOBAL_MIN_DATE;
     startEl.max = GLOBAL_MAX_DATE;
@@ -1309,11 +1281,12 @@
       addRequest(requester, startStr, endStr, reason);
 
       form.reset();
-      requesterEl.value = "madre";
+      // tras enviar, volvemos a dejar seleccionado el rol actual
+      requesterEl.value = currentRole;
     });
   }
 
-  // ================= CONTROLES (AÑO / VISTA / MES / NAVEGACIÓN) =================
+  // ================= CONTROLES =================
 
   function setupControls() {
     const yearSelect = document.getElementById("year-select");
@@ -1392,13 +1365,16 @@
     });
   }
 
-  // ================= TOGGLE ROL (SOLO ESTILO) =================
+  // ================= TOGGLE ROL (SOLO ESTILO + SINCRONIZAR FORMULARIO) =================
 
   function setupRoleToggle() {
     const btnMadre = document.getElementById("btnSoyMadre");
     const btnPadre = document.getElementById("btnSoyPadre");
+    const requesterSelect = document.getElementById("requester");
 
     function setActive(active) {
+      currentRole = active; // guardamos el rol actual
+
       if (active === "madre") {
         btnMadre.classList.add("active");
         btnPadre.classList.remove("active");
@@ -1406,16 +1382,23 @@
         btnPadre.classList.add("active");
         btnMadre.classList.remove("active");
       }
+
+      // Sincronizar automáticamente el select del formulario
+      if (requesterSelect) {
+        requesterSelect.value = active;
+      }
     }
 
     btnMadre.addEventListener("click", () => setActive("madre"));
     btnPadre.addEventListener("click", () => setActive("padre"));
+
+    // Estado inicial
+    setActive("madre");
   }
 
   // ================= LISTENERS FIREBASE =================
 
   function setupFirebaseListeners() {
-    // Overrides (días modificados)
     db.collection("overrides").onSnapshot(
       (snapshot) => {
         overrides = {};
@@ -1434,7 +1417,6 @@
       }
     );
 
-    // Solicitudes
     db.collection("requests")
       .orderBy("createdAt", "desc")
       .onSnapshot(
@@ -1473,8 +1455,8 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     setupControls();
-    setupForm();
     setupRoleToggle();
+    setupForm();
     setupFirebaseListeners();
     renderCalendar();
     renderRequests();

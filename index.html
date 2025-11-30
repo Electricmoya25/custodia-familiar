@@ -133,13 +133,13 @@
     .requests-list { max-height:260px; overflow:auto; border-radius:12px; border:1px solid #e5e7eb; padding:8px; }
     
     .request-item { border-radius:10px; border:1px solid #e5e7eb; padding:8px 10px; margin-bottom:8px; font-size:0.8rem; background: #f9fafb; }
-    /* Nuevos botones de acción */
     .request-actions { display: flex; gap: 8px; margin-top: 8px; }
     .action-btn { flex: 1; padding: 6px; border-radius: 6px; border: none; font-size: 0.75rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; }
     .btn-accept { background: #dcfce7; color: #166534; }
     .btn-accept:hover { background: #bbf7d0; }
     .btn-reject { background: #fee2e2; color: #b91c1c; }
     .btn-reject:hover { background: #fecaca; }
+    .waiting-text { font-size: 0.75rem; color: #6b7280; font-style: italic; margin-top: 6px; text-align: center; }
 
     /* CALENDARIO */
     .calendar-wrapper { background:var(--card-bg); border-radius:28px; padding:16px 12px; box-shadow:var(--shadow-soft); overflow: hidden; }
@@ -417,7 +417,7 @@
     }, 250);
   }
 
-  // --- LÓGICA DE SOLICITUDES ACTUALIZADA (CON BOTONES) ---
+  // --- LÓGICA DE SOLICITUDES ACTUALIZADA (SEGURIDAD DE ROLES) ---
   function renderRequestsList() {
     const pendingEl = document.getElementById("pending-requests");
     const historyEl = document.getElementById("history-requests");
@@ -430,17 +430,20 @@
         const quien = req.requesterRole ? (req.requesterRole.charAt(0).toUpperCase() + req.requesterRole.slice(1)) : "Usuario";
         
         let actionsHtml = "";
-        // Si hay usuario logueado, mostrar botones. 
-        // (Opcional: Podríamos validar que no sea el mismo que solicitó, pero para simplificar dejamos que cualquiera apruebe)
-        if(currentUser) {
-            // Pasamos los parámetros necesarios para actualizar la base de datos
-            // Usamos comillas simples escapadas para los strings en el onclick
-            actionsHtml = `
-            <div class="request-actions">
-                <button class="action-btn btn-accept" onclick="answerRequest('${req.id}', 'aceptado', '${req.startDate}', '${req.endDate}', '${req.requesterRole}')">✅ Aceptar</button>
-                <button class="action-btn btn-reject" onclick="answerRequest('${req.id}', 'rechazado')">❌ Rechazar</button>
-            </div>
-            `;
+        
+        // --- LOGICA CRITICA: Solo mostrar botones si NO eres el que solicitó ---
+        if (currentUser && currentRole) {
+            if (currentRole !== req.requesterRole) {
+                // Eres el "otro" padre, puedes decidir
+                actionsHtml = `
+                <div class="request-actions">
+                    <button class="action-btn btn-accept" onclick="answerRequest('${req.id}', 'aceptado', '${req.startDate}', '${req.endDate}', '${req.requesterRole}')">✅ Aceptar</button>
+                    <button class="action-btn btn-reject" onclick="answerRequest('${req.id}', 'rechazado')">❌ Rechazar</button>
+                </div>`;
+            } else {
+                // Eres quien hizo la solicitud
+                actionsHtml = `<div class="waiting-text">⏳ Esperando respuesta del otro progenitor...</div>`;
+            }
         }
 
         div.innerHTML = `
@@ -478,10 +481,9 @@
 
         // 2. Si se acepta, actualizar los días en el calendario (Overrides)
         if (newStatus === 'aceptado' && startDate && endDate && requesterRole) {
-            const start = new Date(startDate + 'T12:00:00'); // Asegurar mediodía para evitar problemas de zona horaria
+            const start = new Date(startDate + 'T12:00:00');
             const end = new Date(endDate + 'T12:00:00');
             
-            // Recorrer día a día
             for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
                 const year = d.getFullYear();
                 const month = d.getMonth(); // 0-11
@@ -489,13 +491,13 @@
                 const dateKey = formatDateKey(year, month, day);
                 
                 const overrideRef = db.collection("overrides").doc(dateKey);
-                // Establecer el dueño (requesterRole es quien pidió el cambio, así que ahora es suyo)
+                // El dueño pasa a ser quien lo SOLICITÓ (requesterRole)
                 batch.set(overrideRef, { owner: requesterRole });
             }
         }
 
         await batch.commit();
-        showToast(newStatus === 'aceptado' ? "Solicitud Aceptada y Calendario Actualizado" : "Solicitud Rechazada");
+        showToast(newStatus === 'aceptado' ? "Solicitud Aceptada" : "Solicitud Rechazada");
 
     } catch (err) {
         console.error("Error respondiendo:", err);
@@ -581,7 +583,7 @@
   document.getElementById("next-period").addEventListener("click", () => { currentMonth++; if(currentMonth > 11) { currentMonth = 0; currentYear++; document.getElementById("year-select").value = currentYear; } renderCalendar(); });
 
   // ---------------------------------------------------------
-  // VERSIÓN SEGURA: SOLO FIREBASE (La notificación la hace el Backend)
+  // FORMULARIO DE ENVÍO SEGURO
   // ---------------------------------------------------------
   document.getElementById("request-form").addEventListener("submit", async (e) => {
     e.preventDefault();

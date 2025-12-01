@@ -156,13 +156,11 @@
     .month-table th { font-size:0.7rem; color:#9ca3af; font-weight:500; padding:4px 0; }
     .month-table td { height:55px; position:relative; border-radius:12px; vertical-align: top; overflow: hidden; }
 
-    /* ESTILOS DE CUSTODIA */
     .day-mother { background:var(--mother-color); }
     .day-father { background:var(--father-color); }
     
     .day-number { position:absolute; top:4px; left:6px; font-size:0.9rem; font-weight:700; color:#1f2937; z-index: 2; }
     
-    /* MARCA DE AGUA */
     .owner-icon {
       position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
       font-size: 2.5rem; opacity: 0.15; pointer-events: none; z-index: 1; user-select: none;
@@ -305,27 +303,36 @@
   const weekDayNames = ["Lun","Mar","Mié","Jue","Vie","Sáb","Dom"];
   const BASE_MONDAY = new Date(2026, 0, 5, 12, 0, 0);
 
-  // --- FUNCIÓN TELEGRAM (HTTP Cloud Run URL nueva) ---
+  // --- FUNCIÓN TELEGRAM (URL Cloud Run + DEBUG) ---
   function sendTelegramMessage(text) {
-    const url = "https://sendtelegram-jd4jwaesba-uc.a.run.app";
+    const url = "https://sendtelegram-jd4jwaesba-uc.a.run.app"; // URL de la función en Cloud Run
 
     fetch(url, {
       method: "POST",
       headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({ text })
+      body: JSON.stringify({ text }),
     })
-      .then((res) => res.json())
-      .then((data) => {
-        if (!data || !data.ok) {
+      .then(async (res) => {
+        const raw = await res.text();
+        console.log("sendTelegram HTTP", res.status, raw);
+
+        let data;
+        try {
+          data = JSON.parse(raw);
+        } catch (e) {
+          console.error("Respuesta no es JSON válido", e);
+          return;
+        }
+
+        if (!data.ok) {
           console.error("Error respuesta sendTelegram:", data);
         }
       })
       .catch((err) => {
-        console.error("Error al llamar a sendTelegram:", err);
+        console.error("Error de red al llamar a sendTelegram:", err);
       });
   }
 
-  // HELPERS
   function showToast(msg, type = 'success') {
     const container = document.getElementById('toast-container');
     const el = document.createElement('div');
@@ -431,7 +438,6 @@
               ownerIcon.textContent = final === "madre" ? "👩" : "👨";
               td.appendChild(ownerIcon);
 
-              const today = new Date();
               if(currentYear === today.getFullYear() && mIndex === today.getMonth() && dayCounter === today.getDate()){
                 const todayMark = document.createElement("div");
                 todayMark.className = "today-marker";
@@ -468,7 +474,6 @@
     if(pendingEl) pendingEl.innerHTML = "";
     if(historyEl) historyEl.innerHTML = "";
 
-    // PENDIENTES
     if(pendingRequests.length === 0 && pendingEl) {
       pendingEl.innerHTML = "<div style='color:#9ca3af;font-style:italic;text-align:center;'>No hay pendientes</div>";
     } else if(pendingEl) {
@@ -498,7 +503,6 @@
       });
     }
 
-    // HISTORIAL
     if(historyRequests.length === 0 && historyEl) {
       historyEl.innerHTML = "<div style='color:#9ca3af;font-style:italic;text-align:center;'>Historial vacío</div>";
     } else if(historyEl) {
@@ -522,38 +526,38 @@
 
   // --- LÓGICA DE PROCESAMIENTO CON TELEGRAM ---
   window.processRequest = async function(reqId, newStatus, reqRole, startStr, endStr) {
-      if(!confirm(`¿Estás seguro de marcar como ${newStatus}?`)) return;
+    if(!confirm(`¿Estás seguro de marcar como ${newStatus}?`)) return;
 
-      try {
-          const batch = db.batch();
-          const reqRef = db.collection("requests").doc(reqId);
-          batch.update(reqRef, { status: newStatus });
+    try {
+      const batch = db.batch();
+      const reqRef = db.collection("requests").doc(reqId);
+      batch.update(reqRef, { status: newStatus });
 
-          if (newStatus === 'aceptado' && startStr && endStr) {
-              const start = new Date(startStr);
-              const end = new Date(endStr);
-              for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-                  const y = d.getFullYear();
-                  const m = String(d.getMonth() + 1).padStart(2, '0');
-                  const da = String(d.getDate()).padStart(2, '0');
-                  const key = `${y}-${m}-${da}`;
-                  
-                  const overrideRef = db.collection("overrides").doc(key);
-                  batch.set(overrideRef, { owner: reqRole }); 
-              }
-          }
-
-          await batch.commit();
-          showToast(`Solicitud ${newStatus}`);
+      if (newStatus === 'aceptado' && startStr && endStr) {
+        const start = new Date(startStr);
+        const end = new Date(endStr);
+        for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+          const y = d.getFullYear();
+          const m = String(d.getMonth() + 1).padStart(2, '0');
+          const da = String(d.getDate()).padStart(2, '0');
+          const key = `${y}-${m}-${da}`;
           
-          const responder = currentRole ? (currentRole.charAt(0).toUpperCase() + currentRole.slice(1)) : "Usuario";
-          const icono = newStatus === 'aceptado' ? "✅" : "❌";
-          sendTelegramMessage(`${icono} Solicitud **${newStatus.toUpperCase()}** por ${responder}.\nFechas: ${startStr} a ${endStr}`);
-
-      } catch (err) {
-          console.error(err);
-          showToast("Error al procesar", "error");
+          const overrideRef = db.collection("overrides").doc(key);
+          batch.set(overrideRef, { owner: reqRole }); 
+        }
       }
+
+      await batch.commit();
+      showToast(`Solicitud ${newStatus}`);
+      
+      const responder = currentRole ? (currentRole.charAt(0).toUpperCase() + currentRole.slice(1)) : "Usuario";
+      const icono = newStatus === 'aceptado' ? "✅" : "❌";
+      sendTelegramMessage(`${icono} Solicitud **${newStatus.toUpperCase()}** por ${responder}.\nFechas: ${startStr} a ${endStr}`);
+
+    } catch (err) {
+      console.error(err);
+      showToast("Error al procesar", "error");
+    }
   };
 
   // --- SWIPE CALENDARIO ---

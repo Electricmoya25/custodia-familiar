@@ -144,8 +144,26 @@ const auth = firebase.auth();
    FUNCIÓN TELEGRAM (VÍA CLOUD FUNCTION HTTP)
 =========================================================== */
 function sendTelegramMessage(text) {
+  const url = "https://sendtelegram-jd4jwaesba-uc.a.run.app";
 
-  const url = "https://us-central1-custodia-familiar.cloudfunctions.net/sendTelegram";
+  fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ text }),
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      if (!data || !data.ok) {
+        console.error("Error respuesta sendTelegram:", data);
+      }
+    })
+    .catch((err) => {
+      console.error("Error al llamar a sendTelegram:", err);
+    });
+}
+
 
   fetch(url, {
     method: "POST",
@@ -258,3 +276,4 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 </body>
 </html>
+

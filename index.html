@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>Custodia Familiar 2026-2027</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' x='0.1em' font-size='80'%3E%F0%9F%93%85%3C/text%3E%3C/svg%3C/svg%3E">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' x='0.1em' font-size='80'%3E%F0%9F%93%85%3C/text%3E%3C/svg%3E">
   <style>
     :root {
       --mother-color: #fce7f3; /* Rosa pastel */
@@ -156,11 +156,13 @@
     .month-table th { font-size:0.7rem; color:#9ca3af; font-weight:500; padding:4px 0; }
     .month-table td { height:55px; position:relative; border-radius:12px; vertical-align: top; overflow: hidden; }
 
+    /* ESTILOS DE CUSTODIA */
     .day-mother { background:var(--mother-color); }
     .day-father { background:var(--father-color); }
     
     .day-number { position:absolute; top:4px; left:6px; font-size:0.9rem; font-weight:700; color:#1f2937; z-index: 2; }
     
+    /* MARCA DE AGUA */
     .owner-icon {
       position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
       font-size: 2.5rem; opacity: 0.15; pointer-events: none; z-index: 1; user-select: none;
@@ -272,8 +274,12 @@
 
 <script>
   // ==========================================
-  // ⚙️ FIREBASE
+  // ⚙️ CONFIGURACIÓN TELEGRAM (¡CORREGIDO!)
   // ==========================================
+  // ✅ El token y el ID deben ir entre COMILLAS ("")
+  const TELEGRAM_TOKEN = "8556115664:AAGG4iOFmY7s75GX5BOJsgBJIb0E4FXRVZU";
+  const TELEGRAM_CHAT_ID = "277297907";
+
   const firebaseConfig = {
     apiKey: "AIzaSyAwgk4_l0zvaCUCgm1CjqqqXjJHr5KPBjc",
     authDomain: "custodia-familiar.firebaseapp.com",
@@ -303,36 +309,39 @@
   const weekDayNames = ["Lun","Mar","Mié","Jue","Vie","Sáb","Dom"];
   const BASE_MONDAY = new Date(2026, 0, 5, 12, 0, 0);
 
-  // --- FUNCIÓN TELEGRAM (URL Cloud Run + DEBUG) ---
+  // --- FUNCIÓN TELEGRAM ---
   function sendTelegramMessage(text) {
-    const url = "https://sendtelegram-jd4jwaesba-uc.a.run.app"; // URL de la función en Cloud Run
-
+    if (!TELEGRAM_TOKEN || !TELEGRAM_CHAT_ID) {
+      console.warn("Telegram no configurado correctamente.");
+      return;
+    }
+    const url = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`;
     fetch(url, {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({ text }),
-    })
-      .then(async (res) => {
-        const raw = await res.text();
-        console.log("sendTelegram HTTP", res.status, raw);
-
-        let data;
-        try {
-          data = JSON.parse(raw);
-        } catch (e) {
-          console.error("Respuesta no es JSON válido", e);
-          return;
-        }
-
-        if (!data.ok) {
-          console.error("Error respuesta sendTelegram:", data);
-        }
-      })
-      .catch((err) => {
-        console.error("Error de red al llamar a sendTelegram:", err);
-      });
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: text, parse_mode: "Markdown" })
+    }).catch(err => console.error("Error Telegram:", err));
   }
 
+  // --- HELPER: FORMATEO DE FECHA AMIGABLE ---
+  // Convierte "2025-01-02" a "jueves 2 de Enero del 2025"
+  function formatDateFriendly(dateStr) {
+    if(!dateStr) return "";
+    // Separamos la fecha manualmente para evitar problemas de zona horaria UTC
+    const [y, m, d] = dateStr.split('-').map(Number);
+    // Mes en JS es 0-11
+    const date = new Date(y, m - 1, d);
+    
+    const days = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
+    const months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+    
+    const dayName = days[date.getDay()];
+    const monthName = months[date.getMonth()];
+    
+    return `${dayName} ${d} de ${monthName} del ${y}`;
+  }
+
+  // HELPERS UI
   function showToast(msg, type = 'success') {
     const container = document.getElementById('toast-container');
     const el = document.createElement('div');
@@ -340,10 +349,7 @@
     el.innerHTML = type === 'success' ? `✅ ${msg}` : `⚠️ ${msg}`;
     container.appendChild(el);
     requestAnimationFrame(() => el.classList.add('visible'));
-    setTimeout(() => {
-      el.classList.remove('visible');
-      setTimeout(() => el.remove(), 300);
-    }, 4000);
+    setTimeout(() => { el.classList.remove('visible'); setTimeout(() => el.remove(), 300); }, 4000);
   }
 
   function setConnectionStatus(state) {
@@ -386,33 +392,23 @@
       const today = new Date();
 
       monthsToRender.forEach(mIndex => {
-        const monthDiv = document.createElement("div");
-        monthDiv.className = "month";
-        const header = document.createElement("div");
-        header.className = "month-header";
+        const monthDiv = document.createElement("div"); monthDiv.className = "month";
+        const header = document.createElement("div"); header.className = "month-header";
         header.textContent = currentView === "year" ? `${monthNames[mIndex]} ${currentYear}` : monthNames[mIndex];
         monthDiv.appendChild(header);
 
-        const table = document.createElement("table");
-        table.className = "month-table";
+        const table = document.createElement("table"); table.className = "month-table";
         const thead = document.createElement("thead");
         const trHead = document.createElement("tr");
-        weekDayNames.forEach(d => {
-          const th = document.createElement("th");
-          th.textContent = d.charAt(0);
-          trHead.appendChild(th);
-        });
-        thead.appendChild(trHead);
-        table.appendChild(thead);
+        weekDayNames.forEach(d => { const th = document.createElement("th"); th.textContent = d.charAt(0); trHead.appendChild(th); });
+        thead.appendChild(trHead); table.appendChild(thead);
 
         const daysInMonth = new Date(currentYear, mIndex + 1, 0).getDate();
         const firstDayInstance = new Date(currentYear, mIndex, 1);
-        let startDay = firstDayInstance.getDay();
-        startDay = (startDay === 0) ? 6 : startDay - 1;
+        let startDay = firstDayInstance.getDay(); startDay = (startDay === 0) ? 6 : startDay - 1;
 
         const tbody = document.createElement("tbody");
-        let dayCounter = 1;
-        let finished = false;
+        let dayCounter = 1; let finished = false;
         while(!finished) {
           const tr = document.createElement("tr");
           for(let i = 0; i < 7; i++) {
@@ -428,24 +424,18 @@
               if(final === "madre") td.classList.add("day-mother");
               if(override) td.classList.add("day-overridden");
 
-              const spanNum = document.createElement("span");
-              spanNum.className = "day-number";
-              spanNum.textContent = dayCounter;
+              const spanNum = document.createElement("span"); spanNum.className = "day-number"; spanNum.textContent = dayCounter;
               td.appendChild(spanNum);
               
               const ownerIcon = document.createElement("div");
               ownerIcon.className = "owner-icon";
-              ownerIcon.textContent = final === "madre" ? "👩" : "👨";
-              td.appendChild(ownerIcon);
-
+              ownerIcon.textContent = final === "madre" ? "👩" : "👨"; td.appendChild(ownerIcon);
               if(currentYear === today.getFullYear() && mIndex === today.getMonth() && dayCounter === today.getDate()){
                 const todayMark = document.createElement("div");
-                todayMark.className = "today-marker";
-                td.appendChild(todayMark);
+                todayMark.className = "today-marker"; td.appendChild(todayMark);
               }
               td.title = `${dateKey}: ${final}`;
-              tr.appendChild(td);
-              dayCounter++;
+              tr.appendChild(td); dayCounter++;
             } else {
               td.style.background = "transparent";
               tr.appendChild(td);
@@ -454,16 +444,12 @@
           tbody.appendChild(tr);
           if(dayCounter > daysInMonth) finished = true;
         }
-        table.appendChild(tbody);
-        monthDiv.appendChild(table);
-        grid.appendChild(monthDiv);
+        table.appendChild(tbody); monthDiv.appendChild(table); grid.appendChild(monthDiv);
       });
       requestAnimationFrame(() => {
         grid.classList.remove('fading');
         const cells = grid.querySelectorAll('.day-cell');
-        cells.forEach((cell, index) => {
-          setTimeout(() => cell.classList.add('animated'), index * 10);
-        });
+        cells.forEach((cell, index) => { setTimeout(() => cell.classList.add('animated'), index * 10); });
       });
     }, 250);
   }
@@ -471,18 +457,17 @@
   function renderRequestsList() {
     const pendingEl = document.getElementById("pending-requests");
     const historyEl = document.getElementById("history-requests");
-    if(pendingEl) pendingEl.innerHTML = "";
-    if(historyEl) historyEl.innerHTML = "";
+    if(pendingEl) pendingEl.innerHTML = ""; if(historyEl) historyEl.innerHTML = "";
 
-    if(pendingRequests.length === 0 && pendingEl) {
-      pendingEl.innerHTML = "<div style='color:#9ca3af;font-style:italic;text-align:center;'>No hay pendientes</div>";
-    } else if(pendingEl) {
+    // PENDIENTES
+    if(pendingRequests.length === 0 && pendingEl) pendingEl.innerHTML = "<div style='color:#9ca3af;font-style:italic;text-align:center;'>No hay pendientes</div>";
+    else if(pendingEl) {
       pendingRequests.forEach(req => {
-        const div = document.createElement("div");
-        div.className = "request-item";
+        const div = document.createElement("div"); div.className = "request-item";
         const quien = req.requesterRole ? (req.requesterRole.charAt(0).toUpperCase() + req.requesterRole.slice(1)) : "Usuario";
         
         let actionsHtml = "";
+        // Si yo NO soy el que pidió, y soy el otro rol (o admin), muestro botones
         if (req.requesterRole !== currentRole) {
             actionsHtml = `
             <div class="req-actions">
@@ -503,22 +488,15 @@
       });
     }
 
-    if(historyRequests.length === 0 && historyEl) {
-      historyEl.innerHTML = "<div style='color:#9ca3af;font-style:italic;text-align:center;'>Historial vacío</div>";
-    } else if(historyEl) {
+    // HISTORIAL
+    if(historyRequests.length === 0 && historyEl) historyEl.innerHTML = "<div style='color:#9ca3af;font-style:italic;text-align:center;'>Historial vacío</div>";
+    else if(historyEl) {
       historyRequests.forEach(req => {
-        const div = document.createElement("div");
-        div.className = "request-item";
+        const div = document.createElement("div"); div.className = "request-item";
         const status = req.status || "finalizado";
         const icon = status === "aceptado" ? "✅" : "❌";
         const quien = req.requesterRole ? (req.requesterRole.charAt(0).toUpperCase() + req.requesterRole.slice(1)) : "Usuario";
-        div.innerHTML = `
-          <div style="display:flex;justify-content:space-between;font-size:0.75rem;font-weight:600;margin-bottom:4px;">
-            <span>${quien}</span>
-            <span>${icon} ${status.toUpperCase()}</span>
-          </div>
-          <div style="font-weight:700;">${req.startDate} al ${req.endDate}</div>
-          <div style="font-size:0.85rem;">${req.reason||""}</div>`;
+        div.innerHTML = `<div style="display:flex;justify-content:space-between;font-size:0.75rem;font-weight:600;margin-bottom:4px;"><span>${quien}</span><span>${icon} ${status.toUpperCase()}</span></div><div style="font-weight:700;">${req.startDate} al ${req.endDate}</div><div style="font-size:0.85rem;">${req.reason||""}</div>`;
         historyEl.appendChild(div);
       });
     }
@@ -526,41 +504,48 @@
 
   // --- LÓGICA DE PROCESAMIENTO CON TELEGRAM ---
   window.processRequest = async function(reqId, newStatus, reqRole, startStr, endStr) {
-    if(!confirm(`¿Estás seguro de marcar como ${newStatus}?`)) return;
+      if(!confirm(`¿Estás seguro de marcar como ${newStatus}?`)) return;
 
-    try {
-      const batch = db.batch();
-      const reqRef = db.collection("requests").doc(reqId);
-      batch.update(reqRef, { status: newStatus });
+      try {
+          const batch = db.batch();
+          const reqRef = db.collection("requests").doc(reqId);
+          batch.update(reqRef, { status: newStatus });
 
-      if (newStatus === 'aceptado' && startStr && endStr) {
-        const start = new Date(startStr);
-        const end = new Date(endStr);
-        for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-          const y = d.getFullYear();
-          const m = String(d.getMonth() + 1).padStart(2, '0');
-          const da = String(d.getDate()).padStart(2, '0');
-          const key = `${y}-${m}-${da}`;
+          // Si se acepta, crear los Overrides en el calendario
+          if (newStatus === 'aceptado' && startStr && endStr) {
+              const start = new Date(startStr);
+              const end = new Date(endStr);
+              for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+                  const y = d.getFullYear();
+                  const m = String(d.getMonth() + 1).padStart(2, '0');
+                  const da = String(d.getDate()).padStart(2, '0');
+                  const key = `${y}-${m}-${da}`;
+                  
+                  const overrideRef = db.collection("overrides").doc(key);
+                  batch.set(overrideRef, { owner: reqRole }); 
+              }
+          }
+
+          await batch.commit();
+          showToast(`Solicitud ${newStatus}`);
           
-          const overrideRef = db.collection("overrides").doc(key);
-          batch.set(overrideRef, { owner: reqRole }); 
-        }
+          // TELEGRAM: Notificar resultado
+          const responder = currentRole ? (currentRole.charAt(0).toUpperCase() + currentRole.slice(1)) : "Usuario";
+          const icono = newStatus === 'aceptado' ? "✅" : "❌";
+          
+          // Formateamos fechas para el mensaje
+          const niceStart = formatDateFriendly(startStr);
+          const niceEnd = formatDateFriendly(endStr);
+          
+          sendTelegramMessage(`${icono} Solicitud **${newStatus.toUpperCase()}** por ${responder}.\nFechas: ${niceStart} al ${niceEnd}`);
+
+      } catch (err) {
+          console.error(err);
+          showToast("Error al procesar", "error");
       }
-
-      await batch.commit();
-      showToast(`Solicitud ${newStatus}`);
-      
-      const responder = currentRole ? (currentRole.charAt(0).toUpperCase() + currentRole.slice(1)) : "Usuario";
-      const icono = newStatus === 'aceptado' ? "✅" : "❌";
-      sendTelegramMessage(`${icono} Solicitud **${newStatus.toUpperCase()}** por ${responder}.\nFechas: ${startStr} a ${endStr}`);
-
-    } catch (err) {
-      console.error(err);
-      showToast("Error al procesar", "error");
-    }
   };
 
-  // --- SWIPE CALENDARIO ---
+  // --- LÓGICA DE SWIPE (DESLIZAR) ---
   const gridElement = document.getElementById("calendar-grid");
   let touchStartX = 0;
   let touchStartY = 0;
@@ -597,23 +582,13 @@
           currentRole = data.role;
           document.getElementById("user-role-label").textContent = currentRole === "padre" ? "Padre 👨" : "Madre 👩";
           document.getElementById("whoami-label").innerHTML = currentRole === "padre" ? "Padre 👨" : "Madre 👩";
-          loginView.classList.add("hidden");
-          appRoot.classList.remove("hidden");
-          initDataListeners();
-          renderCalendar();
-        } else {
-          alert(`Usuario sin perfil.`);
-          auth.signOut();
-        }
-      } catch (e) {
-        alert("Error DB.");
-        auth.signOut();
-      }
+          loginView.classList.add("hidden"); appRoot.classList.remove("hidden");
+          initDataListeners(); renderCalendar();
+        } else { alert(`Usuario sin perfil.`); auth.signOut(); }
+      } catch (e) { alert("Error DB."); auth.signOut(); }
     } else {
-      currentUser = null;
-      currentRole = null;
-      loginView.classList.remove("hidden");
-      appRoot.classList.add("hidden");
+      currentUser = null; currentRole = null;
+      loginView.classList.remove("hidden"); appRoot.classList.add("hidden");
     }
   });
 
@@ -621,68 +596,25 @@
     e.preventDefault();
     const btn = document.getElementById("login-submit-btn");
     const errEl = document.getElementById("login-error");
-    btn.disabled = true;
-    btn.textContent = "Verificando...";
-    errEl.textContent = "";
-    auth.signInWithEmailAndPassword(
-      document.getElementById("login-email").value,
-      document.getElementById("login-password").value
-    )
-      .catch(err => {
-        errEl.textContent = "Credenciales incorrectas";
-      })
-      .finally(() => {
-        btn.disabled = false;
-        btn.textContent = "Entrar";
-      });
+    btn.disabled = true; btn.textContent = "Verificando..."; errEl.textContent = "";
+    auth.signInWithEmailAndPassword(document.getElementById("login-email").value, document.getElementById("login-password").value)
+      .catch(err => { errEl.textContent = "Credenciales incorrectas"; })
+      .finally(() => { btn.disabled = false; btn.textContent = "Entrar"; });
   });
-
   document.getElementById("logout-btn").addEventListener("click", () => auth.signOut());
 
   function initDataListeners() {
-    db.collection("overrides").onSnapshot(snap => {
-      overrides = {};
-      snap.forEach(doc => overrides[doc.id] = doc.data().owner);
-      renderCalendar();
-      setConnectionStatus("online");
-    });
+    db.collection("overrides").onSnapshot(snap => { overrides = {}; snap.forEach(doc => overrides[doc.id] = doc.data().owner); renderCalendar(); setConnectionStatus("online"); });
     db.collection("requests").orderBy("createdAt", "desc").onSnapshot(snap => {
-      pendingRequests = [];
-      historyRequests = [];
-      snap.forEach(doc => {
-        const d = doc.data();
-        const i = { id: doc.id, ...d };
-        if(i.status === "pendiente") pendingRequests.push(i);
-        else historyRequests.push(i);
-      });
+      pendingRequests = []; historyRequests = [];
+      snap.forEach(doc => { const d = doc.data(); const i = { id: doc.id, ...d }; if(i.status === "pendiente") pendingRequests.push(i); else historyRequests.push(i); });
       renderRequestsList();
     });
   }
 
-  document.getElementById("year-select").addEventListener("change", (e) => {
-    currentYear = parseInt(e.target.value);
-    renderCalendar();
-  });
-
-  document.getElementById("prev-period").addEventListener("click", () => {
-    currentMonth--;
-    if(currentMonth < 0) {
-      currentMonth = 11;
-      currentYear--;
-      document.getElementById("year-select").value = currentYear;
-    }
-    renderCalendar();
-  });
-
-  document.getElementById("next-period").addEventListener("click", () => {
-    currentMonth++;
-    if(currentMonth > 11) {
-      currentMonth = 0;
-      currentYear++;
-      document.getElementById("year-select").value = currentYear;
-    }
-    renderCalendar();
-  });
+  document.getElementById("year-select").addEventListener("change", (e) => { currentYear = parseInt(e.target.value); renderCalendar(); });
+  document.getElementById("prev-period").addEventListener("click", () => { currentMonth--; if(currentMonth < 0) { currentMonth = 11; currentYear--; document.getElementById("year-select").value = currentYear; } renderCalendar(); });
+  document.getElementById("next-period").addEventListener("click", () => { currentMonth++; if(currentMonth > 11) { currentMonth = 0; currentYear++; document.getElementById("year-select").value = currentYear; } renderCalendar(); });
 
   // --- ENVÍO DE SOLICITUD CON TELEGRAM ---
   document.getElementById("request-form").addEventListener("submit", async (e) => {
@@ -694,46 +626,29 @@
 
     try {
       await db.collection("requests").add({
-        requesterUid: currentUser.uid,
-        requesterRole: currentRole,
-        startDate: sDate,
-        endDate: eDate,
-        reason: reason,
-        status: "pendiente",
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        requesterUid: currentUser.uid, requesterRole: currentRole,
+        startDate: sDate, endDate: eDate, reason: reason,
+        status: "pendiente", createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
-      showToast("Solicitud enviada");
-      e.target.reset();
+      showToast("Solicitud enviada"); e.target.reset();
 
+      // TELEGRAM: Notificar nueva solicitud
       const quien = currentRole.charAt(0).toUpperCase() + currentRole.slice(1);
-      sendTelegramMessage(`📢 **NUEVA SOLICITUD**\nDe: ${quien}\n📅: ${sDate} al ${eDate}\n💬: "${reason}"`);
+      
+      // Formateamos fechas para el mensaje
+      const niceStart = formatDateFriendly(sDate);
+      const niceEnd = formatDateFriendly(eDate);
 
-    } catch (err) {
-      console.error(err);
-      showToast("Error al enviar", "error");
-    }
+      sendTelegramMessage(`📢 **NUEVA SOLICITUD**\nDe: ${quien}\n📅: ${niceStart} al ${niceEnd}\n💬: "${reason}"`);
+
+    } catch (err) { showToast("Error al enviar", "error"); }
   });
 
   document.addEventListener("DOMContentLoaded", () => {
-    const sd = document.getElementById("start-date"),
-          ed = document.getElementById("end-date");
-    if(sd && ed) {
-      sd.min = GLOBAL_MIN_DATE;
-      sd.max = GLOBAL_MAX_DATE;
-      ed.min = GLOBAL_MIN_DATE;
-      ed.max = GLOBAL_MAX_DATE;
-    }
+    const sd = document.getElementById("start-date"), ed = document.getElementById("end-date");
+    if(sd && ed) { sd.min = GLOBAL_MIN_DATE; sd.max = GLOBAL_MAX_DATE; ed.min = GLOBAL_MIN_DATE; ed.max = GLOBAL_MAX_DATE; }
     const ys = document.getElementById("year-select");
-    if(ys) {
-      ys.innerHTML = "";
-      [2026, 2027].forEach(y => {
-        const o = document.createElement("option");
-        o.value = y;
-        o.textContent = y;
-        if(y === currentYear) o.selected = true;
-        ys.appendChild(o);
-      });
-    }
+    if(ys) { ys.innerHTML = ""; [2026, 2027].forEach(y => { const o = document.createElement("option"); o.value = y; o.textContent = y; if(y === currentYear) o.selected = true; ys.appendChild(o); }); }
     renderCalendar();
   });
 </script>

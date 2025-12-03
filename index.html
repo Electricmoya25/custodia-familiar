@@ -188,10 +188,23 @@
     .owner-icon {
       position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
       font-size: 3rem; opacity: 0.12; pointer-events: none; z-index: 1; user-select: none;
+      transition: opacity 0.3s ease, transform 0.3s ease;
     }
 
     .day-overridden::after { content:"⇄"; position:absolute; bottom:2px; left:50%; transform:translateX(-50%); font-size:0.8rem; color:var(--accent-color); opacity:0.9; z-index: 3; }
-    .today-marker { position:absolute; top:4px; right:4px; width:8px; height:8px; background:var(--accent-color); border-radius:50%; box-shadow:0 0 0 2px white; z-index: 3; }
+    
+    /* ESTILO PARA DÍA ACTUAL */
+    .day-cell.is-today {
+      /* Sin borde, solo el icono resaltado */
+      box-shadow: none !important;
+    }
+    
+    /* CUANDO ES HOY: El icono pierde la transparencia y se hace sólido */
+    .day-cell.is-today .owner-icon {
+      opacity: 1 !important; /* Sin transparencia */
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15)); /* Sombra para resaltar */
+      transform: translate(-50%, -50%) scale(1.1); /* Ligeramente más grande */
+    }
 
     /* ESTILOS DE LOS EVENTOS (ICONOS TIPO PEGATINA INFANTIL) */
     .event-marker {
@@ -236,6 +249,11 @@
       
       .owner-icon {
         font-size: 2rem;
+      }
+      
+      /* Ajuste tamaño icono HOY en móvil */
+      .day-cell.is-today .owner-icon {
+         font-size: 2.5rem;
       }
 
       /* Ajuste fino de pegatinas para móvil */
@@ -667,9 +685,7 @@
               });
 
               if(currentYear === today.getFullYear() && mIndex === today.getMonth() && dayCounter === today.getDate()){
-                const todayMark = document.createElement("div");
-                todayMark.className = "today-marker";
-                td.appendChild(todayMark);
+                td.classList.add("is-today");
               }
               tr.appendChild(td);
               dayCounter++;

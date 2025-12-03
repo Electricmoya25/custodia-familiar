@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Custodia Familiar 2026-2027</title>
+  <title>Custodia Familiar</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' x='0.1em' font-size='80'%3E%F0%9F%93%85%3C/text%3E%3C/svg%3C/svg%3E">
   <style>
@@ -286,51 +286,52 @@
   const db = firebase.firestore();
   const auth = firebase.auth();
 
-  const MIN_YEAR = 2026;
+  // INICIO RANGO DE FECHAS DESDE 2025
+  const MIN_YEAR = 2025;
   const MAX_YEAR = 2027;
-  const GLOBAL_MIN_DATE = `${MIN_YEAR}-01-01`;
+  const GLOBAL_MIN_DATE = `${MIN_YEAR}-12-01`; // Permitimos desde diciembre 2025
   const GLOBAL_MAX_DATE = `${MAX_YEAR}-12-31`;
 
-  let currentYear = 2026;
-  let currentMonth = 0;
+  // Inicializar en 2025 y mes 11 (Diciembre)
+  let currentYear = 2025;
+  let currentMonth = 11; // 0 = Enero, 11 = Diciembre
+  
   let currentView = "month";
   let currentUser = null;
   let currentRole = null;
   let overrides = {};
   let pendingRequests = [];
   let historyRequests = [];
+  
   const monthNames = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
   const weekDayNames = ["Lun","Mar","Mié","Jue","Vie","Sáb","Dom"];
-  const BASE_MONDAY = new Date(2026, 0, 5, 12, 0, 0);
+  const BASE_MONDAY = new Date(2026, 0, 5, 12, 0, 0); // Base de referencia, no cambiar
 
-  // --- FUNCIÓN TELEGRAM (URL Cloud Run + DEBUG) ---
+  // --- UTILIDAD: FORMATEO DE FECHAS AMIGABLE ---
+  function formatearFechaAmigable(dateStr) {
+    if (!dateStr) return "Fecha desconocida";
+    // Convertir YYYY-MM-DD a objeto Date asegurando zona horaria local
+    const parts = dateStr.split('-');
+    const fecha = new Date(parts[0], parts[1] - 1, parts[2]);
+    
+    return fecha.toLocaleDateString('es-ES', { 
+      day: 'numeric', 
+      month: 'long', 
+      year: 'numeric' 
+    }); // Ej: "3 de diciembre de 2025"
+  }
+
+  // --- FUNCIÓN TELEGRAM ---
   function sendTelegramMessage(text) {
-    const url = "https://sendtelegram-jd4jwaesba-uc.a.run.app"; // URL de la función en Cloud Run
+    const url = "https://sendtelegram-jd4jwaesba-uc.a.run.app"; 
 
     fetch(url, {
       method: "POST",
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify({ text }),
     })
-      .then(async (res) => {
-        const raw = await res.text();
-        console.log("sendTelegram HTTP", res.status, raw);
-
-        let data;
-        try {
-          data = JSON.parse(raw);
-        } catch (e) {
-          console.error("Respuesta no es JSON válido", e);
-          return;
-        }
-
-        if (!data.ok) {
-          console.error("Error respuesta sendTelegram:", data);
-        }
-      })
-      .catch((err) => {
-        console.error("Error de red al llamar a sendTelegram:", err);
-      });
+    .then(res => res.text())
+    .catch(err => console.error("Error Telegram:", err));
   }
 
   function showToast(msg, type = 'success') {
@@ -366,7 +367,9 @@
     const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
     const weekIndex = Math.floor(diffDays / 7);
     const isEven = Math.abs(weekIndex) % 2 === 0;
-    return isEven ? "padre" : "madre";
+    
+    // Ajuste para fechas anteriores a la base (negativos)
+    return isEven ? "padre" : "madre"; 
   }
 
   function renderCalendar() {
@@ -482,19 +485,24 @@
         div.className = "request-item";
         const quien = req.requesterRole ? (req.requesterRole.charAt(0).toUpperCase() + req.requesterRole.slice(1)) : "Usuario";
         
+        // Formato amigable para visualización
+        const inicioF = formatearFechaAmigable(req.startDate);
+        const finF = formatearFechaAmigable(req.endDate);
+
         let actionsHtml = "";
         if (req.requesterRole !== currentRole) {
+            // Importante: Pasamos startDate y endDate también en el botón RECHAZAR para que Telegram no envíe undefined
             actionsHtml = `
             <div class="req-actions">
                 <button class="btn-action btn-accept" onclick="processRequest('${req.id}', 'aceptado', '${req.requesterRole}', '${req.startDate}', '${req.endDate}')">✔ Aceptar</button>
-                <button class="btn-action btn-reject" onclick="processRequest('${req.id}', 'rechazado')">✖ Rechazar</button>
+                <button class="btn-action btn-reject" onclick="processRequest('${req.id}', 'rechazado', '${req.requesterRole}', '${req.startDate}', '${req.endDate}')">✖ Rechazar</button>
             </div>`;
         } else {
             actionsHtml = `<div class="req-wait">⏳ Esperando respuesta...</div>`;
         }
 
         div.innerHTML = `
-            <div style="font-weight:700;">${req.startDate} ➔ ${req.endDate}</div>
+            <div style="font-weight:700; font-size: 0.8rem;">${inicioF} <br>⬇<br> ${finF}</div>
             <div style="font-size:0.85rem;margin:4px 0;">"${req.reason||'Sin motivo'}"</div>
             <div style="font-size:0.75rem;">Solicita: <strong>${quien}</strong></div>
             ${actionsHtml}
@@ -512,19 +520,23 @@
         const status = req.status || "finalizado";
         const icon = status === "aceptado" ? "✅" : "❌";
         const quien = req.requesterRole ? (req.requesterRole.charAt(0).toUpperCase() + req.requesterRole.slice(1)) : "Usuario";
+        
+        const inicioF = formatearFechaAmigable(req.startDate);
+        const finF = formatearFechaAmigable(req.endDate);
+
         div.innerHTML = `
           <div style="display:flex;justify-content:space-between;font-size:0.75rem;font-weight:600;margin-bottom:4px;">
             <span>${quien}</span>
             <span>${icon} ${status.toUpperCase()}</span>
           </div>
-          <div style="font-weight:700;">${req.startDate} al ${req.endDate}</div>
+          <div style="font-weight:700; font-size:0.8rem;">Del ${inicioF}<br>al ${finF}</div>
           <div style="font-size:0.85rem;">${req.reason||""}</div>`;
         historyEl.appendChild(div);
       });
     }
   }
 
-  // --- LÓGICA DE PROCESAMIENTO CON TELEGRAM ---
+  // --- LÓGICA DE PROCESAMIENTO CON TELEGRAM CORREGIDA ---
   window.processRequest = async function(reqId, newStatus, reqRole, startStr, endStr) {
     if(!confirm(`¿Estás seguro de marcar como ${newStatus}?`)) return;
 
@@ -552,7 +564,13 @@
       
       const responder = currentRole ? (currentRole.charAt(0).toUpperCase() + currentRole.slice(1)) : "Usuario";
       const icono = newStatus === 'aceptado' ? "✅" : "❌";
-      sendTelegramMessage(`${icono} Solicitud **${newStatus.toUpperCase()}** por ${responder}.\nFechas: ${startStr} a ${endStr}`);
+      
+      // Usar el formateador amigable para Telegram
+      const fechaTxt = (startStr && endStr) 
+        ? `${formatearFechaAmigable(startStr)} al ${formatearFechaAmigable(endStr)}` 
+        : "Fechas no especificadas";
+
+      sendTelegramMessage(`${icono} Solicitud **${newStatus.toUpperCase()}** por ${responder}.\n📅 ${fechaTxt}`);
 
     } catch (err) {
       console.error(err);
@@ -684,7 +702,7 @@
     renderCalendar();
   });
 
-  // --- ENVÍO DE SOLICITUD CON TELEGRAM ---
+  // --- ENVÍO DE SOLICITUD CON TELEGRAM Y FECHAS AMIGABLES ---
   document.getElementById("request-form").addEventListener("submit", async (e) => {
     e.preventDefault();
     if (!currentUser || !currentRole) return;
@@ -706,7 +724,10 @@
       e.target.reset();
 
       const quien = currentRole.charAt(0).toUpperCase() + currentRole.slice(1);
-      sendTelegramMessage(`📢 **NUEVA SOLICITUD**\nDe: ${quien}\n📅: ${sDate} al ${eDate}\n💬: "${reason}"`);
+      
+      // Formatear para Telegram
+      const rangoFechas = `${formatearFechaAmigable(sDate)} al ${formatearFechaAmigable(eDate)}`;
+      sendTelegramMessage(`📢 **NUEVA SOLICITUD**\nDe: ${quien}\n📅: ${rangoFechas}\n💬: "${reason}"`);
 
     } catch (err) {
       console.error(err);
@@ -726,7 +747,8 @@
     const ys = document.getElementById("year-select");
     if(ys) {
       ys.innerHTML = "";
-      [2026, 2027].forEach(y => {
+      // Rango incluye 2025 para diciembre
+      [2025, 2026, 2027].forEach(y => {
         const o = document.createElement("option");
         o.value = y;
         o.textContent = y;
@@ -739,4 +761,3 @@
 </script>
 </body>
 </html>
-

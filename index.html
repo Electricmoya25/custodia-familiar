@@ -162,7 +162,7 @@
     
     /* MODIFICACIÓN CELDA DÍA PARA ICONOS EN ESQUINAS */
     .month-table td { 
-      height: 90px; /* Más altura para acomodar iconos */
+      height: 90px; /* Default para escritorio */
       position: relative; 
       border-radius: 12px; 
       vertical-align: top; 
@@ -196,14 +196,14 @@
     /* ESTILOS DE LOS EVENTOS (ICONOS TIPO PEGATINA INFANTIL) */
     .event-marker {
       position: absolute;
-      width: 26px; height: 26px; /* Tamaño generoso */
+      width: 26px; height: 26px; /* Tamaño generoso escritorio */
       display: flex; align-items: center; justify-content: center;
-      border-radius: 50%; /* COMPLETAMENTE REDONDOS */
+      border-radius: 50%; 
       color: #fff;
       font-size: 14px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* Sombra para efecto relieve */
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
       z-index: 5;
-      border: 2px solid white; /* Borde blanco estilo pegatina */
+      border: 2px solid white;
     }
     .event-marker svg { width: 16px; height: 16px; }
     
@@ -221,6 +221,40 @@
     .evt-parque { background: #84cc16; }    /* Verde Naturaleza */
     .evt-general { background: #64748b; }   /* Gris Neutro */
     .evt-vacaciones { background: #06b6d4; } /* Cyan Playa */
+
+    /* === OPTIMIZACIÓN MÓVIL === */
+    @media (max-width: 768px) {
+      .month-table td {
+        height: auto !important; /* Quitar altura fija */
+        aspect-ratio: 1 / 1;     /* Forzar cuadrado perfecto */
+        border-radius: 6px;      /* Bordes menos redondeados en celdas pequeñas */
+      }
+      
+      .day-number {
+        font-size: 0.75rem; /* Número más pequeño */
+        top: 2px; left: 2px;
+      }
+      
+      .owner-icon {
+        font-size: 1.8rem; /* Marca de agua ajustada */
+      }
+
+      /* Pegatinas más pequeñas para que quepan en el cuadrado móvil */
+      .event-marker {
+        width: 18px; 
+        height: 18px; 
+        border-width: 1.5px;
+      }
+      .event-marker svg { 
+        width: 10px; 
+        height: 10px; 
+      }
+      
+      /* Ajuste fino de posiciones en esquinas */
+      .pos-0 { top: 2px; right: 2px; }
+      .pos-1 { bottom: 2px; left: 2px; }
+      .pos-2 { bottom: 2px; right: 2px; }
+    }
 
     /* MODAL */
     .modal-overlay {

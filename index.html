@@ -5,6 +5,10 @@
   <title>Custodia Familiar</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' x='0.1em' font-size='80'%3E%F0%9F%93%85%3C/text%3E%3C/svg%3C/svg%3E">
+  
+  <!-- Iconos Lucide (Versión visual limpia) -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
   <style>
     :root {
       --mother-color: #fce7f3; /* Rosa pastel */
@@ -129,8 +133,9 @@
     .field-group label { display:block; margin-bottom:4px; font-size:0.85rem; font-weight:500; color:#4b5563; }
     .field-group input, .field-group textarea { width:100%; padding:8px 10px; border-radius:10px; border:1px solid #d1d5db; font-size:0.9rem; }
     .field-group textarea { min-height:60px; resize:vertical; }
-    .primary-btn { display:inline-block; margin-top:8px; padding:10px 14px; border-radius:999px; border:none; background:var(--accent-color); color:#fff; font-size:0.9rem; font-weight:600; cursor:pointer; width:100%; }
-    
+    .primary-btn { display:inline-block; margin-top:8px; padding:10px 14px; border-radius:999px; border:none; background:var(--accent-color); color:#fff; font-size:0.9rem; font-weight:600; cursor:pointer; width:100%; transition: opacity 0.2s; }
+    .primary-btn:hover { opacity: 0.9; }
+
     /* ESTILOS SOLICITUDES */
     .requests-list { max-height:300px; overflow:auto; border-radius:12px; border:1px solid #e5e7eb; padding:8px; }
     .request-item { border-radius:10px; border:1px solid #e5e7eb; padding:10px; margin-bottom:8px; font-size:0.85rem; background: #f9fafb; }
@@ -152,27 +157,178 @@
 
     .month { border-radius:16px; background:#ffffff; border:1px solid #f3f4f6; overflow:hidden; margin-bottom:24px; }
     .month-header { text-align:center; padding:8px; background:#f9fafb; font-weight:600; font-size:0.9rem; color:#374151; }
-    table.month-table { width:100%; border-collapse:separate; border-spacing:2.5px; table-layout:fixed; }
+    table.month-table { width:100%; border-collapse:separate; border-spacing:2px; table-layout:fixed; }
     .month-table th { font-size:0.7rem; color:#9ca3af; font-weight:500; padding:4px 0; }
-    .month-table td { height:55px; position:relative; border-radius:12px; vertical-align: top; overflow: hidden; }
+    
+    /* MODIFICACIÓN CELDA DÍA PARA ICONOS EN ESQUINAS */
+    .month-table td { 
+      height: 90px; /* Más altura para acomodar iconos */
+      position: relative; 
+      border-radius: 12px; 
+      vertical-align: top; 
+      overflow: hidden; 
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .month-table td:hover {
+      transform: scale(0.98);
+      box-shadow: inset 0 0 0 2px var(--accent-color);
+    }
 
     .day-mother { background:var(--mother-color); }
     .day-father { background:var(--father-color); }
     
-    .day-number { position:absolute; top:4px; left:6px; font-size:0.9rem; font-weight:700; color:#1f2937; z-index: 2; }
+    /* Esquina Superior Izquierda: Número */
+    .day-number { 
+      position: absolute; top: 4px; left: 6px; 
+      font-size: 0.9rem; font-weight: 700; color: #1f2937; z-index: 2; 
+    }
     
+    /* Marca de agua (Padre/Madre) */
     .owner-icon {
       position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-      font-size: 2.5rem; opacity: 0.15; pointer-events: none; z-index: 1; user-select: none;
+      font-size: 3rem; opacity: 0.12; pointer-events: none; z-index: 1; user-select: none;
     }
 
-    .day-overridden::after { content:"⇄"; position:absolute; top:4px; right:4px; font-size:0.8rem; color:var(--accent-color); opacity:0.9; z-index: 3; }
-    .today-marker { position:absolute; bottom:4px; right:4px; width:6px; height:6px; background:var(--accent-color); border-radius:50%; box-shadow:0 0 0 2px white; z-index: 3; }
+    .day-overridden::after { content:"⇄"; position:absolute; bottom:2px; left:50%; transform:translateX(-50%); font-size:0.8rem; color:var(--accent-color); opacity:0.9; z-index: 3; }
+    .today-marker { position:absolute; top:4px; right:4px; width:8px; height:8px; background:var(--accent-color); border-radius:50%; box-shadow:0 0 0 2px white; z-index: 3; }
+
+    /* ESTILOS DE LOS EVENTOS (ICONOS TIPO PEGATINA INFANTIL) */
+    .event-marker {
+      position: absolute;
+      width: 26px; height: 26px; /* Tamaño generoso */
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 50%; /* COMPLETAMENTE REDONDOS */
+      color: #fff;
+      font-size: 14px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* Sombra para efecto relieve */
+      z-index: 5;
+      border: 2px solid white; /* Borde blanco estilo pegatina */
+    }
+    .event-marker svg { width: 16px; height: 16px; }
+    
+    /* Posiciones de las esquinas */
+    .pos-0 { top: 4px; right: 4px; }    /* Arriba Derecha */
+    .pos-1 { bottom: 4px; left: 4px; }  /* Abajo Izquierda */
+    .pos-2 { bottom: 4px; right: 4px; } /* Abajo Derecha */
+
+    /* COLORES VIBRANTES (INFANTILES) PARA LOS 8 TIPOS */
+    .evt-medico { background: #ef4444; }    /* Rojo Urgencia */
+    .evt-dentista { background: #0ea5e9; }  /* Azul Brillante */
+    .evt-escuela { background: #f97316; }   /* Naranja Escolar */
+    .evt-deporte { background: #8b5cf6; }   /* Violeta Energía */
+    .evt-cumple { background: #eab308; }    /* Amarillo Fiesta */
+    .evt-parque { background: #84cc16; }    /* Verde Naturaleza */
+    .evt-general { background: #64748b; }   /* Gris Neutro */
+    .evt-vacaciones { background: #06b6d4; } /* Cyan Playa */
+
+    /* MODAL */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 10000; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+      backdrop-filter: blur(4px);
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: auto; }
+    .modal-card {
+      background: #fff; width: 90%; max-width: 400px;
+      border-radius: 24px; padding: 24px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      transform: scale(0.95); transition: transform 0.3s;
+    }
+    .modal-overlay.open .modal-card { transform: scale(1); }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .modal-title { font-size: 1.25rem; font-weight: 700; color: #1f2937; }
+    .close-modal { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #9ca3af; }
+    
+    /* REJILLA DE 4 COLUMNAS PARA 8 ICONOS */
+    .icon-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
+    
+    .icon-btn {
+      aspect-ratio: 1; border-radius: 12px; border: 2px solid transparent;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      background: #f3f4f6; cursor: pointer; transition: all 0.2s; color: #6b7280;
+    }
+    .icon-btn:hover { background: #e5e7eb; transform: translateY(-2px); }
+    .icon-btn.selected { border-color: var(--accent-color); background: var(--accent-soft); color: var(--accent-color); }
+    .icon-btn svg { margin-bottom: 4px; }
+    .icon-label { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; text-align: center; margin-top: 4px;}
+
+    .event-list-modal { margin-top: 16px; max-height: 150px; overflow-y: auto; }
+    .modal-event-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 12px; background: #f9fafb; border-radius: 8px; margin-bottom: 8px;
+    }
   </style>
 </head>
 <body>
 
 <div class="toast-container" id="toast-container"></div>
+
+<!-- MODAL PARA AÑADIR NOTAS -->
+<div class="modal-overlay" id="day-modal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-date-title">Detalles del día</div>
+      <button class="close-modal" onclick="closeModal()">×</button>
+    </div>
+    
+    <!-- Info Custodia -->
+    <div style="margin-bottom: 20px; padding: 12px; background: #f3f4f6; border-radius: 12px; display: flex; align-items: center; gap: 10px;">
+      <div id="modal-custody-icon" style="font-size: 1.5rem;"></div>
+      <div>
+        <div style="font-size: 0.75rem; color: #6b7280; font-weight: 600; text-transform: uppercase;">Custodia</div>
+        <div id="modal-custody-text" style="font-weight: 700; color: #374151;"></div>
+      </div>
+    </div>
+
+    <!-- Formulario Nota -->
+    <div style="margin-bottom: 10px; font-weight: 600; font-size: 0.9rem;">¿Qué actividad es?</div>
+    <input type="text" id="event-title" placeholder="Ej. Revisión pediatra..." style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #d1d5db; margin-bottom: 12px;">
+    
+    <!-- 8 TIPOS DE ICONOS INFANTILES (Cuadrícula 4x2) -->
+    <div class="icon-grid">
+      <button class="icon-btn" onclick="selectIcon('medico', this)" title="Médico">
+        <i data-lucide="stethoscope" style="color: #ef4444;"></i>
+        <span class="icon-label">Médico</span>
+      </button>
+      <button class="icon-btn" onclick="selectIcon('dentista', this)" title="Dentista">
+        <i data-lucide="smile" style="color: #0ea5e9;"></i>
+        <span class="icon-label">Dentista</span>
+      </button>
+      <button class="icon-btn" onclick="selectIcon('escuela', this)" title="Escuela">
+        <i data-lucide="backpack" style="color: #f97316;"></i>
+        <span class="icon-label">Escuela</span>
+      </button>
+      <button class="icon-btn" onclick="selectIcon('deporte', this)" title="Deporte">
+        <i data-lucide="trophy" style="color: #8b5cf6;"></i>
+        <span class="icon-label">Deporte</span>
+      </button>
+      
+      <button class="icon-btn" onclick="selectIcon('cumple', this)" title="Cumpleaños">
+        <i data-lucide="cake" style="color: #eab308;"></i>
+        <span class="icon-label">Cumple</span>
+      </button>
+      <button class="icon-btn" onclick="selectIcon('parque', this)" title="Parque">
+        <i data-lucide="tree-deciduous" style="color: #84cc16;"></i>
+        <span class="icon-label">Parque</span>
+      </button>
+      <button class="icon-btn" onclick="selectIcon('general', this)" title="General">
+        <i data-lucide="star" style="color: #64748b;"></i>
+        <span class="icon-label">General</span>
+      </button>
+      <button class="icon-btn" onclick="selectIcon('vacaciones', this)" title="Vacaciones">
+        <i data-lucide="palmtree" style="color: #06b6d4;"></i>
+        <span class="icon-label">Vacaciones</span>
+      </button>
+    </div>
+
+    <button onclick="saveEvent()" class="primary-btn" style="width: 100%;">Guardar Nota</button>
+
+    <!-- Lista de eventos del día -->
+    <div class="event-list-modal" id="modal-event-list"></div>
+  </div>
+</div>
 
 <div id="login-view" class="login-wrapper">
   <div class="login-card">
@@ -228,13 +384,14 @@
           <span class="legend-item"><span style="width:12px;height:12px;background:var(--mother-color);border-radius:2px;border:1px solid #ccc;"></span> Madre 👩</span>
           <span class="legend-item"><span style="width:12px;height:12px;background:var(--father-color);border-radius:2px;border:1px solid #ccc;"></span> Padre 👨</span>
         </div>
+        <div style="font-size: 0.75rem; color: #6b7280;">* Toca un día para añadir notas</div>
       </div>
       <div id="calendar-grid" class="calendar-grid"></div>
     </section>
 
     <section class="side-panel">
       <div class="card">
-        <div class="panel-title">➕ Nueva solicitud</div>
+        <div class="panel-title">➕ Nueva solicitud de cambio</div>
         <form id="request-form">
           <div class="field-group">
             <label>Solicitante: <span id="whoami-label" style="font-weight:600;">...</span></label>
@@ -286,52 +443,57 @@
   const db = firebase.firestore();
   const auth = firebase.auth();
 
-  // INICIO RANGO DE FECHAS DESDE 2025
+  // CONFIGURACIÓN FECHAS
   const MIN_YEAR = 2025;
   const MAX_YEAR = 2027;
-  const GLOBAL_MIN_DATE = `${MIN_YEAR}-12-01`; // Permitimos desde diciembre 2025
+  const GLOBAL_MIN_DATE = `${MIN_YEAR}-12-01`; 
   const GLOBAL_MAX_DATE = `${MAX_YEAR}-12-31`;
 
-  // Inicializar en 2025 y mes 11 (Diciembre)
   let currentYear = 2025;
-  let currentMonth = 11; // 0 = Enero, 11 = Diciembre
+  let currentMonth = 11;
   
   let currentView = "month";
   let currentUser = null;
   let currentRole = null;
+  
+  // DATOS
   let overrides = {};
+  let eventsData = {}; 
   let pendingRequests = [];
   let historyRequests = [];
   
+  // VARIABLES PARA MODAL
+  let selectedDateKey = null;
+  let selectedIconType = 'medico'; // Por defecto
+
   const monthNames = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
   const weekDayNames = ["Lun","Mar","Mié","Jue","Vie","Sáb","Dom"];
-  const BASE_MONDAY = new Date(2026, 0, 5, 12, 0, 0); // Base de referencia, no cambiar
+  const BASE_MONDAY = new Date(2026, 0, 5, 12, 0, 0); 
 
-  // --- UTILIDAD: FORMATEO DE FECHAS AMIGABLE ---
+  // --- MAPPING DE 8 ICONOS INFANTILES ---
+  const ICON_MAP = {
+    'medico': 'stethoscope',
+    'dentista': 'smile',
+    'escuela': 'backpack',  // Antes colegio
+    'deporte': 'trophy',
+    'cumple': 'cake',
+    'parque': 'tree-deciduous',
+    'general': 'star',
+    'vacaciones': 'palmtree'
+  };
+
   function formatearFechaAmigable(dateStr) {
     if (!dateStr) return "Fecha desconocida";
-    // Convertir YYYY-MM-DD a objeto Date asegurando zona horaria local
     const parts = dateStr.split('-');
     const fecha = new Date(parts[0], parts[1] - 1, parts[2]);
-    
-    return fecha.toLocaleDateString('es-ES', { 
-      day: 'numeric', 
-      month: 'long', 
-      year: 'numeric' 
-    }); // Ej: "3 de diciembre de 2025"
+    return fecha.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
   }
 
-  // --- FUNCIÓN TELEGRAM ---
   function sendTelegramMessage(text) {
     const url = "https://sendtelegram-jd4jwaesba-uc.a.run.app"; 
-
     fetch(url, {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({ text }),
-    })
-    .then(res => res.text())
-    .catch(err => console.error("Error Telegram:", err));
+      method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({ text }),
+    }).catch(err => console.error("Error Telegram:", err));
   }
 
   function showToast(msg, type = 'success') {
@@ -341,10 +503,7 @@
     el.innerHTML = type === 'success' ? `✅ ${msg}` : `⚠️ ${msg}`;
     container.appendChild(el);
     requestAnimationFrame(() => el.classList.add('visible'));
-    setTimeout(() => {
-      el.classList.remove('visible');
-      setTimeout(() => el.remove(), 300);
-    }, 4000);
+    setTimeout(() => { el.classList.remove('visible'); setTimeout(() => el.remove(), 300); }, 4000);
   }
 
   function setConnectionStatus(state) {
@@ -367,11 +526,10 @@
     const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
     const weekIndex = Math.floor(diffDays / 7);
     const isEven = Math.abs(weekIndex) % 2 === 0;
-    
-    // Ajuste para fechas anteriores a la base (negativos)
     return isEven ? "padre" : "madre"; 
   }
 
+  // --- RENDERIZADO DEL CALENDARIO ---
   function renderCalendar() {
     const grid = document.getElementById("calendar-grid");
     const titleEl = document.getElementById("calendar-title");
@@ -426,31 +584,50 @@
               const override = overrides[dateKey];
               const final = override || base;
 
+              // Obtener eventos para este día
+              const dayEvents = eventsData[dateKey] || [];
+              const visibleEvents = dayEvents.slice(0, 3); // MAX 3 notas
+
               td.className = "day-cell";
               if(final === "padre") td.classList.add("day-father");
               if(final === "madre") td.classList.add("day-mother");
               if(override) td.classList.add("day-overridden");
+              
+              // EVENTO CLICK PARA MODAL
+              td.onclick = () => openDayModal(dateKey, final);
 
+              // 1. ESQUINA SUPERIOR IZQUIERDA: DÍA
               const spanNum = document.createElement("span");
               spanNum.className = "day-number";
               spanNum.textContent = dayCounter;
               td.appendChild(spanNum);
               
+              // 2. MARCA DE AGUA (CENTRO)
               const ownerIcon = document.createElement("div");
               ownerIcon.className = "owner-icon";
               ownerIcon.textContent = final === "madre" ? "👩" : "👨";
               td.appendChild(ownerIcon);
+
+              // 3. ICONOS GRANDES EN ESQUINAS
+              visibleEvents.forEach((evt, idx) => {
+                const badge = document.createElement("div");
+                badge.className = `event-marker evt-${evt.type} pos-${idx}`;
+                const i = document.createElement("i");
+                i.setAttribute("data-lucide", ICON_MAP[evt.type] || 'circle');
+                badge.appendChild(i);
+                td.appendChild(badge);
+              });
 
               if(currentYear === today.getFullYear() && mIndex === today.getMonth() && dayCounter === today.getDate()){
                 const todayMark = document.createElement("div");
                 todayMark.className = "today-marker";
                 td.appendChild(todayMark);
               }
-              td.title = `${dateKey}: ${final}`;
               tr.appendChild(td);
               dayCounter++;
             } else {
               td.style.background = "transparent";
+              td.style.cursor = "default";
               tr.appendChild(td);
             }
           }
@@ -467,10 +644,108 @@
         cells.forEach((cell, index) => {
           setTimeout(() => cell.classList.add('animated'), index * 10);
         });
+        lucide.createIcons();
       });
     }, 250);
   }
 
+  // --- LÓGICA MODAL ---
+  function openDayModal(dateKey, owner) {
+    selectedDateKey = dateKey;
+    const modal = document.getElementById('day-modal');
+    document.getElementById('modal-date-title').textContent = formatearFechaAmigable(dateKey);
+    
+    // Info Custodia
+    const iconDiv = document.getElementById('modal-custody-icon');
+    const textDiv = document.getElementById('modal-custody-text');
+    iconDiv.textContent = owner === 'madre' ? '👩' : '👨';
+    textDiv.textContent = owner === 'madre' ? 'Madre' : 'Padre';
+    textDiv.style.color = owner === 'madre' ? '#db2777' : '#2563eb';
+    
+    // Limpiar form
+    document.getElementById('event-title').value = '';
+    selectIcon('medico', null); // Reset icono por defecto a Médico
+    
+    renderModalEvents();
+    modal.classList.add('open');
+  }
+
+  function closeModal() {
+    document.getElementById('day-modal').classList.remove('open');
+  }
+
+  function selectIcon(type, btn) {
+    selectedIconType = type;
+    const btns = document.querySelectorAll('.icon-btn');
+    btns.forEach(b => b.classList.remove('selected'));
+    if(btn) btn.classList.add('selected');
+    else {
+        // Seleccionar por defecto si no se pasa botón
+        const defBtn = document.querySelector(`.icon-btn[onclick*="'${type}'"]`);
+        if(defBtn) defBtn.classList.add('selected');
+    }
+  }
+
+  function renderModalEvents() {
+    const list = document.getElementById('modal-event-list');
+    list.innerHTML = '';
+    const evts = eventsData[selectedDateKey] || [];
+    
+    if (evts.length === 0) {
+        list.innerHTML = '<div style="color:#9ca3af; text-align:center; padding:10px; font-style:italic;">Sin notas</div>';
+        return;
+    }
+
+    evts.forEach(evt => {
+        const item = document.createElement('div');
+        item.className = 'modal-event-item';
+        item.innerHTML = `
+            <div style="display:flex; align-items:center; gap:8px;">
+                <div class="event-marker evt-${evt.type}" style="position:static; width:28px; height:28px;">
+                    <i data-lucide="${ICON_MAP[evt.type]}"></i>
+                </div>
+                <span style="font-weight:500; font-size:0.9rem;">${evt.title}</span>
+            </div>
+            <button onclick="deleteEvent('${evt.id}')" style="background:none; border:none; color:#ef4444; cursor:pointer;">
+                <i data-lucide="trash-2" style="width:16px;"></i>
+            </button>
+        `;
+        list.appendChild(item);
+    });
+    lucide.createIcons();
+  }
+
+  async function saveEvent() {
+    const title = document.getElementById('event-title').value.trim();
+    if (!title) return showToast("Escribe un título", "error");
+    
+    try {
+        await db.collection("events").add({
+            date: selectedDateKey,
+            title: title,
+            type: selectedIconType,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            createdBy: currentUser.uid
+        });
+        document.getElementById('event-title').value = ''; // Limpiar input
+        showToast("Nota añadida");
+    } catch (err) {
+        console.error(err);
+        showToast("Error al guardar", "error");
+    }
+  }
+
+  async function deleteEvent(id) {
+    if(!confirm("¿Borrar nota?")) return;
+    try {
+        await db.collection("events").doc(id).delete();
+        showToast("Nota borrada");
+    } catch(err) {
+        showToast("Error al borrar", "error");
+    }
+  }
+
+  // --- LÓGICA SOLICITUDES (Original) ---
   function renderRequestsList() {
     const pendingEl = document.getElementById("pending-requests");
     const historyEl = document.getElementById("history-requests");
@@ -484,14 +759,11 @@
         const div = document.createElement("div");
         div.className = "request-item";
         const quien = req.requesterRole ? (req.requesterRole.charAt(0).toUpperCase() + req.requesterRole.slice(1)) : "Usuario";
-        
-        // Formato amigable para visualización
         const inicioF = formatearFechaAmigable(req.startDate);
         const finF = formatearFechaAmigable(req.endDate);
 
         let actionsHtml = "";
         if (req.requesterRole !== currentRole) {
-            // Importante: Pasamos startDate y endDate también en el botón RECHAZAR para que Telegram no envíe undefined
             actionsHtml = `
             <div class="req-actions">
                 <button class="btn-action btn-accept" onclick="processRequest('${req.id}', 'aceptado', '${req.requesterRole}', '${req.startDate}', '${req.endDate}')">✔ Aceptar</button>
@@ -520,7 +792,6 @@
         const status = req.status || "finalizado";
         const icon = status === "aceptado" ? "✅" : "❌";
         const quien = req.requesterRole ? (req.requesterRole.charAt(0).toUpperCase() + req.requesterRole.slice(1)) : "Usuario";
-        
         const inicioF = formatearFechaAmigable(req.startDate);
         const finF = formatearFechaAmigable(req.endDate);
 
@@ -536,10 +807,8 @@
     }
   }
 
-  // --- LÓGICA DE PROCESAMIENTO CON TELEGRAM CORREGIDA ---
   window.processRequest = async function(reqId, newStatus, reqRole, startStr, endStr) {
     if(!confirm(`¿Estás seguro de marcar como ${newStatus}?`)) return;
-
     try {
       const batch = db.batch();
       const reqRef = db.collection("requests").doc(reqId);
@@ -553,56 +822,37 @@
           const m = String(d.getMonth() + 1).padStart(2, '0');
           const da = String(d.getDate()).padStart(2, '0');
           const key = `${y}-${m}-${da}`;
-          
           const overrideRef = db.collection("overrides").doc(key);
           batch.set(overrideRef, { owner: reqRole }); 
         }
       }
-
       await batch.commit();
       showToast(`Solicitud ${newStatus}`);
-      
       const responder = currentRole ? (currentRole.charAt(0).toUpperCase() + currentRole.slice(1)) : "Usuario";
       const icono = newStatus === 'aceptado' ? "✅" : "❌";
-      
-      // Usar el formateador amigable para Telegram
-      const fechaTxt = (startStr && endStr) 
-        ? `${formatearFechaAmigable(startStr)} al ${formatearFechaAmigable(endStr)}` 
-        : "Fechas no especificadas";
-
+      const fechaTxt = (startStr && endStr) ? `${formatearFechaAmigable(startStr)} al ${formatearFechaAmigable(endStr)}` : "Fechas no especificadas";
       sendTelegramMessage(`${icono} Solicitud **${newStatus.toUpperCase()}** por ${responder}.\n📅 ${fechaTxt}`);
-
     } catch (err) {
       console.error(err);
       showToast("Error al procesar", "error");
     }
   };
 
-  // --- SWIPE CALENDARIO ---
+  // --- SWIPE ---
   const gridElement = document.getElementById("calendar-grid");
-  let touchStartX = 0;
-  let touchStartY = 0;
-  let touchEndX = 0;
-  let touchEndY = 0;
-  gridElement.addEventListener('touchstart', e => {
-    touchStartX = e.changedTouches[0].screenX;
-    touchStartY = e.changedTouches[0].screenY;
-  }, {passive: true});
-  gridElement.addEventListener('touchend', e => {
-    touchEndX = e.changedTouches[0].screenX;
-    touchEndY = e.changedTouches[0].screenY;
-    handleSwipe();
-  }, {passive: true});
+  let touchStartX = 0, touchStartY = 0, touchEndX = 0, touchEndY = 0;
+  gridElement.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; touchStartY = e.changedTouches[0].screenY; }, {passive: true});
+  gridElement.addEventListener('touchend', e => { touchEndX = e.changedTouches[0].screenX; touchEndY = e.changedTouches[0].screenY; handleSwipe(); }, {passive: true});
   function handleSwipe() {
     const xDiff = touchStartX - touchEndX;
     const yDiff = touchStartY - touchEndY;
     if (Math.abs(xDiff) > Math.abs(yDiff) && Math.abs(xDiff) > 50) {
-      if (xDiff > 0) { document.getElementById("next-period").click(); } 
-      else { document.getElementById("prev-period").click(); }
+      if (xDiff > 0) document.getElementById("next-period").click(); 
+      else document.getElementById("prev-period").click();
     }
   }
 
-  // --- AUTH ---
+  // --- AUTH & INIT ---
   auth.onAuthStateChanged(async (user) => {
     const loginView = document.getElementById("login-view");
     const appRoot = document.getElementById("app-root");
@@ -642,31 +892,36 @@
     btn.disabled = true;
     btn.textContent = "Verificando...";
     errEl.textContent = "";
-    auth.signInWithEmailAndPassword(
-      document.getElementById("login-email").value,
-      document.getElementById("login-password").value
-    )
-      .catch(err => {
-        errEl.textContent = "Credenciales incorrectas";
-      })
-      .finally(() => {
-        btn.disabled = false;
-        btn.textContent = "Entrar";
-      });
+    auth.signInWithEmailAndPassword(document.getElementById("login-email").value, document.getElementById("login-password").value)
+      .catch(err => { errEl.textContent = "Credenciales incorrectas"; })
+      .finally(() => { btn.disabled = false; btn.textContent = "Entrar"; });
   });
-
   document.getElementById("logout-btn").addEventListener("click", () => auth.signOut());
 
   function initDataListeners() {
+    // 1. Escuchar Overrides (Custodia)
     db.collection("overrides").onSnapshot(snap => {
       overrides = {};
       snap.forEach(doc => overrides[doc.id] = doc.data().owner);
       renderCalendar();
+    });
+    // 2. Escuchar Eventos (Notas)
+    db.collection("events").orderBy("createdAt", "asc").onSnapshot(snap => {
+      eventsData = {};
+      snap.forEach(doc => {
+        const d = doc.data();
+        if(!eventsData[d.date]) eventsData[d.date] = [];
+        eventsData[d.date].push({ id: doc.id, ...d });
+      });
+      if(selectedDateKey && document.getElementById('day-modal').classList.contains('open')) {
+          renderModalEvents();
+      }
+      renderCalendar();
       setConnectionStatus("online");
     });
+    // 3. Escuchar Solicitudes
     db.collection("requests").orderBy("createdAt", "desc").onSnapshot(snap => {
-      pendingRequests = [];
-      historyRequests = [];
+      pendingRequests = []; historyRequests = [];
       snap.forEach(doc => {
         const d = doc.data();
         const i = { id: doc.id, ...d };
@@ -681,79 +936,42 @@
     currentYear = parseInt(e.target.value);
     renderCalendar();
   });
-
   document.getElementById("prev-period").addEventListener("click", () => {
-    currentMonth--;
-    if(currentMonth < 0) {
-      currentMonth = 11;
-      currentYear--;
-      document.getElementById("year-select").value = currentYear;
-    }
+    currentMonth--; if(currentMonth < 0) { currentMonth = 11; currentYear--; document.getElementById("year-select").value = currentYear; }
     renderCalendar();
   });
-
   document.getElementById("next-period").addEventListener("click", () => {
-    currentMonth++;
-    if(currentMonth > 11) {
-      currentMonth = 0;
-      currentYear++;
-      document.getElementById("year-select").value = currentYear;
-    }
+    currentMonth++; if(currentMonth > 11) { currentMonth = 0; currentYear++; document.getElementById("year-select").value = currentYear; }
     renderCalendar();
   });
 
-  // --- ENVÍO DE SOLICITUD CON TELEGRAM Y FECHAS AMIGABLES ---
   document.getElementById("request-form").addEventListener("submit", async (e) => {
     e.preventDefault();
     if (!currentUser || !currentRole) return;
     const sDate = document.getElementById("start-date").value;
     const eDate = document.getElementById("end-date").value;
     const reason = document.getElementById("reason").value.trim();
-
     try {
       await db.collection("requests").add({
-        requesterUid: currentUser.uid,
-        requesterRole: currentRole,
-        startDate: sDate,
-        endDate: eDate,
-        reason: reason,
-        status: "pendiente",
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        requesterUid: currentUser.uid, requesterRole: currentRole, startDate: sDate, endDate: eDate, reason: reason, status: "pendiente", createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
       showToast("Solicitud enviada");
       e.target.reset();
-
       const quien = currentRole.charAt(0).toUpperCase() + currentRole.slice(1);
-      
-      // Formatear para Telegram
       const rangoFechas = `${formatearFechaAmigable(sDate)} al ${formatearFechaAmigable(eDate)}`;
       sendTelegramMessage(`📢 **NUEVA SOLICITUD**\nDe: ${quien}\n📅: ${rangoFechas}\n💬: "${reason}"`);
-
-    } catch (err) {
-      console.error(err);
-      showToast("Error al enviar", "error");
-    }
+    } catch (err) { console.error(err); showToast("Error al enviar", "error"); }
   });
 
   document.addEventListener("DOMContentLoaded", () => {
-    const sd = document.getElementById("start-date"),
-          ed = document.getElementById("end-date");
-    if(sd && ed) {
-      sd.min = GLOBAL_MIN_DATE;
-      sd.max = GLOBAL_MAX_DATE;
-      ed.min = GLOBAL_MIN_DATE;
-      ed.max = GLOBAL_MAX_DATE;
-    }
+    const sd = document.getElementById("start-date"), ed = document.getElementById("end-date");
+    if(sd && ed) { sd.min = GLOBAL_MIN_DATE; sd.max = GLOBAL_MAX_DATE; ed.min = GLOBAL_MIN_DATE; ed.max = GLOBAL_MAX_DATE; }
     const ys = document.getElementById("year-select");
     if(ys) {
       ys.innerHTML = "";
-      // Rango incluye 2025 para diciembre
       [2025, 2026, 2027].forEach(y => {
-        const o = document.createElement("option");
-        o.value = y;
-        o.textContent = y;
-        if(y === currentYear) o.selected = true;
-        ys.appendChild(o);
+        const o = document.createElement("option"); o.value = y; o.textContent = y;
+        if(y === currentYear) o.selected = true; ys.appendChild(o);
       });
     }
     renderCalendar();

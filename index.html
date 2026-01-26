@@ -4,344 +4,590 @@
   <meta charset="UTF-8">
   <title>Custodia Familiar</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
-  <!-- Lucide -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' x='0.1em' font-size='80'%3E%F0%9F%93%85%3C/text%3E%3C/svg%3C/svg%3E">
+  
+  <!-- Iconos Lucide -->
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <style>
     :root {
-      --mother-color: #fce7f3;
-      --father-color: #dbeafe;
+      --mother-color: #fce7f3; /* Rosa pastel fondo */
+      --father-color: #dbeafe; /* Azul pastel fondo */
+      --mother-icon-color: #db2777; /* Rosa fuerte icono */
+      --father-icon-color: #2563eb; /* Azul fuerte icono */
       --accent-color: #7c3aed;
-      --accent-soft: #ede9fe;
-      --text-main: #111827;
-      --text-muted: #6b7280;
+      --text-main: #1f2937;
       --bg-main: #f8fafc;
       --card-bg: #ffffff;
-      --shadow-soft: 0 16px 40px rgba(15,23,42,.08);
+      --shadow-soft: 0 10px 30px -5px rgba(0, 0, 0, 0.08);
     }
-
-    * { box-sizing: border-box; }
-
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    
     body {
       margin: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       background: var(--bg-main);
       color: var(--text-main);
+      padding-bottom: 50px;
+      overscroll-behavior-y: none;
     }
+    .hidden { display: none !important; }
 
-    .hidden { display: none; }
-
-    /* =====================================================
-       SPRITE GLOBAL MADRE / PADRE
-       ===================================================== */
-
-    .sprite {
-      background-image: url("assets/sprite-madre-padre.png");
-      background-size: 200% 100%;
-      background-repeat: no-repeat;
-      display: inline-block;
+    /* ANIMACIONES */
+    .calendar-grid { 
+      opacity: 1; transition: opacity 0.3s ease; touch-action: pan-y;
     }
+    .calendar-grid.fading { opacity: 0; }
+    
+    .day-cell { opacity: 0; transform: translateY(10px); transition: opacity 0.4s ease, transform 0.4s ease; }
+    .day-cell.animated { opacity: 1; transform: translateY(0); }
 
-    .sprite.madre { background-position: 0% 0%; }
-    .sprite.padre { background-position: 100% 0%; }
+    /* TOASTS */
+    .toast-container {
+      position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+      z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none;
+    }
+    .toast {
+      background: rgba(0,0,0,0.85); color: #fff; padding: 12px 24px; border-radius: 99px;
+      font-size: 0.9rem; font-weight: 500; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      opacity: 0; transform: translateY(20px); transition: all 0.3s ease;
+      backdrop-filter: blur(4px);
+    }
+    .toast.visible { opacity: 1; transform: translateY(0); }
 
-    /* Tamaños */
-    .sprite-xs { width: 18px; height: 18px; }
-    .sprite-sm { width: 28px; height: 28px; }
-    .sprite-md { width: 40px; height: 40px; }
-    .sprite-lg { width: 48px; height: 48px; }
-
-    /* =====================================================
-       LOGIN
-       ===================================================== */
-
+    /* LOGIN */
     .login-wrapper {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: radial-gradient(circle at top, #ede9fe, #f3f4fb);
-      padding: 20px;
+      min-height: 100vh; display:flex; align-items:center; justify-content:center;
+      padding:20px; background: radial-gradient(circle at top, #ede9fe, #f3f4fb);
     }
-
     .login-card {
-      background: #fff;
-      border-radius: 28px;
-      padding: 36px 32px;
-      width: 100%;
-      max-width: 380px;
-      box-shadow: 0 25px 50px rgba(15,23,42,.18);
-      text-align: center;
+      background:#fff; width:100%; max-width:360px; border-radius:24px;
+      box-shadow: 0 20px 40px -10px rgba(0,0,0,0.1); padding:40px 30px;
     }
-
     .login-title {
-      display: flex;
-      justify-content: center;
-      gap: 12px;
-      align-items: center;
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: var(--accent-color);
-      margin-bottom: 8px;
+      font-size:1.4rem; font-weight:800; margin-bottom:10px;
+      color: var(--accent-color); text-align: center;
     }
-
-    .login-subtitle {
-      font-size: .95rem;
-      color: var(--text-muted);
-      margin-bottom: 24px;
-    }
-
-    .login-field {
-      margin-bottom: 14px;
-      text-align: left;
-    }
-
-    .login-field label {
-      font-size: .85rem;
-      font-weight: 600;
-      margin-bottom: 4px;
-      display: block;
-    }
-
+    .login-subtitle { font-size:0.9rem; color:#6b7280; margin-bottom:30px; text-align: center; }
+    .login-field { margin-bottom:15px; }
     .login-field input {
-      width: 100%;
-      padding: 14px;
-      border-radius: 14px;
-      border: 1px solid #d1d5db;
-      font-size: 1rem;
+      width:100%; padding:14px; font-size:1rem; border-radius:12px; border:1px solid #e5e7eb;
+      background: #f9fafb; transition: all 0.2s;
     }
-
+    .login-field input:focus { outline:none; border-color:var(--accent-color); background: #fff; box-shadow: 0 0 0 3px rgba(124,58,237,0.1); }
     .login-btn {
-      width: 100%;
-      padding: 16px;
-      border-radius: 18px;
-      border: none;
-      background: var(--accent-color);
-      color: #fff;
-      font-size: 1.05rem;
-      font-weight: 600;
-      cursor: pointer;
-      margin-top: 10px;
+      margin-top:10px; width:100%; padding:14px; font-size:1rem; font-weight:600;
+      border-radius:12px; background:var(--accent-color); color:white; border:none; cursor:pointer;
+      transition: opacity 0.2s;
     }
+    .login-btn:hover { opacity: 0.9; }
 
-    /* =====================================================
-       TOPBAR
-       ===================================================== */
-
+    /* TOPBAR */
     .topbar {
-      background: #fff;
-      border-radius: 24px;
-      padding: 14px 18px;
-      box-shadow: var(--shadow-soft);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin: 16px;
+      padding:12px 16px; background:#fff; margin-bottom:20px;
+      display:flex; align-items:center; justify-content:space-between;
+      border-bottom: 1px solid #f3f4f6; position: sticky; top: 0; z-index: 50;
     }
-
-    .topbar-left {
-      display: flex;
-      align-items: center;
-      gap: 12px;
+    .app-name { font-size:1.1rem; font-weight:700; color: #111; }
+    .status-pill {
+      font-size:0.7rem; font-weight:600; padding:2px 8px; border-radius:99px;
+      background:#f3f4f6; color:#6b7280; display: inline-flex; align-items: center; gap: 4px;
     }
+    .status-pill.online { color: #166534; background: #dcfce7; }
+    .status-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+    
+    .topbar-right { display:flex; align-items:center; gap:8px; }
+    .user-info { font-size: 0.85rem; font-weight: 500; }
+    .logout-btn { background:none; border:none; color: #ef4444; font-weight: 600; font-size: 0.8rem; cursor: pointer; }
 
-    .app-name {
-      font-weight: 700;
-      font-size: 1.2rem;
+    /* LAYOUT */
+    .layout { padding:10px; max-width: 1000px; margin: 0 auto; display:grid; grid-template-columns:1fr; gap:20px; }
+    @media (min-width:800px){ .layout { grid-template-columns:2fr 1fr; } }
+    
+    .card { background:#fff; border-radius:20px; box-shadow:var(--shadow-soft); padding:20px; margin-bottom: 16px; }
+    .panel-title { margin:0 0 15px; font-size:1rem; font-weight:700; color: #374151; }
+    
+    /* CALENDARIO ESTILO APPLE */
+    .calendar-wrapper { background:#fff; border-radius:24px; padding:20px; box-shadow:var(--shadow-soft); }
+    .calendar-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
+    .calendar-title { font-size:1.4rem; font-weight:800; text-transform: capitalize; color: #111; }
+    .nav-arrow { 
+      width:40px; height:40px; border-radius:50%; border:none; background:#f3f4f6; 
+      font-size:1.2rem; display:flex; align-items:center; justify-content:center; 
+      cursor:pointer; transition: background 0.2s; color: #374151;
     }
+    .nav-arrow:hover { background:#e5e7eb; }
 
-    .user-info {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-weight: 600;
+    .month-table { width:100%; border-collapse:separate; border-spacing:4px; table-layout:fixed; }
+    
+    /* AUMENTADO: Cabecera días semana */
+    .month-table th { 
+      font-size: 0.9rem; font-weight: 700; color: #9ca3af; 
+      padding-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px;
     }
-
-    /* =====================================================
-       CALENDARIO
-       ===================================================== */
-
-    .calendar-wrapper {
-      background: #fff;
-      border-radius: 28px;
-      padding: 16px;
-      box-shadow: var(--shadow-soft);
-      margin: 16px;
-    }
-
-    table.month-table {
-      width: 100%;
-      border-spacing: 4px;
-      border-collapse: separate;
-    }
-
-    .month-table td {
-      height: 90px;
-      border-radius: 16px;
-      position: relative;
+    
+    .month-table td { 
+      height: 85px; /* Altura cómoda */
+      position: relative; 
+      border-radius: 16px; 
+      vertical-align: top; 
       cursor: pointer;
-      overflow: hidden;
+      transition: transform 0.1s;
+      background: #fff; /* Por defecto */
+      border: 1px solid transparent;
     }
+    .month-table td:active { transform: scale(0.97); }
 
+    /* FONDOS CUSTODIA */
     .day-mother { background: var(--mother-color); }
     .day-father { background: var(--father-color); }
-
-    .day-number {
-      position: absolute;
-      top: 6px;
-      left: 8px;
-      font-weight: 700;
-      z-index: 2;
+    
+    /* AUMENTADO: Número del día */
+    .day-number { 
+      position: absolute; top: 6px; left: 8px; 
+      font-size: 1.1rem; /* Más grande y legible */
+      font-weight: 700; color: #374151; z-index: 2; 
     }
-
+    
+    /* ICONO CUSTODIA (CENTRO) */
     .owner-icon {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      opacity: .14;
-      z-index: 1;
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      pointer-events: none; z-index: 1;
+      opacity: 0.15; /* MARCA DE AGUA POR DEFECTO */
+      transition: opacity 0.3s ease;
     }
+    .owner-icon img { 
+      width: 48px; height: 48px; 
+      object-fit: contain;
+    } 
 
+    /* COLORES ESPECÍFICOS ICONOS (YA NO NECESARIOS CON PNG, PERO SE MANTIENEN PARA REFERENCIA) */
+    .icon-mother { color: var(--mother-icon-color); }
+    .icon-father { color: var(--father-icon-color); }
+
+    /* ESTILO DÍA ACTUAL (HOY) */
+    .day-cell.is-today {
+      box-shadow: inset 0 0 0 2px var(--accent-color); /* Borde sutil */
+    }
+    /* EN EL DÍA DE HOY: ICONO SÓLIDO */
     .day-cell.is-today .owner-icon {
-      opacity: 1;
-      transform: translate(-50%, -50%) scale(1.1);
-      filter: drop-shadow(0 3px 5px rgba(0,0,0,.2));
+      opacity: 1 !important; /* Totalmente visible */
+    }
+    .day-cell.is-today .owner-icon img {
+       filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); /* Sombra para resaltar */
+    }
+    /* EN EL DÍA DE HOY: NÚMERO RESALTADO */
+    .day-cell.is-today .day-number {
+        color: #fff;
+        background: var(--accent-color);
+        border-radius: 50%;
+        width: 28px; height: 28px;
+        display: flex; align-items: center; justify-content: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
     }
 
-    /* =====================================================
-       MODAL
-       ===================================================== */
+    /* BOLAS DE EVENTOS (PEGATINAS) */
+    .event-marker {
+      position: absolute;
+      width: 22px; height: 22px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 50%; color: #fff; 
+      box-shadow: 0 2px 4px rgba(0,0,0,0.15); border: 2px solid #fff;
+      z-index: 5;
+    }
+    .event-marker svg { width: 12px; height: 12px; }
+    
+    /* Posiciones esquinas */
+    .pos-0 { top: 4px; right: 4px; }
+    .pos-1 { bottom: 4px; left: 4px; }
+    .pos-2 { bottom: 4px; right: 4px; }
 
+    /* COLORES EVENTOS */
+    .evt-medico { background: #ef4444; }
+    .evt-dentista { background: #0ea5e9; }
+    .evt-escuela { background: #f97316; }
+    .evt-deporte { background: #8b5cf6; }
+    .evt-cumple { background: #eab308; }
+    .evt-parque { background: #84cc16; }
+    .evt-general { background: #64748b; }
+    .evt-vacaciones { background: #06b6d4; }
+
+    /* FORMULARIOS */
+    .field-group { margin-bottom:15px; }
+    .field-group label { display:block; margin-bottom:6px; font-size:0.85rem; font-weight:600; color:#4b5563; }
+    .field-group input, .field-group textarea { width:100%; padding:10px; border-radius:10px; border:1px solid #d1d5db; font-size:0.95rem; }
+    .primary-btn { 
+      background: var(--accent-color); color: #fff; border: none; 
+      padding: 12px; border-radius: 12px; width: 100%; font-weight: 600; cursor: pointer;
+    }
+    
+    /* LISTAS */
+    .request-item { background: #f9fafb; padding: 12px; border-radius: 12px; margin-bottom: 8px; font-size: 0.9rem; }
+    
+    /* MODAL */
     .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,.5);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity .3s;
-      z-index: 9999;
+      position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(2px);
+      display: flex; align-items: center; justify-content: center; z-index: 10000;
+      opacity: 0; pointer-events: none; transition: opacity 0.2s;
     }
-
-    .modal-overlay.open {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
+    .modal-overlay.open { opacity: 1; pointer-events: auto; }
     .modal-card {
-      background: #fff;
-      border-radius: 24px;
-      padding: 24px;
-      width: 90%;
-      max-width: 380px;
+      background: #fff; width: 90%; max-width: 400px; border-radius: 24px; padding: 24px;
+      transform: scale(0.95); transition: transform 0.2s; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
     }
-
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
+    .modal-overlay.open .modal-card { transform: scale(1); }
+    .icon-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 20px; }
+    .icon-btn {
+      aspect-ratio: 1; border-radius: 16px; background: #f3f4f6; border: 2px solid transparent;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer;
     }
+    .icon-btn.selected { background: var(--accent-soft); border-color: var(--accent-color); color: var(--accent-color); }
+    .icon-label { font-size: 0.65rem; font-weight: 700; margin-top: 4px; text-transform: uppercase; }
 
-    /* =====================================================
-       LEYENDA
-       ===================================================== */
-
-    .legend {
-      display: flex;
-      gap: 20px;
-      font-weight: 600;
-      margin-bottom: 10px;
-      align-items: center;
+    /* MÓVIL OPTIMIZACIÓN */
+    @media (max-width: 768px) {
+      .month-table td { height: 75px; }
+      .day-number { font-size: 1rem; }
+      .owner-icon img { width: 40px; height: 40px; }
     }
-
   </style>
 </head>
-
 <body>
 
-<!-- LOGIN -->
-<div id="login-view" class="login-wrapper">
-  <div class="login-card">
-    <div class="login-title">
-      <span class="sprite madre sprite-md"></span>
-      Custodia Familiar
-      <span class="sprite padre sprite-md"></span>
-    </div>
-    <div class="login-subtitle">Acceso seguro</div>
-
-    <div class="login-field">
-      <label>Correo</label>
-      <input type="email">
-    </div>
-    <div class="login-field">
-      <label>Contraseña</label>
-      <input type="password">
-    </div>
-    <button class="login-btn">Entrar</button>
-  </div>
-</div>
-
-<!-- APP -->
-<div id="app-root" class="hidden">
-
-  <!-- TOPBAR -->
-  <header class="topbar">
-    <div class="topbar-left">
-      <span class="sprite madre sprite-sm"></span>
-      <span class="sprite padre sprite-sm"></span>
-      <span class="app-name">Custodia Familiar</span>
-    </div>
-    <div class="user-info">
-      <span class="sprite madre sprite-xs"></span>
-      Usuario
-    </div>
-  </header>
-
-  <!-- CALENDARIO -->
-  <section class="calendar-wrapper">
-    <div class="legend">
-      <span><span class="sprite madre sprite-xs"></span> Madre</span>
-      <span><span class="sprite padre sprite-xs"></span> Padre</span>
-    </div>
-
-    <table class="month-table">
-      <tr>
-        <td class="day-cell day-mother is-today">
-          <span class="day-number">1</span>
-          <span class="sprite madre sprite-lg owner-icon"></span>
-        </td>
-        <td class="day-cell day-father">
-          <span class="day-number">2</span>
-          <span class="sprite padre sprite-lg owner-icon"></span>
-        </td>
-      </tr>
-    </table>
-  </section>
-
-</div>
+<div class="toast-container" id="toast-container"></div>
 
 <!-- MODAL -->
 <div class="modal-overlay" id="day-modal">
   <div class="modal-card">
-    <div class="modal-header">
-      <strong>Detalle del día</strong>
-      <span class="sprite madre sprite-sm"></span>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+      <h3 style="margin:0; font-size:1.2rem;" id="modal-date-title">Fecha</h3>
+      <button onclick="closeModal()" style="background:none; border:none; font-size:1.5rem; color:#9ca3af;">&times;</button>
     </div>
-    <div style="display:flex;align-items:center;gap:10px;">
-      <span class="sprite madre sprite-md"></span>
-      <strong>Madre</strong>
+    
+    <div style="display:flex; align-items:center; gap:12px; padding:12px; background:#f9fafb; border-radius:12px; margin-bottom:20px;">
+      <div id="modal-custody-icon" style="width:40px; height:40px; display:flex; align-items:center; justify-content:center;"></div>
+      <div>
+        <div style="font-size:0.75rem; color:#6b7280; text-transform:uppercase; font-weight:700;">Custodia</div>
+        <div id="modal-custody-text" style="font-weight:700; font-size:1rem;"></div>
+      </div>
     </div>
+
+    <input type="text" id="event-title" placeholder="Añadir nota o evento..." class="field-group" style="width:100%; padding:12px; margin-bottom:15px; border-radius:12px; border:1px solid #e5e7eb;">
+    
+    <div class="icon-grid">
+      <div class="icon-btn" onclick="selectIcon('medico', this)"><i data-lucide="stethoscope" class="evt-medico" style="background:transparent; color:#ef4444;"></i><span class="icon-label">Médico</span></div>
+      <div class="icon-btn" onclick="selectIcon('dentista', this)"><i data-lucide="smile" class="evt-dentista" style="background:transparent; color:#0ea5e9;"></i><span class="icon-label">Dentista</span></div>
+      <div class="icon-btn" onclick="selectIcon('escuela', this)"><i data-lucide="backpack" class="evt-escuela" style="background:transparent; color:#f97316;"></i><span class="icon-label">Escuela</span></div>
+      <div class="icon-btn" onclick="selectIcon('deporte', this)"><i data-lucide="trophy" class="evt-deporte" style="background:transparent; color:#8b5cf6;"></i><span class="icon-label">Deporte</span></div>
+      <div class="icon-btn" onclick="selectIcon('cumple', this)"><i data-lucide="cake" class="evt-cumple" style="background:transparent; color:#eab308;"></i><span class="icon-label">Cumple</span></div>
+      <div class="icon-btn" onclick="selectIcon('parque', this)"><i data-lucide="tree-deciduous" class="evt-parque" style="background:transparent; color:#84cc16;"></i><span class="icon-label">Parque</span></div>
+      <div class="icon-btn" onclick="selectIcon('general', this)"><i data-lucide="star" class="evt-general" style="background:transparent; color:#64748b;"></i><span class="icon-label">General</span></div>
+      <div class="icon-btn" onclick="selectIcon('vacaciones', this)"><i data-lucide="palmtree" class="evt-vacaciones" style="background:transparent; color:#06b6d4;"></i><span class="icon-label">Playa</span></div>
+    </div>
+
+    <button onclick="saveEvent()" class="primary-btn">Guardar</button>
+    <div id="modal-event-list" style="margin-top:15px; max-height:150px; overflow-y:auto;"></div>
   </div>
 </div>
 
-<script>
-  lucide.createIcons();
-</script>
+<!-- LOGIN -->
+<div id="login-view" class="login-wrapper">
+  <div class="login-card">
+    <div class="login-title">Custodia Familiar</div>
+    <div class="login-subtitle">Organiza tu calendario compartido</div>
+    <form id="login-form">
+      <div class="login-field">
+        <input type="email" id="login-email" required placeholder="Correo electrónico">
+      </div>
+      <div class="login-field">
+        <input type="password" id="login-password" required placeholder="Contraseña">
+      </div>
+      <button type="submit" class="login-btn" id="login-submit-btn">Entrar</button>
+      <div id="login-error" style="color:#ef4444; text-align:center; margin-top:10px; font-size:0.9rem;"></div>
+    </form>
+  </div>
+</div>
 
+<!-- APP -->
+<div id="app-root" class="app hidden">
+  <header class="topbar">
+    <div style="display:flex; align-items:center; gap:10px;">
+      <div style="font-size:1.5rem;">📅</div>
+      <div>
+        <div class="app-name">Custodia</div>
+        <div class="status-pill" id="status-pill"><span class="status-dot"></span> <span id="status-text">Conectando</span></div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <select id="year-select" style="padding:4px 8px; border-radius:8px; border:1px solid #e5e7eb;"></select>
+      <button id="logout-btn" class="logout-btn">Salir</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <section class="calendar-wrapper">
+      <div class="calendar-header">
+        <button id="prev-period" class="nav-arrow"><i data-lucide="chevron-left"></i></button>
+        <div class="calendar-title" id="calendar-title"></div>
+        <button id="next-period" class="nav-arrow"><i data-lucide="chevron-right"></i></button>
+      </div>
+      <div id="calendar-grid" class="calendar-grid"></div>
+    </section>
+
+    <section class="side-panel">
+      <div class="card">
+        <div class="panel-title">Solicitar Cambio</div>
+        <form id="request-form">
+          <div style="display:flex; gap:10px; margin-bottom:10px;">
+            <input type="date" id="start-date" required style="flex:1; padding:10px; border-radius:8px; border:1px solid #e5e7eb;">
+            <input type="date" id="end-date" required style="flex:1; padding:10px; border-radius:8px; border:1px solid #e5e7eb;">
+          </div>
+          <textarea id="reason" placeholder="Motivo (opcional)" style="width:100%; padding:10px; border-radius:8px; border:1px solid #e5e7eb; margin-bottom:10px;"></textarea>
+          <button type="submit" class="primary-btn">Enviar</button>
+        </form>
+      </div>
+      <div class="card">
+        <div class="panel-title">Pendientes</div>
+        <div id="pending-requests" style="font-size:0.9rem; color:#6b7280; font-style:italic;">No hay solicitudes</div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+<script>
+  // CONFIGURACIÓN FIREBASE
+  const firebaseConfig = {
+    apiKey: "AIzaSyAwgk4_l0zvaCUCgm1CjqqqXjJHr5KPBjc",
+    authDomain: "custodia-familiar.firebaseapp.com",
+    projectId: "custodia-familiar",
+    storageBucket: "custodia-familiar.firebasestorage.app",
+    messagingSenderId: "1038952432258",
+    appId: "1:1038952432258:web:7608d6a48d8ad8308a6a9b"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+  const auth = firebase.auth();
+
+  // IMÁGENES PNG (Desde assets)
+  const DAD_ICON_IMG = `<img src="assets/icono-padre.png" alt="Padre" class="custody-icon-img" style="width:100%; height:100%; object-fit:contain;">`;
+  const MOM_ICON_IMG = `<img src="assets/icono-madre.png" alt="Madre" class="custody-icon-img" style="width:100%; height:100%; object-fit:contain;">`;
+  
+  // VARIABLES DE ESTADO
+  let todayInit = new Date();
+  let currentYear = todayInit.getFullYear();
+  let currentMonth = todayInit.getMonth();
+  if (currentYear < 2025) currentYear = 2025;
+  
+  let overrides = {};
+  let eventsData = {};
+  let currentUser = null;
+  let currentRole = null;
+  let selectedDateKey = null;
+  let selectedIconType = 'medico';
+
+  const monthNames = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+  const weekDayNames = ["Lun","Mar","Mié","Jue","Vie","Sáb","Dom"];
+  const BASE_MONDAY = new Date(2026, 0, 5, 12, 0, 0); 
+  
+  // FUNCIONES AUXILIARES
+  const formatDateKey = (y, m, d) => `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+  const showToast = (msg) => {
+    const t = document.createElement('div'); t.className='toast'; t.textContent=msg;
+    document.getElementById('toast-container').appendChild(t);
+    setTimeout(()=>t.classList.add('visible'),10);
+    setTimeout(()=>{t.classList.remove('visible');setTimeout(()=>t.remove(),300)},3000);
+  };
+
+  // CÁLCULO CUSTODIA BASE
+  function getBaseOwner(year, month, day) {
+    const date = new Date(year, month, day, 12, 0, 0);
+    if(date.getFullYear() < 2025 || date.getFullYear() > 2027) return null;
+    const diffDays = Math.round((date - BASE_MONDAY)/(1000*60*60*24));
+    return (Math.floor(diffDays/7) % 2 === 0) ? "padre" : "madre";
+  }
+
+  // RENDERIZADO CALENDARIO
+  function renderCalendar() {
+    const grid = document.getElementById("calendar-grid");
+    const title = document.getElementById("calendar-title");
+    grid.innerHTML = "";
+    title.textContent = `${monthNames[currentMonth]} ${currentYear}`;
+    
+    // Grid Setup
+    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+    const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+    const startOffset = (firstDay === 0) ? 6 : firstDay - 1;
+    
+    // Tabla
+    const table = document.createElement("table");
+    table.className = "month-table";
+    
+    // Cabecera Días
+    const thead = document.createElement("tr");
+    weekDayNames.forEach(d => {
+      const th = document.createElement("th"); th.textContent = d; thead.appendChild(th);
+    });
+    table.appendChild(thead);
+
+    // Días
+    let dayCount = 1;
+    for (let r=0; r<6; r++) {
+      const tr = document.createElement("tr");
+      for (let c=0; c<7; c++) {
+        const td = document.createElement("td");
+        if ((r===0 && c<startOffset) || dayCount > daysInMonth) {
+          td.style.background = "transparent"; td.style.cursor="default";
+        } else {
+          const dateKey = formatDateKey(currentYear, currentMonth, dayCount);
+          const owner = overrides[dateKey] || getBaseOwner(currentYear, currentMonth, dayCount);
+          const isToday = (dateKey === formatDateKey(todayInit.getFullYear(), todayInit.getMonth(), todayInit.getDate()));
+          
+          td.className = `day-cell ${owner === 'madre' ? 'day-mother' : 'day-father'}`;
+          if(isToday) td.classList.add('is-today');
+          td.onclick = () => openDayModal(dateKey, owner);
+
+          // Número Día
+          const num = document.createElement("span"); 
+          num.className = "day-number"; num.textContent = dayCount;
+          td.appendChild(num);
+
+          // Icono Fondo (PNG)
+          const icon = document.createElement("div");
+          icon.className = `owner-icon`; // Sin clases de color extra, ya que es PNG
+          icon.innerHTML = owner === 'madre' ? MOM_ICON_IMG : DAD_ICON_IMG;
+          td.appendChild(icon);
+
+          // Eventos
+          const evts = (eventsData[dateKey] || []).slice(0,3);
+          evts.forEach((evt, i) => {
+            const badge = document.createElement("div");
+            badge.className = `event-marker evt-${evt.type} pos-${i}`;
+            const lucideIcon = document.createElement("i");
+            lucideIcon.setAttribute("data-lucide", getIconName(evt.type));
+            badge.appendChild(lucideIcon);
+            td.appendChild(badge);
+          });
+          
+          dayCount++;
+        }
+        tr.appendChild(td);
+      }
+      table.appendChild(tr);
+      if (dayCount > daysInMonth) break;
+    }
+    grid.appendChild(table);
+    lucide.createIcons();
+    setTimeout(()=>document.querySelectorAll('.day-cell').forEach(c=>c.classList.add('animated')), 50);
+  }
+
+  function getIconName(type) {
+    const map = { 'medico':'stethoscope', 'dentista':'smile', 'escuela':'backpack', 'deporte':'trophy', 'cumple':'cake', 'parque':'tree-deciduous', 'general':'star', 'vacaciones':'palmtree' };
+    return map[type] || 'circle';
+  }
+
+  // MODAL
+  function openDayModal(dateKey, owner) {
+    selectedDateKey = dateKey;
+    document.getElementById("day-modal").classList.add("open");
+    document.getElementById("modal-date-title").textContent = new Date(dateKey).toLocaleDateString('es-ES', {weekday:'long', day:'numeric', month:'long'});
+    
+    const iconDiv = document.getElementById("modal-custody-icon");
+    iconDiv.innerHTML = owner==='madre'? MOM_ICON_IMG : DAD_ICON_IMG;
+    // Quitamos la lógica de clases de color para los iconos SVG, mantenemos texto
+    document.getElementById("modal-custody-text").textContent = owner==='madre'? 'Madre' : 'Padre';
+    document.getElementById("modal-custody-text").style.color = owner==='madre'? 'var(--mother-icon-color)' : 'var(--father-icon-color)';
+    
+    renderEventsList();
+  }
+
+  function renderEventsList() {
+    const list = document.getElementById("modal-event-list");
+    list.innerHTML = "";
+    (eventsData[selectedDateKey]||[]).forEach(evt => {
+      const item = document.createElement("div");
+      item.style.cssText = "display:flex; justify-content:space-between; padding:8px; background:#f3f4f6; margin-bottom:4px; border-radius:8px; font-size:0.9rem;";
+      item.innerHTML = `<span>${evt.title}</span> <button onclick="deleteEvent('${evt.id}')" style="border:none; color:#ef4444; cursor:pointer;">&times;</button>`;
+      list.appendChild(item);
+    });
+  }
+
+  function closeModal() { document.getElementById("day-modal").classList.remove("open"); }
+  function selectIcon(t,el) { selectedIconType=t; document.querySelectorAll('.icon-btn').forEach(b=>b.classList.remove('selected')); el.classList.add('selected'); }
+
+  // LOGICA DATABASE
+  async function saveEvent() {
+    const title = document.getElementById("event-title").value;
+    if(!title) return;
+    await db.collection("events").add({ date: selectedDateKey, title, type: selectedIconType, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+    document.getElementById("event-title").value="";
+    renderEventsList(); showToast("Evento guardado");
+  }
+  
+  async function deleteEvent(id) {
+    if(confirm("¿Borrar?")) { await db.collection("events").doc(id).delete(); renderEventsList(); }
+  }
+
+  // AUTH STATE
+  auth.onAuthStateChanged(async (user) => {
+    if(user) {
+      currentUser = user;
+      document.getElementById("login-view").classList.add("hidden");
+      document.getElementById("app-root").classList.remove("hidden");
+      
+      const uDoc = await db.collection("users").doc(user.uid).get();
+      currentRole = uDoc.exists ? uDoc.data().role : null;
+      
+      // Listeners
+      db.collection("overrides").onSnapshot(s => { overrides={}; s.forEach(d=>overrides[d.id]=d.data().owner); renderCalendar(); });
+      db.collection("events").orderBy("createdAt").onSnapshot(s => { 
+        eventsData={}; s.forEach(d=>{ const v=d.data(); if(!eventsData[v.date]) eventsData[v.date]=[]; eventsData[v.date].push({id:d.id, ...v}); });
+        renderCalendar();
+      });
+      db.collection("requests").orderBy("createdAt", "desc").onSnapshot(s => {
+        const el = document.getElementById("pending-requests"); el.innerHTML="";
+        let count=0;
+        s.forEach(d => {
+          const r = d.data();
+          if(r.status === "pendiente") {
+             count++;
+             const div = document.createElement("div"); div.className="request-item";
+             div.innerHTML = `<strong>${r.startDate}</strong>: ${r.reason} (${r.requesterRole})`;
+             // Aquí irían botones aceptar/rechazar
+             el.appendChild(div);
+          }
+        });
+        if(count===0) el.innerHTML = "<div style='color:#9ca3af;font-style:italic;'>No hay solicitudes</div>";
+      });
+      
+      document.getElementById("status-pill").className="status-pill online";
+      document.getElementById("status-text").textContent="En línea";
+    } else {
+      document.getElementById("login-view").classList.remove("hidden");
+      document.getElementById("app-root").classList.add("hidden");
+    }
+  });
+
+  // BOTONES
+  document.getElementById("login-form").addEventListener("submit", e => {
+    e.preventDefault();
+    auth.signInWithEmailAndPassword(document.getElementById("login-email").value, document.getElementById("login-password").value)
+    .catch(e => document.getElementById("login-error").textContent = "Error de acceso");
+  });
+  document.getElementById("logout-btn").click = () => auth.signOut();
+  document.getElementById("prev-period").onclick = () => { currentMonth--; if(currentMonth<0){currentMonth=11;currentYear--}; renderCalendar(); };
+  document.getElementById("next-period").onclick = () => { currentMonth++; if(currentMonth>11){currentMonth=0;currentYear++}; renderCalendar(); };
+  
+  // INIT
+  const ys = document.getElementById("year-select");
+  [2025,2026,2027].forEach(y => { const o=document.createElement("option"); o.value=y; o.textContent=y; if(y===currentYear) o.selected=true; ys.appendChild(o); });
+  ys.addEventListener("change", e => { currentYear=parseInt(e.target.value); renderCalendar(); });
+
+  renderCalendar();
+</script>
 </body>
 </html>

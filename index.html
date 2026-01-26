@@ -166,6 +166,14 @@
       object-position: center; /* CENTRA la imagen (foco en el centro) */
       display: block;
     } 
+    
+    /* NUEVO: ESTILO PARA LA IMAGEN EN EL MODAL/DETAILS */
+    .custody-icon-img {
+        width: 100%; height: 100%;
+        object-fit: cover;
+        object-position: center;
+        display: block;
+    }
 
     /* COLORES ESPECÍFICOS ICONOS (YA NO NECESARIOS CON PNG, PERO SE MANTIENEN PARA REFERENCIA) */
     .icon-mother { color: var(--mother-icon-color); }
@@ -270,8 +278,9 @@
       <button onclick="closeModal()" style="background:none; border:none; font-size:1.5rem; color:#9ca3af;">&times;</button>
     </div>
     
+    <!-- MODIFICADO: Contenedor de icono en modal -->
     <div style="display:flex; align-items:center; gap:12px; padding:12px; background:#f9fafb; border-radius:12px; margin-bottom:20px;">
-      <div id="modal-custody-icon" style="width:40px; height:40px; display:flex; align-items:center; justify-content:center;"></div>
+      <div id="modal-custody-icon" style="width:50px; height:50px; border-radius:50%; overflow:hidden; border:2px solid #e5e7eb; background:#fff;"></div>
       <div>
         <div style="font-size:0.75rem; color:#6b7280; text-transform:uppercase; font-weight:700;">Custodia</div>
         <div id="modal-custody-text" style="font-weight:700; font-size:1rem;"></div>

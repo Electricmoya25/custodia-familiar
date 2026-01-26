@@ -135,6 +135,7 @@
       transition: transform 0.1s;
       background: #fff; /* Por defecto */
       border: 1px solid transparent;
+      overflow: hidden; /* Asegura que la imagen no se salga en las esquinas redondeadas */
     }
     .month-table td:active { transform: scale(0.97); }
 
@@ -149,17 +150,19 @@
       font-weight: 700; color: #374151; z-index: 2; 
     }
     
-    /* ICONO CUSTODIA (CENTRO) */
+    /* ICONO CUSTODIA (FONDO COMPLETO) */
     .owner-icon {
       position: absolute; inset: 0;
-      display: flex; align-items: center; justify-content: center;
+      /* Eliminado flex center para permitir estiramiento total */
       pointer-events: none; z-index: 1;
       opacity: 0.15; /* MARCA DE AGUA POR DEFECTO */
       transition: opacity 0.3s ease;
     }
+    /* IMAGEN OCUPA TODO EL ESPACIO */
     .owner-icon img { 
-      width: 48px; height: 48px; 
-      object-fit: contain;
+      width: 100%; height: 100%; 
+      object-fit: cover; /* Clave: Rellena todo el espacio sin deformar, recortando si hace falta */
+      display: block;
     } 
 
     /* COLORES ESPECÍFICOS ICONOS (YA NO NECESARIOS CON PNG, PERO SE MANTIENEN PARA REFERENCIA) */
@@ -175,7 +178,7 @@
       opacity: 1 !important; /* Totalmente visible */
     }
     .day-cell.is-today .owner-icon img {
-       filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); /* Sombra para resaltar */
+       /* filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); Opcional: sombra si se desea */
     }
     /* EN EL DÍA DE HOY: NÚMERO RESALTADO */
     .day-cell.is-today .day-number {
@@ -249,7 +252,7 @@
     @media (max-width: 768px) {
       .month-table td { height: 75px; }
       .day-number { font-size: 1rem; }
-      .owner-icon img { width: 40px; height: 40px; }
+      /* Ya no necesitamos ajustar tamaño de img específicamente aquí porque es 100% cover */
     }
   </style>
 </head>
@@ -373,9 +376,9 @@
   const db = firebase.firestore();
   const auth = firebase.auth();
 
-  // IMÁGENES PNG (Desde assets)
-  const DAD_ICON_IMG = `<img src="assets/padre.png" alt="Padre" class="custody-icon-img" style="width:100%; height:100%; object-fit:contain;">`;
-  const MOM_ICON_IMG = `<img src="assets/madre.png" alt="Madre" class="custody-icon-img" style="width:100%; height:100%; object-fit:contain;">`;
+  // IMÁGENES PNG (Desde assets) - Sin estilos inline, controlados por CSS
+  const DAD_ICON_IMG = `<img src="assets/padre.png" alt="Padre" class="custody-icon-img">`;
+  const MOM_ICON_IMG = `<img src="assets/madre.png" alt="Madre" class="custody-icon-img">`;
   
   // VARIABLES DE ESTADO
   let todayInit = new Date();

@@ -301,7 +301,7 @@
     </div>
 
     <button onclick="saveEvent()" class="primary-btn">Guardar</button>
-    <div id="modal-event-list" style="margin-top:15px; max-height:150px; overflow-y:auto;"></div>
+    <div id="modal-event-list" style="margin-top:15px; max-height:200px; overflow-y:auto;"></div>
   </div>
 </div>
 
@@ -522,12 +522,40 @@
   function renderEventsList() {
     const list = document.getElementById("modal-event-list");
     list.innerHTML = "";
-    (eventsData[selectedDateKey]||[]).forEach(evt => {
+    const evts = eventsData[selectedDateKey] || [];
+    
+    if(evts.length === 0) {
+      list.innerHTML = '<div style="text-align:center; padding:20px; color:#9ca3af; font-style:italic;">No hay notas para este día</div>';
+      return;
+    }
+
+    const colors = { 
+      'medico': '#ef4444', 'dentista': '#0ea5e9', 'escuela': '#f97316', 
+      'deporte': '#8b5cf6', 'cumple': '#eab308', 'parque': '#84cc16', 
+      'general': '#64748b', 'vacaciones': '#06b6d4' 
+    };
+
+    evts.forEach(evt => {
       const item = document.createElement("div");
-      item.style.cssText = "display:flex; justify-content:space-between; padding:8px; background:#f3f4f6; margin-bottom:4px; border-radius:8px; font-size:0.9rem;";
-      item.innerHTML = `<span>${evt.title}</span> <button onclick="deleteEvent('${evt.id}')" style="border:none; color:#ef4444; cursor:pointer;">&times;</button>`;
+      item.style.cssText = "display:flex; justify-content:space-between; align-items:center; padding:12px 16px; background:#fff; margin-bottom:10px; border-radius:16px; box-shadow:0 2px 5px rgba(0,0,0,0.05); border:1px solid #f3f4f6;";
+      
+      const iconColor = colors[evt.type] || '#666';
+      const iconName = getIconName(evt.type);
+
+      item.innerHTML = `
+        <div style="display:flex; align-items:center; gap:14px; flex:1; overflow:hidden;">
+          <div style="width:40px; height:40px; border-radius:12px; background:${iconColor}20; color:${iconColor}; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            <i data-lucide="${iconName}" style="width:24px; height:24px;"></i>
+          </div>
+          <span style="font-size:1.15rem; font-weight:600; color:#1f2937; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${evt.title}</span>
+        </div>
+        <button onclick="deleteEvent('${evt.id}')" style="border:none; background:none; color:#ef4444; cursor:pointer; padding:8px; margin-left:8px;">
+          <i data-lucide="trash-2" style="width:22px; height:22px;"></i>
+        </button>
+      `;
       list.appendChild(item);
     });
+    lucide.createIcons();
   }
 
   function closeModal() { document.getElementById("day-modal").classList.remove("open"); }

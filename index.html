@@ -153,15 +153,17 @@
     /* ICONO CUSTODIA (FONDO COMPLETO) */
     .owner-icon {
       position: absolute; inset: 0;
-      /* Eliminado flex center para permitir estiramiento total */
+      /* Flexbox para asegurar centrado absoluto del contenido */
+      display: flex; align-items: center; justify-content: center;
       pointer-events: none; z-index: 1;
       opacity: 0.15; /* MARCA DE AGUA POR DEFECTO */
       transition: opacity 0.3s ease;
     }
-    /* IMAGEN OCUPA TODO EL ESPACIO */
+    /* IMAGEN OCUPA TODO EL ESPACIO PERO CENTRADA */
     .owner-icon img { 
       width: 100%; height: 100%; 
-      object-fit: cover; /* Clave: Rellena todo el espacio sin deformar, recortando si hace falta */
+      object-fit: cover; /* Rellena todo el espacio */
+      object-position: center; /* CENTRA la imagen (foco en el centro) */
       display: block;
     } 
 

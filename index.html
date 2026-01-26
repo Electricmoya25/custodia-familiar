@@ -29,13 +29,13 @@
       background: var(--bg-main);
       color: var(--text-main);
       padding-bottom: 50px;
-      overscroll-behavior-y: none;
+      overscroll-behavior-y: none; /* Evita rebote en scroll */
     }
     .hidden { display: none !important; }
 
     /* ANIMACIONES */
     .calendar-grid { 
-      opacity: 1; transition: opacity 0.3s ease; touch-action: pan-y;
+      opacity: 1; transition: opacity 0.3s ease; touch-action: pan-y; /* Permite scroll vertical, bloquea horizontal para el JS */
     }
     .calendar-grid.fading { opacity: 0; }
     
@@ -108,7 +108,11 @@
     .panel-title { margin:0 0 15px; font-size:1rem; font-weight:700; color: #374151; }
     
     /* CALENDARIO ESTILO APPLE */
-    .calendar-wrapper { background:#fff; border-radius:24px; padding:20px; box-shadow:var(--shadow-soft); }
+    .calendar-wrapper { 
+      background:#fff; border-radius:24px; padding:20px; box-shadow:var(--shadow-soft); 
+      /* Importante para que el swipe se sienta bien */
+      user-select: none;
+    }
     .calendar-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
     .calendar-title { font-size:1.4rem; font-weight:800; text-transform: capitalize; color: #111; }
     .nav-arrow { 
@@ -340,7 +344,7 @@
   </header>
 
   <div class="layout">
-    <section class="calendar-wrapper">
+    <section class="calendar-wrapper" id="calendar-wrapper-swipe"> <!-- ID añadido para el swipe -->
       <div class="calendar-header">
         <button id="prev-period" class="nav-arrow"><i data-lucide="chevron-left"></i></button>
         <div class="calendar-title" id="calendar-title"></div>
@@ -572,6 +576,40 @@
   
   async function deleteEvent(id) {
     if(confirm("¿Borrar?")) { await db.collection("events").doc(id).delete(); renderEventsList(); }
+  }
+
+  // --- SWIPE LOGIC RESTORED (Revisado para Móvil) ---
+  const swipeElement = document.getElementById("calendar-wrapper-swipe");
+  let touchStartX = 0;
+  let touchStartY = 0;
+  
+  if (swipeElement) {
+    swipeElement.addEventListener('touchstart', e => {
+      touchStartX = e.changedTouches[0].screenX;
+      touchStartY = e.changedTouches[0].screenY;
+    }, {passive: true});
+
+    swipeElement.addEventListener('touchend', e => {
+      const touchEndX = e.changedTouches[0].screenX;
+      const touchEndY = e.changedTouches[0].screenY;
+      handleSwipe(touchStartX, touchStartY, touchEndX, touchEndY);
+    }, {passive: true});
+  }
+
+  function handleSwipe(startX, startY, endX, endY) {
+    const xDiff = startX - endX;
+    const yDiff = startY - endY;
+    
+    // Umbral de 50px y movimiento horizontal claro (X > Y)
+    if (Math.abs(xDiff) > Math.abs(yDiff) && Math.abs(xDiff) > 50) {
+      if (xDiff > 0) {
+        // Deslizar izquierda -> Siguiente Mes
+        document.getElementById("next-period").click();
+      } else {
+        // Deslizar derecha -> Mes Anterior
+        document.getElementById("prev-period").click();
+      }
+    }
   }
 
   // AUTH STATE

@@ -1,1753 +1,403 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Custodia Familiar Alberto</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-    <style>
-        :root {
-            --primary: #4361ee;
-            --secondary: #3f37c9;
-            --accent: #4895ef;
-            --success: #4cc9f0;
-            --warning: #f72585;
-            --light: #f8f9fa;
-            --dark: #212529;
-            --gray: #6c757d;
-            --light-gray: #e9ecef;
-            --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            --shadow-hover: 0 6px 25px rgba(0, 0, 0, 0.12);
-            --radius: 16px;
-            --radius-sm: 10px;
-            --transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
-            color: var(--dark);
-            line-height: 1.5;
-            overflow-x: hidden;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
-        
-        .container {
-            max-width: 100%;
-            margin: 0 auto;
-            padding: 0 16px;
-        }
-        
-        /* Auth Styles */
-        .auth-container {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            text-align: center;
-        }
-        
-        .logo {
-            font-size: 2.5rem;
-            font-weight: 800;
-            margin-bottom: 16px;
-            background: linear-gradient(45deg, var(--primary), var(--accent));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-        }
-        
-        .logo i {
-            font-size: 2.8rem;
-        }
-        
-        .app-name {
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin: 8px 0;
-            color: var(--dark);
-        }
-        
-        .app-desc {
-            color: var(--gray);
-            margin-bottom: 32px;
-            max-width: 400px;
-        }
-        
-        .auth-card {
-            background: white;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            width: 100%;
-            max-width: 420px;
-            padding: 32px;
-            margin-bottom: 24px;
-            transition: var(--transition);
-        }
-        
-        .auth-card:hover {
-            box-shadow: var(--shadow-hover);
-        }
-        
-        .input-group {
-            margin-bottom: 20px;
-            text-align: left;
-        }
-        
-        .input-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: var(--dark);
-        }
-        
-        .input-field {
-            width: 100%;
-            padding: 14px 16px;
-            border: 1px solid var(--light-gray);
-            border-radius: var(--radius-sm);
-            font-size: 16px;
-            transition: var(--transition);
-        }
-        
-        .input-field:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
-        }
-        
-        .btn {
-            display: block;
-            width: 100%;
-            padding: 16px;
-            border: none;
-            border-radius: var(--radius-sm);
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            margin-top: 8px;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(45deg, var(--primary), var(--secondary));
-            color: white;
-            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.35);
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(67, 97, 238, 0.45);
-        }
-        
-        .btn-google {
-            background: white;
-            color: var(--dark);
-            border: 1px solid var(--light-gray);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-        
-        .btn-google:hover {
-            background: var(--light);
-            transform: translateY(-1px);
-        }
-        
-        .divider {
-            display: flex;
-            align-items: center;
-            text-align: center;
-            margin: 20px 0;
-        }
-        
-        .divider::before,
-        .divider::after {
-            content: '';
-            flex: 1;
-            border-bottom: 1px solid var(--light-gray);
-        }
-        
-        .divider span {
-            padding: 0 10px;
-            color: var(--gray);
-            font-weight: 500;
-        }
-        
-        /* App Styles */
-        .app-container {
-            display: none;
-            min-height: 100vh;
-            background: linear-gradient(135deg, #f0f4f8 0%, #e6eeff 100%);
-        }
-        
-        .header {
-            background: white;
-            box-shadow: var(--shadow);
-            padding: 16px 0;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-        
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 16px;
-        }
-        
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        
-        .user-avatar {
-            width: 42px;
-            height: 42px;
-            border-radius: 50%;
-            background: linear-gradient(45deg, var(--primary), var(--accent));
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 18px;
-        }
-        
-        .user-name {
-            font-weight: 600;
-            font-size: 18px;
-        }
-        
-        .logout-btn {
-            background: none;
-            border: none;
-            color: var(--warning);
-            font-weight: 500;
-            cursor: pointer;
-            padding: 8px 12px;
-            border-radius: 8px;
-            transition: var(--transition);
-        }
-        
-        .logout-btn:hover {
-            background: rgba(247, 37, 133, 0.1);
-        }
-        
-        .main-content {
-            padding: 20px 16px;
-        }
-        
-        .section-title {
-            font-size: 22px;
-            font-weight: 700;
-            margin: 24px 0 16px;
-            color: var(--secondary);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .section-title i {
-            color: var(--accent);
-        }
-        
-        /* Calendar Styles */
-        .calendar-container {
-            background: white;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            padding: 20px;
-            margin-bottom: 24px;
-            overflow: hidden;
-        }
-        
-        .calendar-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid var(--light-gray);
-        }
-        
-        .month-year {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: var(--secondary);
-        }
-        
-        .nav-buttons {
-            display: flex;
-            gap: 12px;
-        }
-        
-        .nav-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: var(--light);
-            border: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: var(--transition);
-            color: var(--primary);
-            font-weight: bold;
-        }
-        
-        .nav-btn:hover {
-            background: var(--accent);
-            color: white;
-            transform: scale(1.05);
-        }
-        
-        .weekdays {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            text-align: center;
-            font-weight: 600;
-            color: var(--gray);
-            margin-bottom: 12px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid var(--light-gray);
-        }
-        
-        .days-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 8px;
-        }
-        
-        .day-cell {
-            aspect-ratio: 1;
-            border-radius: var(--radius-sm);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 4px;
-            position: relative;
-            cursor: pointer;
-            transition: var(--transition);
-            border: 1px solid transparent;
-            font-weight: 500;
-        }
-        
-        .day-cell:hover {
-            background: var(--light);
-            transform: scale(1.03);
-        }
-        
-        .day-number {
-            font-size: 16px;
-            margin-bottom: 4px;
-        }
-        
-        .day-today {
-            background: rgba(67, 97, 238, 0.1);
-            border-color: var(--accent);
-            color: var(--primary);
-            font-weight: 700;
-        }
-        
-        .day-parent-a {
-            background: rgba(67, 97, 238, 0.08);
-            color: var(--primary);
-        }
-        
-        .day-parent-b {
-            background: rgba(72, 149, 239, 0.08);
-            color: var(--accent);
-        }
-        
-        .day-request-pending {
-            position: relative;
-        }
-        
-        .day-request-pending::after {
-            content: '';
-            position: absolute;
-            bottom: 4px;
-            width: 8px;
-            height: 8px;
-            background: var(--warning);
-            border-radius: 50%;
-        }
-        
-        .day-request-accepted {
-            position: relative;
-        }
-        
-        .day-request-accepted::after {
-            content: '';
-            position: absolute;
-            bottom: 4px;
-            width: 8px;
-            height: 8px;
-            background: var(--success);
-            border-radius: 50%;
-        }
-        
-        .day-past {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-        
-        .day-past:hover {
-            transform: none;
-            background: transparent;
-        }
-        
-        /* Requests Section */
-        .requests-container {
-            background: white;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            padding: 20px;
-            margin-bottom: 24px;
-        }
-        
-        .request-card {
-            background: var(--light);
-            border-radius: var(--radius-sm);
-            padding: 16px;
-            margin-bottom: 16px;
-            border-left: 4px solid var(--accent);
-            transition: var(--transition);
-        }
-        
-        .request-card.pending {
-            border-left-color: var(--warning);
-        }
-        
-        .request-card.accepted {
-            border-left-color: var(--success);
-        }
-        
-        .request-card:hover {
-            transform: translateX(5px);
-            box-shadow: var(--shadow-hover);
-        }
-        
-        .request-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-        }
-        
-        .request-date {
-            font-weight: 600;
-            color: var(--secondary);
-        }
-        
-        .request-status {
-            font-weight: 500;
-            padding: 4px 8px;
-            border-radius: 20px;
-            font-size: 14px;
-        }
-        
-        .status-pending {
-            background: rgba(247, 37, 133, 0.15);
-            color: var(--warning);
-        }
-        
-        .status-accepted {
-            background: rgba(76, 201, 240, 0.15);
-            color: var(--success);
-        }
-        
-        .status-rejected {
-            background: rgba(108, 117, 125, 0.15);
-            color: var(--gray);
-        }
-        
-        .request-reasons {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            margin: 8px 0;
-        }
-        
-        .reason-tag {
-            background: white;
-            border: 1px solid var(--light-gray);
-            border-radius: 20px;
-            padding: 4px 10px;
-            font-size: 13px;
-            font-weight: 500;
-        }
-        
-        .request-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 12px;
-        }
-        
-        .action-btn {
-            flex: 1;
-            padding: 10px;
-            border: none;
-            border-radius: var(--radius-sm);
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-        
-        .btn-accept {
-            background: rgba(76, 201, 240, 0.15);
-            color: var(--success);
-        }
-        
-        .btn-accept:hover {
-            background: var(--success);
-            color: white;
-        }
-        
-        .btn-reject {
-            background: rgba(247, 37, 133, 0.15);
-            color: var(--warning);
-        }
-        
-        .btn-reject:hover {
-            background: var(--warning);
-            color: white;
-        }
-        
-        .btn-view {
-            background: rgba(67, 97, 238, 0.15);
-            color: var(--primary);
-        }
-        
-        .btn-view:hover {
-            background: var(--primary);
-            color: white;
-        }
-        
-        /* Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-        
-        .modal-content {
-            background: white;
-            border-radius: var(--radius);
-            width: 100%;
-            max-width: 500px;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
-            transform: translateY(20px);
-            opacity: 0;
-            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-        }
-        
-        .modal.show .modal-content {
-            transform: translateY(0);
-            opacity: 1;
-        }
-        
-        .modal-header {
-            padding: 20px;
-            border-bottom: 1px solid var(--light-gray);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .modal-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--secondary);
-        }
-        
-        .close-modal {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            color: var(--gray);
-            cursor: pointer;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: var(--transition);
-        }
-        
-        .close-modal:hover {
-            background: var(--light);
-            color: var(--warning);
-        }
-        
-        .modal-body {
-            padding: 20px;
-        }
-        
-        .date-display {
-            text-align: center;
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--secondary);
-            margin: 10px 0 20px;
-            padding: 15px;
-            background: rgba(67, 97, 238, 0.05);
-            border-radius: var(--radius-sm);
-        }
-        
-        .reasons-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            gap: 12px;
-            margin: 20px 0;
-        }
-        
-        .reason-checkbox {
-            display: none;
-        }
-        
-        .reason-label {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 15px 10px;
-            border: 2px solid var(--light-gray);
-            border-radius: var(--radius-sm);
-            cursor: pointer;
-            transition: var(--transition);
-            text-align: center;
-            font-weight: 500;
-        }
-        
-        .reason-label i {
-            font-size: 1.8rem;
-            margin-bottom: 8px;
-            color: var(--accent);
-        }
-        
-        .reason-checkbox:checked + .reason-label {
-            border-color: var(--primary);
-            background: rgba(67, 97, 238, 0.08);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(67, 97, 238, 0.15);
-        }
-        
-        .reason-label.medicine i { color: #ff6b6b; }
-        .reason-label.dentist i { color: #4895ef; }
-        .reason-label.school i { color: #7209b7; }
-        .reason-label.sports i { color: #4361ee; }
-        .reason-label.party i { color: #f72585; }
-        .reason-label.park i { color: #4cc9f0; }
-        .reason-label.other i { color: #7209b7; }
-        .reason-label.trip i { color: #4895ef; }
-        
-        .submit-request {
-            background: linear-gradient(45deg, var(--primary), var(--secondary));
-            color: white;
-            border: none;
-            width: 100%;
-            padding: 16px;
-            border-radius: var(--radius-sm);
-            font-size: 16px;
-            font-weight: 600;
-            margin-top: 10px;
-            cursor: pointer;
-            transition: var(--transition);
-            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.35);
-        }
-        
-        .submit-request:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(67, 97, 238, 0.45);
-        }
-        
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--gray);
-        }
-        
-        .empty-state i {
-            font-size: 3rem;
-            margin-bottom: 16px;
-            color: var(--light-gray);
-        }
-        
-        .empty-state p {
-            font-size: 1.1rem;
-            margin-top: 10px;
-        }
-        
-        /* Responsive Adjustments */
-        @media (max-width: 768px) {
-            .auth-card {
-                padding: 24px;
-            }
-            
-            .logo {
-                font-size: 2.2rem;
-            }
-            
-            .app-name {
-                font-size: 1.6rem;
-            }
-            
-            .section-title {
-                font-size: 20px;
-            }
-            
-            .calendar-container, 
-            .requests-container {
-                padding: 16px;
-            }
-            
-            .day-number {
-                font-size: 14px;
-            }
-            
-            .nav-btn {
-                width: 36px;
-                height: 36px;
-            }
-            
-            .reasons-grid {
-                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-            }
-            
-            .reason-label {
-                padding: 12px 8px;
-                font-size: 14px;
-            }
-            
-            .reason-label i {
-                font-size: 1.5rem;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .header-content {
-                padding: 0 12px;
-            }
-            
-            .user-name {
-                font-size: 16px;
-            }
-            
-            .user-avatar {
-                width: 36px;
-                height: 36px;
-                font-size: 16px;
-            }
-            
-            .main-content {
-                padding: 16px 12px;
-            }
-            
-            .auth-card {
-                padding: 20px;
-            }
-            
-            .logo {
-                font-size: 2rem;
-            }
-            
-            .app-name {
-                font-size: 1.4rem;
-            }
-            
-            .btn {
-                padding: 14px;
-            }
-            
-            .reasons-grid {
-                grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-            }
-            
-            .request-actions {
-                flex-direction: column;
-            }
-            
-            .action-btn {
-                width: 100%;
-            }
-        }
-        
-        /* Animation for new requests */
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(67, 97, 238, 0.4); }
-            70% { box-shadow: 0 0 0 10px rgba(67, 97, 238, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(67, 97, 238, 0); }
-        }
-        
-        .new-request {
-            animation: pulse 1.5s infinite;
-        }
-        
-        /* Loading animation */
-        .loading {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100px;
-        }
-        
-        .spinner {
-            width: 32px;
-            height: 32px;
-            border: 4px solid rgba(67, 97, 238, 0.2);
-            border-top: 4px solid var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        /* Security Notice Styles */
-        .security-notice {
-            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
-            color: white;
-            padding: 20px;
-            border-radius: var(--radius);
-            margin: 20px 0;
-            text-align: left;
-            box-shadow: 0 4px 15px rgba(238, 90, 36, 0.3);
-        }
-        
-        .security-notice h3 {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
-            font-size: 1.4rem;
-        }
-        
-        .security-notice ul {
-            margin-left: 20px;
-            margin-top: 10px;
-        }
-        
-        .security-notice li {
-            margin-bottom: 8px;
-            line-height: 1.5;
-        }
-        
-        .config-container {
-            background: white;
-            border-radius: var(--radius);
-            padding: 25px;
-            margin: 25px 0;
-            box-shadow: var(--shadow);
-        }
-        
-        .config-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 15px;
-            color: var(--secondary);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .config-steps {
-            background: var(--light);
-            border-left: 4px solid var(--primary);
-            padding: 15px;
-            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-            margin: 15px 0;
-        }
-        
-        .step {
-            margin-bottom: 12px;
-            padding-left: 20px;
-            position: relative;
-        }
-        
-        .step:before {
-            content: "✓";
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 20px;
-            height: 20px;
-            background: var(--primary);
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: bold;
-        }
-        
-        .code-block {
-            background: var(--dark);
-            color: #4cc9f0;
-            padding: 15px;
-            border-radius: var(--radius-sm);
-            margin: 15px 0;
-            font-family: monospace;
-            overflow-x: auto;
-            font-size: 0.9rem;
-        }
-        
-        .warning {
-            background: rgba(247, 37, 133, 0.1);
-            border-left: 4px solid var(--warning);
-            padding: 15px;
-            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-            margin: 15px 0;
-            color: var(--warning);
-            font-weight: 500;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Custodia Familiar Alberto</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' x='0.1em' font-size='80'%3E%F0%9F%91%A8%E2%80%8D%F0%9F%91%A9%E2%80%8D%F0%9F%91%A7%E2%80%8D%F0%9F%91%A6%3C/text%3E%3C/svg%3E">
+  
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      /* PALETA PREMIUM */
+      --primary: #6366f1;
+      --bg-app: #f8f9fc;
+      --text-main: #111827;
+      --text-muted: #6b7280;
+      
+      /* CUSTODIA - DEGRADADOS */
+      --mom-gradient: linear-gradient(135deg, #fff0f6 0%, #ffe3e8 100%);
+      --mom-accent: #db2777;
+      --dad-gradient: linear-gradient(135deg, #f0f7ff 0%, #dbeafe 100%);
+      --dad-accent: #2563eb;
+
+      /* SOMBRAS & RADIOS */
+      --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+      --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+      --radius-card: 24px;
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    
+    body {
+      margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-app); color: var(--text-main);
+      min-height: 100vh; display: flex; flex-direction: column; padding-bottom: 40px;
+    }
+    .hidden { display: none !important; }
+
+    /* --- LOGIN --- */
+    .login-wrapper { position: fixed; inset: 0; z-index: 2000; background: #fff; display: flex; align-items: center; justify-content: center; padding: 24px; }
+    .login-box { width: 100%; max-width: 380px; text-align: center; }
+    .input-modern { width: 100%; padding: 16px 20px; margin-bottom: 12px; background: #f3f4f6; border: 2px solid transparent; border-radius: 16px; font-size: 1rem; font-family: inherit; transition: all 0.2s; }
+    .input-modern:focus { background: #fff; border-color: var(--primary); outline: none; }
+    .btn-modern { width: 100%; padding: 16px; background: var(--text-main); color: #fff; border: none; border-radius: 16px; font-weight: 700; font-size: 1rem; cursor: pointer; }
+
+    /* --- HEADER --- */
+    .app-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; }
+    .brand-logo { font-size: 1.3rem; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+    .user-menu { display: flex; gap: 12px; align-items: center; }
+    .btn-icon-subtle { background: #fff; border: 1px solid #e5e7eb; color: var(--text-main); padding: 8px 12px; border-radius: 99px; font-weight: 600; font-size: 0.9rem; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: var(--shadow-card); }
+    
+    /* Insignia de Rol */
+    .role-badge { padding: 6px 12px; border-radius: 20px; font-weight: 700; font-size: 0.85rem; display: flex; align-items: center; gap: 6px; box-shadow: var(--shadow-card); }
+    .role-badge.mom { background: var(--mom-gradient); color: var(--mom-accent); border: 1px solid #fbcfe8; }
+    .role-badge.dad { background: var(--dad-gradient); color: var(--dad-accent); border: 1px solid #bfdbfe; }
+
+
+    /* --- LAYOUT & CALENDARIO --- */
+    .main-container { max-width: 1100px; margin: 0 auto; width: 100%; padding: 0 24px; display: grid; gap: 32px; grid-template-columns: 1fr; }
+    @media(min-width: 900px) { .main-container { grid-template-columns: 3fr 1fr; } }
+    
+    .calendar-section { background: #fff; border-radius: 32px; padding: 24px; box-shadow: var(--shadow-card); }
+    .calendar-controls { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+    .month-heading { font-size: 1.8rem; font-weight: 800; text-transform: capitalize; }
+    .nav-circle-btn { width: 44px; height: 44px; border-radius: 50%; background: #f3f4f6; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-main); }
+    
+    .week-header, .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 12px; }
+    .week-header { margin-bottom: 12px; }
+    .week-day-label { text-align: center; font-weight: 700; font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; }
+
+    /* TARJETA DÍA */
+    .day-card { aspect-ratio: 4/5; border-radius: 20px; padding: 10px; position: relative; cursor: pointer; background: #fff; border: 1px solid rgba(0,0,0,0.03); box-shadow: var(--shadow-card); display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; }
+    .day-card.empty { background: transparent; border: none; box-shadow: none; pointer-events: none; }
+    .is-mom { background: var(--mom-gradient); border-color: var(--mom-accent); }
+    .is-dad { background: var(--dad-gradient); border-color: var(--dad-accent); }
+    .is-today { box-shadow: 0 0 0 3px var(--primary) !important; }
+    .day-number { font-weight: 800; font-size: 1.1rem; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.7); border-radius: 12px; backdrop-filter: blur(4px); position: relative; z-index: 2;}
+    .bg-illustration { position: absolute; bottom: -10px; right: -10px; width: 80%; height: 80%; object-fit: contain; opacity: 0.25; pointer-events: none; z-index: 0; }
+    .events-container { display: flex; flex-wrap: wrap; gap: 4px; position: relative; z-index: 2; margin-top: auto; }
+    .event-chip { height: 24px; padding: 0 8px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .event-chip svg { width: 14px; height: 14px; }
+    .chip-medico { background: #ef4444; } .chip-dentista { background: #0ea5e9; } .chip-escuela { background: #f97316; } .chip-deporte { background: #8b5cf6; } .chip-cumple { background: #eab308; } .chip-parque { background: #84cc16; } .chip-general { background: #64748b; } .chip-vacaciones { background: #06b6d4; }
+
+    /* --- SIDEBAR & SOLICITUDES --- */
+    .sidebar { display: flex; flex-direction: column; gap: 24px; }
+    .glass-panel { background: #fff; border-radius: 24px; padding: 24px; border: 1px solid #f3f4f6; box-shadow: var(--shadow-card); }
+    .panel-title { font-size: 1.1rem; font-weight: 800; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+
+    /* Estilos Lista Solicitudes */
+    .requests-list-container { display: flex; flex-direction: column; gap: 12px; max-height: 400px; overflow-y: auto; }
+    .request-item { padding: 16px; background: #f8f9fc; border-radius: 16px; border: 1px solid #e5e7eb; font-size: 0.9rem; transition: all 0.3s ease; position: relative; }
+    .request-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .request-dates { font-weight: 700; font-size: 1rem; color: var(--text-main); }
+    .req-status { font-size: 0.7rem; padding: 4px 10px; border-radius: 99px; text-transform: uppercase; font-weight: 700; }
+    .req-status.pendiente { background: #fef3c7; color: #d97706; }
+    .req-status.aprobada { background: #dcfce7; color: #166534; }
+    .req-status.rechazada { background: #fee2e2; color: #991b1b; }
+    .request-meta { font-size: 0.8rem; color: var(--text-muted); margin-top: 8px; display: flex; justify-content: space-between; align-items: center;}
+    
+    /* Estilo para solicitud que requiere MI atención */
+    .request-item.needs-action { border: 2px solid var(--primary); background: #eef2ff; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15); animation: subtlePulse 2s infinite; }
+    @keyframes subtlePulse { 0% { background: #eef2ff; } 50% { background: #e0e7ff; } 100% { background: #eef2ff; } }
+    
+    /* Botones de Acción en Solicitudes */
+    .request-actions { display: flex; gap: 8px; margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(0,0,0,0.05); }
+    .btn-action { flex: 1; padding: 10px; border-radius: 12px; border: none; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: transform 0.1s; }
+    .btn-action:active { transform: scale(0.97); }
+    .btn-action.approve { background: #dcfce7; color: #166534; }
+    .btn-action.reject { background: #fee2e2; color: #991b1b; }
+
+    /* --- MODAL & RESPONSIVE --- */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(8px); z-index: 3000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: all 0.3s; }
+    .modal-overlay.open { opacity: 1; pointer-events: auto; }
+    .modal-card { background: #fff; width: 90%; max-width: 480px; border-radius: 32px; padding: 32px; box-shadow: var(--shadow-hover); transform: scale(0.95); transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+    .modal-overlay.open .modal-card { transform: scale(1); }
+    .selection-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+    .select-item { aspect-ratio: 1; background: #f8f9fc; border-radius: 20px; border: 2px solid transparent; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; }
+    .select-item.selected { background: #eef2ff; border-color: var(--primary); color: var(--primary); }
+    @media (max-width: 768px) { .main-container { padding: 0 16px; gap: 20px; } .calendar-section { padding: 16px; } .days-grid, .week-header { gap: 8px; } .day-card { padding: 8px; } .app-header { padding: 16px; } .brand-logo { font-size: 1.1rem; } }
+  </style>
 </head>
 <body>
-    <!-- Security Notice - Shown when Firebase is not configured -->
-    <div id="security-notice" class="auth-container" style="display: none;">
-        <div class="logo">
-            <i class="fas fa-shield-alt"></i>
-            <div>Configuración de Seguridad</div>
-        </div>
-        <div class="app-name">⚠️ Configuración de Firebase Requerida</div>
-        <p class="app-desc">Para proteger tu aplicación, debes configurar Firebase correctamente antes de usarla.</p>
-        
-        <div class="config-container">
-            <h2 class="config-title"><i class="fas fa-cog"></i> Pasos para Configurar Firebase</h2>
-            <div class="config-steps">
-                <div class="step">Crear un proyecto en <a href="https://console.firebase.google.com/" target="_blank" style="color: var(--primary); text-decoration: underline;">Firebase Console</a></div>
-                <div class="step">Registrar una aplicación web en tu proyecto de Firebase</div>
-                <div class="step">Copiar tu configuración de Firebase (firebaseConfig)</div>
-                <div class="step">Reemplazar la configuración de ejemplo en el archivo index.html</div>
-            </div>
-            
-            <h3 style="margin: 20px 0 10px; color: var(--secondary);"><i class="fas fa-file-code"></i> Ejemplo de Configuración:</h3>
-            <div class="code-block">
-// Reemplaza esto en la sección de configuración de Firebase<br>
-const firebaseConfig = {<br>
-&nbsp;&nbsp;apiKey: "AIzaSyAwgk4_l0zvaCUCgm1CjqqqXjJHr5KPBjc",<br>
-&nbsp;&nbsp;authDomain: "custodia-familiar.firebaseapp.com",<br>
-&nbsp;&nbsp;projectId: "custodia-familiar",<br>
-&nbsp;&nbsp;storageBucket:"custodia-familiar.firebasestorage.app",<br>
-&nbsp;&nbsp;messagingSenderId: "1038952432258",<br>
-&nbsp;&nbsp;appId: "1:1038952432258:web:7608d6a48d8ad8308a6a9b"<br>
-};
-            </div>
-            
-            <div class="warning">
-                <i class="fas fa-exclamation-triangle"></i> NUNCA commitees tus claves reales a GitHub. Usa variables de entorno o archivos .env en producción.
-            </div>
-            
-            <button id="continue-btn" class="btn btn-primary" style="margin-top: 20px;">
-                <i class="fas fa-check-circle"></i> He Configurado Firebase - Continuar
-            </button>
-        </div>
-        
-        <div class="security-notice">
-            <h3><i class="fas fa-lock"></i> ¿Por qué es esto importante?</h3>
-            <ul>
-                <li>Las claves expuestas pueden ser usadas para acceder a tu base de datos</li>
-                <li>Podrían generar cargos no autorizados en tu cuenta de Google Cloud</li>
-                <li>GitHub bloquea repositorios con claves expuestas automáticamente</li>
-                <li>Protege la privacidad de los usuarios de tu aplicación</li>
-            </ul>
-        </div>
+
+<div id="login-view" class="login-wrapper">
+  <div class="login-box">
+    <div style="font-size:3rem; margin-bottom:1rem;">👨‍👩‍👧‍👦</div>
+    <h1 style="font-size:1.5rem; font-weight:800; margin-bottom:0.5rem;">Custodia Familiar Alberto</h1>
+    <form id="login-form">
+      <input type="email" id="login-email" class="input-modern" required placeholder="Correo electrónico">
+      <input type="password" id="login-password" class="input-modern" required placeholder="Contraseña">
+      <button type="submit" class="btn-modern" style="margin-top:16px;">Entrar</button>
+      <div id="login-error" style="color:#ef4444; margin-top:20px; font-weight:600; font-size:0.9rem;"></div>
+    </form>
+  </div>
+</div>
+
+<div id="app-root" class="hidden">
+  <header class="app-header">
+    <div class="brand-logo">
+      <i data-lucide="calendar-heart" style="color:var(--primary);"></i>
+      <span>Custodia Familiar Alberto</span>
     </div>
-    
-    <!-- Authentication Screen -->
-    <div id="auth-screen" class="auth-container">
-        <div class="logo">
-            <i class="fas fa-home"></i>
-            <div>Custodia Familiar Alberto</div>
-        </div>
-        <div class="app-name">👨‍👩‍👧‍👦 Custodia Familiar Alberto</div>
-        <p class="app-desc">Gestiona los turnos de custodia de forma sencilla, segura y eficiente. Coordina con el otro progenitor sin complicaciones.</p>
-        
-        <div class="auth-card">
-            <div class="input-group">
-                <label for="email">Correo Electrónico</label>
-                <input type="email" id="email" class="input-field" placeholder="tu@email.com" required>
-            </div>
-            <div class="input-group">
-                <label for="password">Contraseña</label>
-                <input type="password" id="password" class="input-field" placeholder="••••••••" required>
-            </div>
-            <button id="login-btn" class="btn btn-primary">Entrar</button>
-        </div>
-        
-        <div class="divider">
-            <span>O continúa con</span>
-        </div>
-        
-        <button id="google-login-btn" class="btn btn-google">
-            <i class="fab fa-google"></i> Iniciar con Google
-        </button>
-        
-        <p style="margin-top: 25px; color: var(--gray); font-size: 14px;">
-            ¿No tienes cuenta? <span style="color: var(--primary); font-weight: 500; cursor: pointer;" id="register-link">Regístrate aquí</span>
-        </p>
+    <div class="user-menu">
+      <div id="user-role-indicator" class="role-badge hidden"></div>
+      <select id="year-select" class="btn-icon-subtle" style="border:none; padding: 8px 16px;"></select>
+      <button id="logout-btn" class="btn-icon-subtle" style="color:#ef4444; background:#fef2f2;"><i data-lucide="log-out" style="width:16px;"></i></button>
     </div>
-    
-    <!-- Main App -->
-    <div id="app-container" class="app-container">
-        <header class="header">
-            <div class="container header-content">
-                <div class="logo" style="font-size: 1.6rem; gap: 8px;">
-                    <i class="fas fa-home"></i>
-                    <div>Custodia Familiar</div>
-                </div>
-                <div class="user-info">
-                    <div class="user-name" id="user-display-name">Usuario</div>
-                    <div class="user-avatar" id="user-avatar">U</div>
-                    <button class="logout-btn" id="logout-btn">
-                        <i class="fas fa-sign-out-alt"></i> Salir
-                    </button>
-                </div>
-            </div>
-        </header>
-        
-        <div class="main-content">
-            <h2 class="section-title"><i class="fas fa-calendar-alt"></i> Calendario de Custodia</h2>
-            <div class="calendar-container">
-                <div class="calendar-header">
-                    <button class="nav-btn" id="prev-month">
-                        <i class="fas fa-chevron-left"></i>
-                    </button>
-                    <div class="month-year" id="current-month">Enero 2026</div>
-                    <button class="nav-btn" id="next-month">
-                        <i class="fas fa-chevron-right"></i>
-                    </button>
-                </div>
-                <div class="weekdays">
-                    <div>Lun</div>
-                    <div>Mar</div>
-                    <div>Mié</div>
-                    <div>Jue</div>
-                    <div>Vie</div>
-                    <div>Sáb</div>
-                    <div>Dom</div>
-                </div>
-                <div class="days-grid" id="calendar-days">
-                    <!-- Calendar days will be generated here -->
-                </div>
-            </div>
-            
-            <h2 class="section-title"><i class="fas fa-exchange-alt"></i> Solicitudes Pendientes</h2>
-            <div class="requests-container">
-                <div id="pending-requests-list">
-                    <!-- Pending requests will be loaded here -->
-                    <div class="loading">
-                        <div class="spinner"></div>
-                    </div>
-                </div>
-            </div>
-            
-            <h2 class="section-title"><i class="fas fa-history"></i> Historial de Solicitudes</h2>
-            <div class="requests-container">
-                <div id="request-history-list">
-                    <!-- Request history will be loaded here -->
-                    <div class="loading">
-                        <div class="spinner"></div>
-                    </div>
-                </div>
-            </div>
+  </header>
+
+  <main class="main-container">
+    <section class="calendar-section" id="calendar-wrapper-swipe">
+      <div class="calendar-controls">
+        <button id="prev-period" class="nav-circle-btn"><i data-lucide="chevron-left"></i></button>
+        <div id="calendar-title" class="month-heading"></div>
+        <button id="next-period" class="nav-circle-btn"><i data-lucide="chevron-right"></i></button>
+      </div>
+      <div class="week-header">
+        <div class="week-day-label">Lun</div><div class="week-day-label">Mar</div><div class="week-day-label">Mié</div>
+        <div class="week-day-label">Jue</div><div class="week-day-label">Vie</div><div class="week-day-label">Sáb</div><div class="week-day-label">Dom</div>
+      </div>
+      <div id="calendar-grid" class="days-grid"></div>
+    </section>
+
+    <aside class="sidebar">
+      <div class="glass-panel">
+        <div class="panel-title"><i data-lucide="git-pull-request" style="color:var(--primary)"></i> Solicitar Cambio</div>
+        <form id="request-form-sidebar">
+          <div style="display:flex; gap:12px; margin-bottom:12px;">
+            <input type="date" id="req-start" class="input-modern" style="margin:0; padding:12px;" required>
+            <input type="date" id="req-end" class="input-modern" style="margin:0; padding:12px;" required>
+          </div>
+          <input type="text" id="req-reason" class="input-modern" placeholder="Motivo (opcional)">
+          <button type="submit" class="btn-modern" style="padding:12px; font-size:0.9rem;">Enviar Solicitud</button>
+        </form>
+      </div>
+
+      <div class="glass-panel">
+        <div class="panel-title"><i data-lucide="list-checks" style="color:var(--primary)"></i> Estado Solicitudes</div>
+        <div id="requests-status-list" class="requests-list-container">
+            <div style="text-align:center; color:var(--text-muted); padding:20px;">Cargando...</div>
         </div>
+      </div>
+    </aside>
+  </main>
+</div>
+
+<div class="modal-overlay" id="day-modal">
+  <div class="modal-card">
+    <div style="display:flex; justify-content:space-between; margin-bottom:24px;"><h2 id="modal-date-title" style="margin:0;">Fecha</h2><button onclick="closeModal()" style="border:none;background:#f3f4f6;width:40px;height:40px;border-radius:50%;cursor:pointer;">X</button></div>
+    <div id="modal-custody-header-container"></div>
+    <input type="text" id="event-title" class="input-modern" placeholder="Añadir evento..." style="font-size:1.1rem;">
+    <div class="selection-grid">
+      <div class="select-item selected" onclick="selectIcon('medico',this)"><i data-lucide="stethoscope" style="color:#ef4444"></i><span>Médico</span></div>
+      <div class="select-item" onclick="selectIcon('dentista',this)"><i data-lucide="smile" style="color:#0ea5e9"></i><span>Dentista</span></div>
+      <div class="select-item" onclick="selectIcon('escuela',this)"><i data-lucide="backpack" style="color:#f97316"></i><span>Colegio</span></div>
+      <div class="select-item" onclick="selectIcon('deporte',this)"><i data-lucide="trophy" style="color:#8b5cf6"></i><span>Deporte</span></div>
+      <div class="select-item" onclick="selectIcon('cumple',this)"><i data-lucide="cake" style="color:#eab308"></i><span>Fiesta</span></div>
+      <div class="select-item" onclick="selectIcon('parque',this)"><i data-lucide="tree-deciduous" style="color:#84cc16"></i><span>Parque</span></div>
+      <div class="select-item" onclick="selectIcon('general',this)"><i data-lucide="star" style="color:#64748b"></i><span>Otro</span></div>
+      <div class="select-item" onclick="selectIcon('vacaciones',this)"><i data-lucide="palmtree" style="color:#06b6d4"></i><span>Viaje</span></div>
     </div>
-    
-    <!-- Request Modal -->
-    <div id="request-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title">Solicitar Cambio de Custodia</div>
-                <button class="close-modal" id="close-request-modal">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="date-display" id="request-date-display">Martes, 30 de Enero de 2026</div>
-                <p style="text-align: center; margin-bottom: 20px; color: var(--gray);">
-                    Selecciona el motivo de tu solicitud:
-                </p>
-                
-                <div class="reasons-grid">
-                    <input type="checkbox" id="reason-medicine" class="reason-checkbox">
-                    <label for="reason-medicine" class="reason-label medicine">
-                        <i class="fas fa-first-aid"></i>
-                        <span>Médico</span>
-                    </label>
-                    
-                    <input type="checkbox" id="reason-dentist" class="reason-checkbox">
-                    <label for="reason-dentist" class="reason-label dentist">
-                        <i class="fas fa-tooth"></i>
-                        <span>Dentista</span>
-                    </label>
-                    
-                    <input type="checkbox" id="reason-school" class="reason-checkbox">
-                    <label for="reason-school" class="reason-label school">
-                        <i class="fas fa-school"></i>
-                        <span>Colegio</span>
-                    </label>
-                    
-                    <input type="checkbox" id="reason-sports" class="reason-checkbox">
-                    <label for="reason-sports" class="reason-label sports">
-                        <i class="fas fa-futbol"></i>
-                        <span>Deporte</span>
-                    </label>
-                    
-                    <input type="checkbox" id="reason-party" class="reason-checkbox">
-                    <label for="reason-party" class="reason-label party">
-                        <i class="fas fa-birthday-cake"></i>
-                        <span>Fiesta</span>
-                    </label>
-                    
-                    <input type="checkbox" id="reason-park" class="reason-checkbox">
-                    <label for="reason-park" class="reason-label park">
-                        <i class="fas fa-tree"></i>
-                        <span>Parque</span>
-                    </label>
-                    
-                    <input type="checkbox" id="reason-trip" class="reason-checkbox">
-                    <label for="reason-trip" class="reason-label trip">
-                        <i class="fas fa-suitcase"></i>
-                        <span>Viaje</span>
-                    </label>
-                    
-                    <input type="checkbox" id="reason-other" class="reason-checkbox">
-                    <label for="reason-other" class="reason-label other">
-                        <i class="fas fa-ellipsis-h"></i>
-                        <span>Otro</span>
-                    </label>
+    <button onclick="saveEvent()" class="btn-modern" style="margin-bottom:24px;">Guardar</button>
+    <div id="modal-event-list"></div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+<script>
+  // ==========================================================
+  // ⚙️ CONFIGURACIÓN DE ROLES (¡IMPRESCINDIBLE EDITAR!) ⚙️
+  // ==========================================================
+  // Pon aquí los emails REALES que usáis para hacer login.
+  // Si no lo haces, los botones de aprobar/rechazar NO aparecerán.
+  const USER_ROLES = {
+      'moya@custodia.com': 'padre', 
+      'alessia@custodia.com': 'madre'
+  };
+  // ==========================================================
+
+  // Configuración de Firebase original (NO TOCAR)
+  const firebaseConfig = { apiKey: "AIzaSyAwgk4_l0zvaCUCgm1CjqqqXjJHr5KPBjc", authDomain: "custodia-familiar.firebaseapp.com", projectId: "custodia-familiar", storageBucket: "custodia-familiar.firebasestorage.app", messagingSenderId: "1038952432258", appId: "1:1038952432258:web:7608d6a48d8ad8308a6a9b" };
+  firebase.initializeApp(firebaseConfig); const db = firebase.firestore(); const auth = firebase.auth();
+  const IMG_MOM = "assets/madre.png"; const IMG_DAD = "assets/padre.png";
+
+  let todayInit = new Date(); let currentYear = todayInit.getFullYear(); let currentMonth = todayInit.getMonth(); if (currentYear < 2025) currentYear = 2025;
+  let overrides={}, eventsData={}; let selectedDateKey=null, selectedIconType='medico';
+  let currentUserEmail = null; let currentUserRole = null;
+
+  const monthNames = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+  const BASE_MONDAY = new Date(2026, 0, 5, 12, 0, 0); 
+
+  function getBaseOwner(y,m,d) { const date = new Date(y, m, d, 12, 0, 0); if(date.getFullYear()<2025 || date.getFullYear()>2027) return null; const diff = Math.round((date - BASE_MONDAY)/(1000*60*60*24)); return (Math.floor(diff/7)%2 === 0) ? "padre" : "madre"; }
+  function getIconName(t) { const m={'medico':'stethoscope','dentista':'smile','escuela':'backpack','deporte':'trophy','cumple':'cake','parque':'tree-deciduous','general':'star','vacaciones':'palmtree'}; return m[t]||'circle'; }
+
+  // RENDER CALENDARIO
+  function renderCalendar() {
+    const grid = document.getElementById("calendar-grid"); document.getElementById("calendar-title").textContent = `${monthNames[currentMonth]} ${currentYear}`; grid.innerHTML = "";
+    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate(); const firstDay = new Date(currentYear, currentMonth, 1).getDay(); const startOffset = (firstDay === 0) ? 6 : firstDay - 1;
+    for(let i=0; i<startOffset; i++) grid.appendChild(createDayCard(null));
+    for(let day=1; day<=daysInMonth; day++) grid.appendChild(createDayCard(day));
+    lucide.createIcons();
+  }
+
+  function createDayCard(day) {
+    const card = document.createElement("div"); card.className = "day-card"; if(day === null) { card.classList.add("empty"); return card; }
+    const y=currentYear, m=currentMonth, d=day; const dKey = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const owner = overrides[dKey] || getBaseOwner(y,m,d); const isToday = (dKey === `${todayInit.getFullYear()}-${String(todayInit.getMonth()+1).padStart(2,'0')}-${String(todayInit.getDate()).padStart(2,'0')}`);
+    if(owner === "madre") card.classList.add("is-mom"); if(owner === "padre") card.classList.add("is-dad"); if(isToday) card.classList.add("is-today");
+    card.onclick = () => openDayModal(dKey, owner);
+    card.innerHTML = `<div style="display:flex;justify-content:space-between;position:relative;z-index:2;"><div class="day-number">${d}</div><i data-lucide="${owner==='madre'?'heart':'shield'}" style="color:${owner==='madre'?'var(--mom-accent)':'var(--dad-accent)'};opacity:0.7;width:20px;"></i></div><img src="${owner==="madre"?IMG_MOM:IMG_DAD}" class="bg-illustration">`;
+    const evts = eventsData[dKey] || []; if(evts.length > 0) { const ec = document.createElement("div"); ec.className = "events-container"; evts.slice(0, 3).forEach(e => { ec.innerHTML += `<div class="event-chip chip-${e.type}"><i data-lucide="${getIconName(e.type)}"></i></div>`; }); card.appendChild(ec); }
+    return card;
+  }
+
+  // MODAL
+  function openDayModal(dateKey, owner) { selectedDateKey = dateKey; document.getElementById("day-modal").classList.add("open"); const dObj = new Date(dateKey); document.getElementById("modal-date-title").textContent = dObj.toLocaleDateString('es-ES', {weekday:'long', day:'numeric', month:'long'}); document.getElementById("modal-custody-header-container").innerHTML = `<div style="display:flex;align-items:center;gap:20px;padding:20px;border-radius:24px;margin-bottom:24px;background:${owner==='madre'?'var(--mom-gradient)':'var(--dad-gradient)'}"><img src="${owner==='madre'?IMG_MOM:IMG_DAD}" style="width:80px;height:80px;border-radius:50%;background:#fff;padding:4px;box-shadow:var(--shadow-card);"><div><div style="font-size:0.9rem;font-weight:700;opacity:0.7;text-transform:uppercase;">Día de</div><div style="font-size:1.8rem;font-weight:900;">${owner==='madre'?'Mamá':'Papá'}</div></div></div>`; renderEventsList(); }
+  function closeModal() { document.getElementById("day-modal").classList.remove("open"); }
+  function selectIcon(t,el) { selectedIconType=t; document.querySelectorAll('.select-item').forEach(b=>b.classList.remove('selected')); el.classList.add('selected'); }
+  function renderEventsList() { const l = document.getElementById("modal-event-list"); l.innerHTML=""; const evts = eventsData[selectedDateKey] || []; if(evts.length===0) l.innerHTML="<div style='color:var(--text-muted);text-align:center;padding:20px;'>No hay eventos.</div>"; evts.forEach(e => { l.innerHTML += `<div style="display:flex;justify-content:space-between;align-items:center;padding:16px;background:#f8f9fc;border-radius:16px;margin-bottom:8px;"><div style="display:flex;gap:12px;align-items:center;"><div class="event-chip chip-${e.type}" style="width:32px;height:32px;"><i data-lucide="${getIconName(e.type)}" style="width:16px;"></i></div><strong>${e.title}</strong></div><button onclick="delEv('${e.id}')" style="border:none;color:#ef4444;background:none;cursor:pointer;"><i data-lucide="trash-2"></i></button></div>`; }); lucide.createIcons(); }
+  async function saveEvent() { const t=document.getElementById("event-title").value; if(t){await db.collection("events").add({date:selectedDateKey, title:t, type:selectedIconType, createdAt:firebase.firestore.FieldValue.serverTimestamp()}); document.getElementById("event-title").value=""; renderEventsList();} }
+  async function delEv(id){if(confirm("¿Eliminar?")){await db.collection("events").doc(id).delete(); renderEventsList();}}
+
+  // ==================================================
+  // LÓGICA DE SOLICITUDES COMPLETA
+  // ==================================================
+
+  function updateHeaderRoleIndicator() {
+      const indicator = document.getElementById("user-role-indicator");
+      if (currentUserRole === 'padre') { indicator.innerHTML = '<i data-lucide="shield" style="width:16px;"></i> Padre'; indicator.className = 'role-badge dad'; } 
+      else if (currentUserRole === 'madre') { indicator.innerHTML = '<i data-lucide="heart" style="width:16px;"></i> Madre'; indicator.className = 'role-badge mom'; } 
+      else { indicator.className = 'hidden'; }
+      lucide.createIcons();
+  }
+
+  document.getElementById("request-form-sidebar").addEventListener("submit", async e => {
+      e.preventDefault();
+      const start = document.getElementById("req-start").value;
+      const end = document.getElementById("req-end").value;
+      if(!start || !end) return alert("Selecciona fechas");
+      // Verificar que el usuario tiene un rol asignado antes de pedir
+      if(!currentUserRole) { return alert("Error: Tu usuario no tiene un rol asignado (padre/madre). Contacta con el administrador."); }
+      try {
+          await db.collection("requests").add({ startDate: start, endDate: end, reason: document.getElementById("req-reason").value || "Sin motivo", status: 'pendiente', requesterEmail: currentUserEmail, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+          alert("Solicitud enviada"); document.getElementById("request-form-sidebar").reset();
+      } catch (error) { console.error(error); alert("Error al enviar"); }
+  });
+
+  // FUNCIÓN CLAVE: Procesar Aprobación/Rechazo
+  async function processRequest(requestId, newStatus) {
+    if(!confirm(`¿Estás seguro de que quieres marcar esto como ${newStatus}?`)) return;
+
+    try {
+        // 1. Obtener datos de la solicitud
+        const reqDoc = await db.collection("requests").doc(requestId).get();
+        const reqData = reqDoc.data();
+
+        // 2. Si se APRUEBA, hay que cambiar el calendario (crear overrides)
+        if (newStatus === 'aprobada') {
+            const requesterRole = USER_ROLES[reqData.requesterEmail];
+            if(!requesterRole) { alert("Error crítico: No se puede determinar el rol del solicitante. Revisa la configuración USER_ROLES."); return; }
+
+            const start = new Date(reqData.startDate);
+            const end = new Date(reqData.endDate);
+            const batch = db.batch(); // Usamos batch para que sea todo o nada
+
+            // Iterar por cada día del rango para cambiar el dueño
+            for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+                const year = d.getFullYear();
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                const dayStr = String(d.getDate()).padStart(2, '0');
+                const dateKey = `${year}-${month}-${dayStr}`;
+
+                // El nuevo dueño es quien lo pidió
+                const newOwner = (requesterRole === 'padre') ? 'padre' : 'madre';
+
+                // Crear/Sobreescribir el documento de override para ese día
+                const overrideRef = db.collection("overrides").doc(dateKey);
+                batch.set(overrideRef, { owner: newOwner });
+            }
+            // Ejecutar todos los cambios de calendario
+            await batch.commit();
+        }
+
+        // 3. Finalmente, actualizar el estado de la solicitud
+        await db.collection("requests").doc(requestId).update({ status: newStatus });
+        
+    } catch (error) {
+        console.error("Error procesando solicitud:", error);
+        alert("Hubo un error al procesar la solicitud.");
+    }
+  }
+
+
+  function renderRequestsList(docs) {
+      const container = document.getElementById("requests-status-list"); container.innerHTML = "";
+      if (docs.length === 0) { container.innerHTML = "<div style='text-align:center;color:var(--text-muted);padding:20px;font-style:italic;'>No hay solicitudes recientes.</div>"; return; }
+
+      docs.forEach(doc => {
+          const data = doc.data();
+          const isMyRequest = data.requesterEmail === currentUserEmail;
+          const isPending = data.status === 'pendiente';
+          // Si está pendiente, NO la pedí yo, y tengo un rol conocido, me toca a mí aprobarla.
+          const needsMyAction = isPending && !isMyRequest && (currentUserRole === 'padre' || currentUserRole === 'madre');
+
+          const item = document.createElement("div");
+          item.className = `request-item ${needsMyAction ? 'needs-action' : ''}`;
+          
+          const startF = new Date(data.startDate).toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit'});
+          const endF = new Date(data.endDate).toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit'});
+
+          let metaInfo = isMyRequest ? 'Solicitado por ti' : 'Solicitado por la otra parte';
+          if(needsMyAction) metaInfo = `<strong>Requiere tu aprobación</strong>`;
+
+          // Generar botones SOLO si requiere acción
+          let actionButtonsHTML = '';
+          if(needsMyAction) {
+              actionButtonsHTML = `
+                <div class="request-actions">
+                  <button onclick="processRequest('${doc.id}', 'aprobada')" class="btn-action approve"><i data-lucide="check"></i> Aprobar</button>
+                  <button onclick="processRequest('${doc.id}', 'rechazada')" class="btn-action reject"><i data-lucide="x"></i> Rechazar</button>
                 </div>
-                
-                <button class="submit-request" id="submit-request-btn">Enviar Solicitud</button>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Confirmation Modal -->
-    <div id="confirmation-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title" id="confirmation-title">Confirmar Acción</div>
-                <button class="close-modal" id="close-confirmation-modal">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <p id="confirmation-message" style="text-align: center; font-size: 1.1rem; margin-bottom: 25px;">
-                    ¿Estás seguro de que quieres aceptar esta solicitud?
-                </p>
-                <div style="display: flex; gap: 15px;">
-                    <button class="btn btn-primary" style="flex: 1; padding: 14px;" id="confirm-yes">Sí, Confirmar</button>
-                    <button class="btn" style="flex: 1; padding: 14px; background: var(--light-gray); color: var(--dark);" id="confirm-no">Cancelar</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <script>
-        // =====================================================
-        // FIREBASE CONFIGURATION - SECURE IMPLEMENTATION
-        // =====================================================
-        // ⚠️ IMPORTANT: REPLACE WITH YOUR ACTUAL FIREBASE CONFIG
-        // Get your config from Firebase Console > Project Settings
-        // NEVER commit real keys to GitHub - use environment variables in production
-        // =====================================================
-        
-        // Placeholder config - MUST BE REPLACED WITH YOUR ACTUAL FIREBASE CONFIG
-        const firebaseConfig = {
-            apiKey: ""AIzaSyAwgk4_l0zvaCUCgm1CjqqqXjJHr5KPBjc"",
-            authDomain: "custodia-familiar.firebaseapp.com",
-            projectId: "custodia-familiar",
-            storageBucket: "custodia-familiar.firebasestorage.app",
-            messagingSenderId: "1038952432258",
-            appId: "1:1038952432258:web:7608d6a48d8ad8308a6a9b"
-        };
-        
-        // Security check: Verify if Firebase has been properly configured
-        const isFirebaseConfigured = () => {
-            return (
-                firebaseConfig.apiKey !== "YOUR_API_KEY" &&
-                firebaseConfig.projectId !== "YOUR_PROJECT_ID" &&
-                firebaseConfig.apiKey.length > 10 &&
-                firebaseConfig.projectId.length > 5
-            );
-        };
-        
-        // Initialize Firebase ONLY if properly configured
-        let firebaseApp = null;
-        if (isFirebaseConfigured()) {
-            try {
-                if (!firebase.apps.length) {
-                    firebaseApp = firebase.initializeApp(firebaseConfig);
-                } else {
-                    firebaseApp = firebase.app();
-                }
-                console.log("✓ Firebase inicializado correctamente");
-            } catch (error) {
-                console.error("Error inicializando Firebase:", error);
-                showSecurityNotice();
-            }
-        } else {
-            // Show security notice if not configured
-            showSecurityNotice();
-        }
-        
-        // DOM Elements
-        const securityNotice = document.getElementById('security-notice');
-        const authScreen = document.getElementById('auth-screen');
-        const appContainer = document.getElementById('app-container');
-        const loginBtn = document.getElementById('login-btn');
-        const googleLoginBtn = document.getElementById('google-login-btn');
-        const logoutBtn = document.getElementById('logout-btn');
-        const registerLink = document.getElementById('register-link');
-        const userEmail = document.getElementById('email');
-        const userPassword = document.getElementById('password');
-        const userDisplayName = document.getElementById('user-display-name');
-        const userAvatar = document.getElementById('user-avatar');
-        const currentMonthDisplay = document.getElementById('current-month');
-        const calendarDays = document.getElementById('calendar-days');
-        const prevMonthBtn = document.getElementById('prev-month');
-        const nextMonthBtn = document.getElementById('next-month');
-        const pendingRequestsList = document.getElementById('pending-requests-list');
-        const requestHistoryList = document.getElementById('request-history-list');
-        const requestModal = document.getElementById('request-modal');
-        const closeRequestModalBtn = document.getElementById('close-request-modal');
-        const requestDateDisplay = document.getElementById('request-date-display');
-        const submitRequestBtn = document.getElementById('submit-request-btn');
-        const confirmationModal = document.getElementById('confirmation-modal');
-        const closeConfirmationModalBtn = document.getElementById('close-confirmation-modal');
-        const confirmationTitle = document.getElementById('confirmation-title');
-        const confirmationMessage = document.getElementById('confirmation-message');
-        const confirmYesBtn = document.getElementById('confirm-yes');
-        const confirmNoBtn = document.getElementById('confirm-no');
-        const continueBtn = document.getElementById('continue-btn');
-        
-        // App State
-        let currentUser = null;
-        let currentMonth = new Date();
-        let selectedDate = null;
-        let currentRequestId = null;
-        let currentAction = null; // 'accept' or 'reject'
-        
-        // Security Notice Functions
-        function showSecurityNotice() {
-            securityNotice.style.display = 'flex';
-            authScreen.style.display = 'none';
-            appContainer.style.display = 'none';
-        }
-        
-        function hideSecurityNotice() {
-            securityNotice.style.display = 'none';
-            authScreen.style.display = 'flex';
-        }
-        
-        // Initialize the app
-        document.addEventListener('DOMContentLoaded', () => {
-            // Set up continue button
-            if (continueBtn) {
-                continueBtn.addEventListener('click', () => {
-                    if (isFirebaseConfigured()) {
-                        hideSecurityNotice();
-                        // Reinitialize Firebase
-                        if (!firebase.apps.length) {
-                            firebase.initializeApp(firebaseConfig);
-                        }
-                        setupAuthStateListener();
-                    } else {
-                        alert("⚠️ Aún no has configurado Firebase correctamente.\n\nReemplaza los valores de ejemplo en la sección de configuración de Firebase con tus claves reales.");
-                    }
-                });
-            }
-            
-            // Set up auth state listener only if Firebase is configured
-            if (isFirebaseConfigured()) {
-                setupAuthStateListener();
-            }
-            
-            // Set up event listeners
-            setupEventListeners();
-            
-            // Initialize calendar
-            renderCalendar();
-        });
-        
-        function setupAuthStateListener() {
-            firebase.auth().onAuthStateChanged(user => {
-                if (user) {
-                    currentUser = user;
-                    setupUserProfile();
-                    loadAppData();
-                    authScreen.style.display = 'none';
-                    appContainer.style.display = 'block';
-                } else {
-                    authScreen.style.display = 'flex';
-                    appContainer.style.display = 'none';
-                }
-            });
-        }
-        
-        // Set up event listeners
-        function setupEventListeners() {
-            // Authentication
-            loginBtn.addEventListener('click', handleLogin);
-            googleLoginBtn.addEventListener('click', handleGoogleLogin);
-            logoutBtn.addEventListener('click', handleLogout);
-            registerLink.addEventListener('click', handleRegister);
-            
-            // Calendar navigation
-            prevMonthBtn.addEventListener('click', () => navigateMonth(-1));
-            nextMonthBtn.addEventListener('click', () => navigateMonth(1));
-            
-            // Modals
-            closeRequestModalBtn.addEventListener('click', () => {
-                requestModal.classList.remove('show');
-            });
-            
-            closeConfirmationModalBtn.addEventListener('click', () => {
-                confirmationModal.classList.remove('show');
-            });
-            
-            submitRequestBtn.addEventListener('click', handleSubmitRequest);
-            confirmYesBtn.addEventListener('click', handleConfirmAction);
-            confirmNoBtn.addEventListener('click', () => {
-                confirmationModal.classList.remove('show');
-            });
-            
-            // Close modals when clicking outside
-            requestModal.addEventListener('click', (e) => {
-                if (e.target === requestModal) {
-                    requestModal.classList.remove('show');
-                }
-            });
-            
-            confirmationModal.addEventListener('click', (e) => {
-                if (e.target === confirmationModal) {
-                    confirmationModal.classList.remove('show');
-                }
-            });
-        }
-        
-        // Authentication Functions
-        function handleLogin() {
-            if (!isFirebaseConfigured()) {
-                showSecurityNotice();
-                return;
-            }
-            
-            const email = userEmail.value.trim();
-            const password = userPassword.value;
-            
-            if (!email || !password) {
-                alert('Por favor ingresa tu correo y contraseña');
-                return;
-            }
-            
-            firebase.auth().signInWithEmailAndPassword(email, password)
-                .catch(error => {
-                    console.error('Error al iniciar sesión:', error);
-                    alert('Error al iniciar sesión: ' + error.message);
-                });
-        }
-        
-        function handleGoogleLogin() {
-            if (!isFirebaseConfigured()) {
-                showSecurityNotice();
-                return;
-            }
-            
-            const provider = new firebase.auth.GoogleAuthProvider();
-            firebase.auth().signInWithPopup(provider)
-                .catch(error => {
-                    console.error('Error con Google Sign-In:', error);
-                    alert('Error al iniciar sesión con Google: ' + error.message);
-                });
-        }
-        
-        function handleLogout() {
-            firebase.auth().signOut()
-                .catch(error => {
-                    console.error('Error al cerrar sesión:', error);
-                    alert('Error al cerrar sesión: ' + error.message);
-                });
-        }
-        
-        function handleRegister() {
-            if (!isFirebaseConfigured()) {
-                showSecurityNotice();
-                return;
-            }
-            
-            const email = userEmail.value.trim();
-            const password = userPassword.value;
-            
-            if (!email || !password) {
-                alert('Por favor ingresa tu correo y contraseña para registrarte');
-                return;
-            }
-            
-            firebase.auth().createUserWithEmailAndPassword(email, password)
-                .then(() => {
-                    // After registration, update profile
-                    return firebase.auth().currentUser.updateProfile({
-                        displayName: email.split('@')[0]
-                    });
-                })
-                .catch(error => {
-                    console.error('Error al registrarse:', error);
-                    alert('Error al registrarse: ' + error.message);
-                });
-        }
-        
-        // User Profile Setup
-        function setupUserProfile() {
-            if (currentUser.displayName) {
-                userDisplayName.textContent = currentUser.displayName;
-                userAvatar.textContent = currentUser.displayName.charAt(0).toUpperCase();
-            } else {
-                const emailName = currentUser.email.split('@')[0];
-                userDisplayName.textContent = emailName;
-                userAvatar.textContent = emailName.charAt(0).toUpperCase();
-            }
-        }
-        
-        // Calendar Functions
-        function renderCalendar() {
-            // Update month display
-            const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-            currentMonthDisplay.textContent = `${monthNames[currentMonth.getMonth()]} ${currentMonth.getFullYear()}`;
-            
-            // Clear previous days
-            calendarDays.innerHTML = '';
-            
-            // Get first day of month and total days
-            const firstDay = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1);
-            const lastDay = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0);
-            const totalDays = lastDay.getDate();
-            const startDayOfWeek = firstDay.getDay() || 7; // Sunday should be 7
-            
-            // Add empty cells for days before the first day of the month
-            for (let i = 1; i < startDayOfWeek; i++) {
-                const emptyCell = document.createElement('div');
-                calendarDays.appendChild(emptyCell);
-            }
-            
-            // Get today's date for highlighting
-            const today = new Date();
-            const todayString = formatDate(today);
-            
-            // Add days of the month
-            for (let day = 1; day <= totalDays; day++) {
-                const dayCell = document.createElement('div');
-                dayCell.className = 'day-cell';
-                
-                const dateObj = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
-                const dateStr = formatDate(dateObj);
-                
-                // Set day number
-                const dayNumber = document.createElement('div');
-                dayNumber.className = 'day-number';
-                dayNumber.textContent = day;
-                dayCell.appendChild(dayNumber);
-                
-                // Determine parent for this day (alternating days pattern)
-                const isParentA = (day % 2 === 0);
-                dayCell.classList.add(isParentA ? 'day-parent-a' : 'day-parent-b');
-                
-                // Highlight today
-                if (todayString === dateStr && currentMonth.getMonth() === today.getMonth() && currentMonth.getFullYear() === today.getFullYear()) {
-                    dayCell.classList.add('day-today');
-                }
-                
-                // Check if there's a pending request for this day
-                // In a real app, this would check Firestore data
-                if (day === 15 || day === 22) {
-                    dayCell.classList.add('day-request-pending');
-                }
-                
-                // Check if there's an accepted request for this day
-                if (day === 8) {
-                    dayCell.classList.add('day-request-accepted');
-                }
-                
-                // Disable past days
-                if (dateObj < today && !(dateObj.getDate() === today.getDate() && dateObj.getMonth() === today.getMonth() && dateObj.getFullYear() === today.getFullYear())) {
-                    dayCell.classList.add('day-past');
-                } else {
-                    // Add click event for requesting change
-                    dayCell.addEventListener('click', () => openRequestModal(dateObj));
-                }
-                
-                calendarDays.appendChild(dayCell);
-            }
-        }
-        
-        function navigateMonth(direction) {
-            currentMonth.setMonth(currentMonth.getMonth() + direction);
-            renderCalendar();
-        }
-        
-        function formatDate(date) {
-            return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-        }
-        
-        // Request Modal Functions
-        function openRequestModal(date) {
-            if (!isFirebaseConfigured()) {
-                showSecurityNotice();
-                return;
-            }
-            
-            selectedDate = date;
-            
-            // Format date for display
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            requestDateDisplay.textContent = date.toLocaleDateString('es-ES', options);
-            
-            // Reset checkboxes
-            document.querySelectorAll('.reason-checkbox').forEach(checkbox => {
-                checkbox.checked = false;
-            });
-            
-            // Show modal
-            requestModal.classList.add('show');
-        }
-        
-        function handleSubmitRequest() {
-            if (!isFirebaseConfigured()) {
-                showSecurityNotice();
-                return;
-            }
-            
-            // Get selected reasons
-            const reasons = [];
-            document.querySelectorAll('.reason-checkbox:checked').forEach(checkbox => {
-                const reasonName = checkbox.id.replace('reason-', '');
-                reasons.push(reasonName);
-            });
-            
-            if (reasons.length === 0) {
-                alert('Por favor selecciona al menos un motivo para tu solicitud');
-                return;
-            }
-            
-            if (!currentUser) {
-                alert('Debes iniciar sesión para enviar una solicitud');
-                return;
-            }
-            
-            // In a real app, this would save to Firestore
-            console.log('Solicitud enviada:', {
-                date: formatDate(selectedDate),
-                from: currentUser.uid,
-                reasons: reasons
-            });
-            
-            // Close modal
-            requestModal.classList.remove('show');
-            
-            // Show success message
-            alert('¡Solicitud enviada correctamente! El otro progenitor recibirá una notificación.');
-            
-            // Refresh the calendar to show pending status
-            renderCalendar();
-            
-            // Refresh requests lists
-            loadRequestsData();
-        }
-        
-        // Requests Data Loading (Mock for demo)
-        function loadAppData() {
-            // In a real app, this would load data from Firestore
-            setTimeout(() => {
-                loadRequestsData();
-            }, 800);
-        }
-        
-        function loadRequestsData() {
-            // Mock pending requests
-            const pendingRequestsHTML = `
-                <div class="request-card pending new-request">
-                    <div class="request-header">
-                        <div class="request-date">Martes, 15 de Enero</div>
-                        <div class="request-status status-pending">Pendiente</div>
-                    </div>
-                    <div class="request-reasons">
-                        <span class="reason-tag"><i class="fas fa-tooth"></i> Dentista</span>
-                        <span class="reason-tag"><i class="fas fa-school"></i> Colegio</span>
-                    </div>
-                    <p style="margin: 8px 0 12px; color: var(--gray);">Solicitud de cambio para llevar a los niños a una cita con el dentista y recogerlos temprano del colegio.</p>
-                    <div class="request-actions">
-                        <button class="action-btn btn-accept" data-request-id="req1" data-action="accept">
-                            <i class="fas fa-check"></i> Aceptar
-                        </button>
-                        <button class="action-btn btn-reject" data-request-id="req1" data-action="reject">
-                            <i class="fas fa-times"></i> Rechazar
-                        </button>
-                    </div>
-                </div>
-                <div class="request-card pending">
-                    <div class="request-header">
-                        <div class="request-date">Martes, 22 de Enero</div>
-                        <div class="request-status status-pending">Pendiente</div>
-                    </div>
-                    <div class="request-reasons">
-                        <span class="reason-tag"><i class="fas fa-birthday-cake"></i> Fiesta</span>
-                        <span class="reason-tag"><i class="fas fa-futbol"></i> Deporte</span>
-                    </div>
-                    <p style="margin: 8px 0 12px; color: var(--gray);">Solicitud para llevar a los niños a una fiesta de cumpleaños y a su práctica de fútbol.</p>
-                    <div class="request-actions">
-                        <button class="action-btn btn-accept" data-request-id="req2" data-action="accept">
-                            <i class="fas fa-check"></i> Aceptar
-                        </button>
-                        <button class="action-btn btn-reject" data-request-id="req2" data-action="reject">
-                            <i class="fas fa-times"></i> Rechazar
-                        </button>
-                    </div>
-                </div>
-            `;
-            
-            // Mock request history
-            const historyHTML = `
-                <div class="request-card accepted">
-                    <div class="request-header">
-                        <div class="request-date">Martes, 8 de Enero</div>
-                        <div class="request-status status-accepted">Aceptada</div>
-                    </div>
-                    <div class="request-reasons">
-                        <span class="reason-tag"><i class="fas fa-suitcase"></i> Viaje</span>
-                    </div>
-                    <p style="margin: 8px 0 12px; color: var(--gray);">Solicitud aceptada para llevar a los niños de viaje durante el fin de semana.</p>
-                    <div class="request-actions">
-                        <button class="action-btn btn-view">
-                            <i class="fas fa-eye"></i> Ver Detalles
-                        </button>
-                    </div>
-                </div>
-                <div class="request-card">
-                    <div class="request-header">
-                        <div class="request-date">Martes, 1 de Enero</div>
-                        <div class="request-status status-rejected">Rechazada</div>
-                    </div>
-                    <div class="request-reasons">
-                        <span class="reason-tag"><i class="fas fa-ellipsis-h"></i> Otro</span>
-                    </div>
-                    <p style="margin: 8px 0 12px; color: var(--gray);">Solicitud rechazada por compromisos previos del otro progenitor.</p>
-                    <div class="request-actions">
-                        <button class="action-btn btn-view">
-                            <i class="fas fa-eye"></i> Ver Detalles
-                        </button>
-                    </div>
-                </div>
-            `;
-            
-            // Update the UI
-            pendingRequestsList.innerHTML = pendingRequestsHTML;
-            requestHistoryList.innerHTML = historyHTML;
-            
-            // Add event listeners to action buttons
-            document.querySelectorAll('.action-btn').forEach(button => {
-                button.addEventListener('click', handleRequestAction);
-            });
-            
-            // Remove new request animation after 5 seconds
-            setTimeout(() => {
-                document.querySelectorAll('.new-request').forEach(el => {
-                    el.classList.remove('new-request');
-                });
-            }, 5000);
-        }
-        
-        function handleRequestAction(e) {
-            if (!isFirebaseConfigured()) {
-                showSecurityNotice();
-                return;
-            }
-            
-            const button = e.currentTarget;
-            currentRequestId = button.dataset.requestId;
-            currentAction = button.dataset.action;
-            
-            if (currentAction === 'accept') {
-                confirmationTitle.textContent = 'Aceptar Solicitud';
-                confirmationMessage.textContent = '¿Estás seguro de que quieres aceptar esta solicitud de cambio de custodia?';
-            } else if (currentAction === 'reject') {
-                confirmationTitle.textContent = 'Rechazar Solicitud';
-                confirmationMessage.textContent = '¿Estás seguro de que quieres rechazar esta solicitud? Esta acción no se puede deshacer.';
-            }
-            
-            confirmationModal.classList.add('show');
-        }
-        
-        function handleConfirmAction() {
-            if (!isFirebaseConfigured()) {
-                showSecurityNotice();
-                return;
-            }
-            
-            if (!currentRequestId || !currentAction) return;
-            
-            // In a real app, this would update Firestore
-            console.log('Action confirmed:', {
-                requestId: currentRequestId,
-                action: currentAction
-            });
-            
-            // Close modal
-            confirmationModal.classList.remove('show');
-            
-            // Show success message
-            if (currentAction === 'accept') {
-                alert('¡Solicitud aceptada! El calendario se ha actualizado.');
-            } else {
-                alert('Solicitud rechazada.');
-            }
-            
-            // Refresh data
-            loadRequestsData();
-            renderCalendar();
-            
-            // Reset action state
-            currentRequestId = null;
-            currentAction = null;
-        }
-    </script>
+              `;
+          }
+
+          item.innerHTML = `
+              <div class="request-header"><div class="request-dates">${startF} - ${endF}</div><div class="req-status ${data.status}">${data.status}</div></div>
+              <div style="font-size:0.85rem; margin-bottom:8px;">"${data.reason}"</div>
+              <div class="request-meta"><div>${metaInfo}</div></div>
+              ${actionButtonsHTML}
+          `;
+          container.appendChild(item);
+      });
+      lucide.createIcons();
+  }
+
+  // AUTH STATE
+  auth.onAuthStateChanged(u=>{
+    if(u){
+      currentUserEmail = u.email;
+      currentUserRole = USER_ROLES[currentUserEmail] || null; // Determinar rol basado en el email
+      document.getElementById("login-view").classList.add("hidden"); document.getElementById("app-root").classList.remove("hidden");
+      updateHeaderRoleIndicator();
+      db.collection("overrides").onSnapshot(s=>{overrides={};s.forEach(d=>overrides[d.id]=d.data().owner);renderCalendar();});
+      db.collection("events").orderBy("createdAt").onSnapshot(s=>{eventsData={};s.forEach(d=>{const v=d.data();if(!eventsData[v.date])eventsData[v.date]=[];eventsData[v.date].push({id:d.id,...v})});renderCalendar();});
+      db.collection("requests").orderBy("createdAt","desc").limit(10).onSnapshot(snapshot => renderRequestsList(snapshot.docs));
+    } else {
+      currentUserEmail = null; currentUserRole = null;
+      document.getElementById("login-view").classList.remove("hidden"); document.getElementById("app-root").classList.add("hidden");
+    }
+  });
+
+  // SWIPE & BASIC EVENTS
+  const el=document.getElementById("calendar-wrapper-swipe"); let sx=0,sy=0; el.addEventListener('touchstart',e=>{sx=e.changedTouches[0].screenX;sy=e.changedTouches[0].screenY},{passive:true}); el.addEventListener('touchend',e=>{const dx=sx-e.changedTouches[0].screenX,dy=sy-e.changedTouches[0].screenY;if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>50){dx>0?currentMonth++:currentMonth--;chkM();renderCalendar();}},{passive:true}); function chkM(){if(currentMonth>11){currentMonth=0;currentYear++}if(currentMonth<0){currentMonth=11;currentYear--}}
+  document.getElementById("login-form").addEventListener("submit",e=>{e.preventDefault();auth.signInWithEmailAndPassword(document.getElementById("login-email").value,document.getElementById("login-password").value).catch(err=>document.getElementById("login-error").textContent="Credenciales incorrectas");}); document.getElementById("logout-btn").onclick=()=>auth.signOut(); document.getElementById("prev-period").onclick=()=>{currentMonth--;chkM();renderCalendar();}; document.getElementById("next-period").onclick=()=>{currentMonth++;chkM();renderCalendar();}; const ys=document.getElementById("year-select");[2025,2026,2027].forEach(y=>{const o=document.createElement("option");o.value=y;o.textContent=y;if(y===currentYear)o.selected=true;ys.appendChild(o)});ys.onchange=e=>{currentYear=parseInt(e.target.value);renderCalendar();}; renderCalendar();
+</script>
 </body>
 </html>
-

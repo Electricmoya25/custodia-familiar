@@ -81,16 +81,18 @@
 
 <!-- VISTA DE CARGA / LOGIN -->
 <div id="auth-screen" class="fixed inset-0 z-[5000] bg-white flex items-center justify-center p-6">
-    <div class="w-full max-sm text-center">
+    <div class="w-full max-w-sm text-center">
         <div class="text-6xl mb-6">👨‍👩‍👧‍👦</div>
         <h1 class="text-2xl font-extrabold mb-2">Custodia Familiar</h1>
-        <p class="text-gray-500 mb-8">Iniciando sesión segura...</p>
+        <p id="auth-status-text" class="text-gray-500 mb-8">Iniciando sesión segura...</p>
+        
         <div id="login-container" class="hidden space-y-4">
             <input type="email" id="email" placeholder="Email" class="w-full p-4 bg-gray-100 rounded-2xl border-none focus:ring-2 focus:ring-indigo-500 outline-none">
             <input type="password" id="password" placeholder="Contraseña" class="w-full p-4 bg-gray-100 rounded-2xl border-none focus:ring-2 focus:ring-indigo-500 outline-none">
             <button id="login-btn" class="w-full py-4 bg-gray-900 text-white font-bold rounded-2xl hover:bg-black transition-colors">Entrar</button>
-            <p id="auth-error" class="text-red-500 text-sm font-medium"></p>
+            <p id="auth-error" class="text-red-500 text-sm font-medium mt-4"></p>
         </div>
+        
         <div id="auth-loader" class="flex justify-center">
             <div class="loader"></div>
         </div>
@@ -208,7 +210,7 @@
                     </button>
                 </div>
                 <div class="flex flex-wrap gap-2" id="icon-selector">
-                    <button data-type="medico" class="icon-tag flex items-center gap-2 px-3 py-2 rounded-lg bg-red-50 text-red-600 border border-red-100 text-xs font-bold selected" onclick="selectType('medico', this)"><i data-lucide="stethoscope" class="w-3"></i> Médico</button>
+                    <button data-type="medico" class="icon-tag flex items-center gap-2 px-3 py-2 rounded-lg bg-red-50 text-red-600 border border-red-100 text-xs font-bold selected ring-2 ring-indigo-600" onclick="selectType('medico', this)"><i data-lucide="stethoscope" class="w-3"></i> Médico</button>
                     <button data-type="escuela" class="icon-tag flex items-center gap-2 px-3 py-2 rounded-lg bg-orange-50 text-orange-600 border border-orange-100 text-xs font-bold" onclick="selectType('escuela', this)"><i data-lucide="backpack" class="w-3"></i> Cole</button>
                     <button data-type="deporte" class="icon-tag flex items-center gap-2 px-3 py-2 rounded-lg bg-purple-50 text-purple-600 border border-purple-100 text-xs font-bold" onclick="selectType('deporte', this)"><i data-lucide="trophy" class="w-3"></i> Deporte</button>
                     <button data-type="viaje" class="icon-tag flex items-center gap-2 px-3 py-2 rounded-lg bg-cyan-50 text-cyan-600 border border-cyan-100 text-xs font-bold" onclick="selectType('viaje', this)"><i data-lucide="palmtree" class="w-3"></i> Viaje</button>
@@ -227,7 +229,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, doc, getDoc, setDoc, collection, query, onSnapshot, addDoc, updateDoc, deleteDoc, writeBatch, orderBy, limit } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     // --- CONFIGURACIÓN & ESTADO ---
@@ -256,7 +258,7 @@
     };
 
     // --- LÓGICA CALENDARIO ---
-    const BASE_MONDAY = new Date(2026, 0, 5); // Referencia rotación semanal
+    const BASE_MONDAY = new Date(2026, 0, 5); 
     const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
 
     function getBaseOwner(y, m, d) {
@@ -267,6 +269,7 @@
 
     // --- UI RENDER ---
     function render() {
+        if (!state.user) return;
         const { currentYear, currentMonth, overrides, events } = state;
         document.getElementById('current-month-label').textContent = `${monthNames[currentMonth]} ${currentYear}`;
         
@@ -327,18 +330,15 @@
             const isPending = req.status === 'pendiente';
             const isMeRequester = req.requesterUid === state.user.uid;
             
-            // LÓGICA DE BOTONES SEGÚN PROPIETARIO
             let actionButtonsHTML = '';
             if (isPending) {
                 if (isMeRequester) {
-                    // Si es mi solicitud: Botón Cancelar
                     actionButtonsHTML = `
                         <button class="w-full py-2 bg-gray-100 text-gray-500 rounded-lg font-bold text-xs hover:bg-red-50 hover:text-red-600 transition-colors" onclick="cancelRequest('${req.id}')">
                             Cancelar Mi Solicitud
                         </button>
                     `;
                 } else {
-                    // Si es del otro: Botones Aprobar/Rechazar
                     actionButtonsHTML = `
                         <div class="flex gap-2">
                             <button class="flex-1 py-2 bg-green-500 text-white rounded-lg font-bold text-xs hover:bg-green-600" onclick="processRequest('${req.id}', 'aprobada')">Aceptar</button>
@@ -347,7 +347,6 @@
                     `;
                 }
             } else {
-                // Si ya no está pendiente: Solo info
                 actionButtonsHTML = `<div class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">${isMeRequester ? 'Tú la solicitaste' : 'Solicitada por el otro'}</div>`;
             }
 
@@ -434,8 +433,9 @@
     // --- PERSISTENCIA FIRESTORE ---
 
     async function saveEvent() {
+        if (!state.user) return;
         const input = document.getElementById('event-input');
-        if (!input.value.trim() || !state.user) return;
+        if (!input.value.trim()) return;
 
         const collectionRef = collection(db, 'artifacts', appId, 'public', 'data', 'events');
         await addDoc(collectionRef, {
@@ -450,12 +450,14 @@
     }
 
     window.removeEvent = async (id) => {
+        if (!state.user) return;
         const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'events', id);
         await deleteDoc(docRef);
         renderModalEvents();
     };
 
     async function sendRequest() {
+        if (!state.user) return;
         const start = document.getElementById('req-start').value;
         const end = document.getElementById('req-end').value;
         const reason = document.getElementById('req-reason').value || "Sin motivo";
@@ -477,19 +479,19 @@
         alert("Solicitud enviada correctamente.");
     }
 
-    // Nueva función para que el dueño cancele su propia petición
     window.cancelRequest = async (id) => {
+        if (!state.user) return;
         if (!confirm("¿Seguro que quieres cancelar esta solicitud?")) return;
         const reqRef = doc(db, 'artifacts', appId, 'public', 'data', 'requests', id);
         await deleteDoc(reqRef);
     };
 
     window.processRequest = async (id, status) => {
+        if (!state.user) return;
         const reqRef = doc(db, 'artifacts', appId, 'public', 'data', 'requests', id);
         const reqSnap = await getDoc(reqRef);
         const reqData = reqSnap.data();
 
-        // Seguridad extra: No permitir aprobar si eres el mismo que solicitó
         if (reqData.requesterUid === state.user.uid) {
             alert("No puedes aprobar tu propia solicitud.");
             return;
@@ -512,7 +514,25 @@
     };
 
     // --- AUTH & INIT ---
+    async function initAuth() {
+        try {
+            // REGLA 3: Siempre intentar el token inicial primero
+            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                await signInWithCustomToken(auth, __initial_auth_token);
+            } else {
+                // Fallback anónimo si no hay token, para que la app no se bloquee
+                await signInAnonymously(auth);
+            }
+        } catch (error) {
+            console.error("Auth error:", error);
+            document.getElementById('auth-status-text').textContent = "Inicia sesión para continuar";
+            document.getElementById('login-container').classList.remove('hidden');
+            document.getElementById('auth-loader').classList.add('hidden');
+        }
+    }
+
     async function init() {
+        // Setup selectores UI
         const ys = document.getElementById('year-select');
         [2025, 2026, 2027].forEach(y => {
             const opt = document.createElement('option');
@@ -526,17 +546,33 @@
         document.getElementById('next-month').onclick = () => { state.currentMonth++; if(state.currentMonth > 11) { state.currentMonth = 0; state.currentYear++; } render(); };
         document.getElementById('add-event-btn').onclick = saveEvent;
         document.getElementById('send-request-btn').onclick = sendRequest;
-        document.getElementById('logout-btn').onclick = () => signOut(auth);
+        document.getElementById('logout-btn').onclick = () => signOut(auth).then(() => window.location.reload());
 
+        document.getElementById('login-btn').onclick = async () => {
+            const email = document.getElementById('email').value;
+            const pass = document.getElementById('password').value;
+            if (!email || !pass) return;
+            document.getElementById('auth-error').textContent = "";
+            document.getElementById('login-btn').disabled = true;
+            try {
+                await signInWithEmailAndPassword(auth, email, pass);
+            } catch (e) {
+                document.getElementById('auth-error').textContent = "Credenciales incorrectas o usuario no encontrado.";
+                document.getElementById('login-btn').disabled = false;
+            }
+        };
+
+        // Escuchar cambios de autenticación
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 state.user = user;
                 state.userRole = USER_ROLES[user.email] || 'visitante';
+                
                 setupListeners();
                 
                 document.getElementById('auth-screen').classList.add('hidden');
                 document.getElementById('app-content').classList.remove('hidden');
-                document.getElementById('app-content').classList.add('opacity-100');
+                setTimeout(() => document.getElementById('app-content').classList.add('opacity-100'), 50);
                 
                 const badge = document.getElementById('user-badge');
                 badge.textContent = state.userRole.toUpperCase();
@@ -546,29 +582,25 @@
             } else {
                 document.getElementById('login-container').classList.remove('hidden');
                 document.getElementById('auth-loader').classList.add('hidden');
+                document.getElementById('auth-screen').classList.remove('hidden');
+                document.getElementById('app-content').classList.add('hidden');
             }
         });
 
-        document.getElementById('login-btn').onclick = async () => {
-            const email = document.getElementById('email').value;
-            const pass = document.getElementById('password').value;
-            try {
-                await signInWithEmailAndPassword(auth, email, pass);
-            } catch (e) {
-                document.getElementById('auth-error').textContent = "Acceso denegado.";
-            }
-        };
+        // Lanzar proceso de auth
+        initAuth();
     }
 
     function setupListeners() {
         if (!state.user) return;
 
+        // REGLA 1: Paths estrictos
         const qOverrides = query(collection(db, 'artifacts', appId, 'public', 'data', 'overrides'));
         onSnapshot(qOverrides, (s) => {
             state.overrides = {};
             s.forEach(d => state.overrides[d.id] = d.data().owner);
             render();
-        }, (err) => console.log("Error overrides", err));
+        }, (err) => console.error("Error overrides", err));
 
         const qEvents = query(collection(db, 'artifacts', appId, 'public', 'data', 'events'));
         onSnapshot(qEvents, (s) => {
@@ -580,13 +612,13 @@
             });
             render();
             if (state.selectedDateKey) renderModalEvents();
-        }, (err) => console.log("Error eventos", err));
+        }, (err) => console.error("Error eventos", err));
 
         const qReqs = query(collection(db, 'artifacts', appId, 'public', 'data', 'requests'), limit(20));
         onSnapshot(qReqs, (s) => {
             state.requests = s.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b) => b.createdAt - a.createdAt);
             renderRequests();
-        }, (err) => console.log("Error solicitudes", err));
+        }, (err) => console.error("Error solicitudes", err));
     }
 
     init();

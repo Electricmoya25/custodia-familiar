@@ -1,672 +1,390 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>Custodia Familiar Alberto - Premium</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta charset="UTF-8">
+  <title>Custodia Familiar Alberto</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' x='0.1em' font-size='80'%3E%F0%9F%91%A8%E2%80%8D%F0%9F%91%A9%E2%80%8D%F0%9F%91%A7%E2%80%8D%F0%9F%91%A6%3C/text%3E%3C/svg%3E">
+  
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #6366f1;
+      --bg-app: #f8f9fc;
+      --text-main: #111827;
+      --text-muted: #6b7280;
+      --mom-gradient: linear-gradient(135deg, #fff0f6 0%, #ffe3e8 100%);
+      --mom-accent: #db2777;
+      --dad-gradient: linear-gradient(135deg, #f0f7ff 0%, #dbeafe 100%);
+      --dad-accent: #2563eb;
+      --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+      --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+      --radius-card: 24px;
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body { margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-app); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; padding-bottom: 40px; }
+    .hidden { display: none !important; }
+
+    /* LOGIN */
+    .login-wrapper { position: fixed; inset: 0; z-index: 2000; background: #fff; display: flex; align-items: center; justify-content: center; padding: 24px; }
+    .login-box { width: 100%; max-width: 380px; text-align: center; }
+    .input-modern { width: 100%; padding: 16px 20px; margin-bottom: 12px; background: #f3f4f6; border: 2px solid transparent; border-radius: 16px; font-size: 1rem; font-family: inherit; transition: all 0.2s; }
+    .input-modern:focus { background: #fff; border-color: var(--primary); outline: none; }
+    .btn-modern { width: 100%; padding: 16px; background: var(--text-main); color: #fff; border: none; border-radius: 16px; font-weight: 700; font-size: 1rem; cursor: pointer; }
+
+    /* HEADER */
+    .app-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; }
+    .brand-logo { font-size: 1.3rem; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+    .user-menu { display: flex; gap: 12px; align-items: center; }
+    .btn-icon-subtle { background: #fff; border: 1px solid #e5e7eb; color: var(--text-main); padding: 8px 12px; border-radius: 99px; font-weight: 600; font-size: 0.9rem; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: var(--shadow-card); position: relative; }
     
-    <!-- Fonts & Icons -->
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' x='0.1em' font-size='80'%3E%F0%9F%91%A8%E2%80%8D%F0%9F%91%A9%E2%80%8D%F0%9F%91%A7%E2%80%8D%F0%9F%91%A6%3C/text%3E%3C/svg%3E">
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
+    /* Indicador Notificación (Punto Rojo) */
+    .notification-dot { position: absolute; top: -2px; right: -2px; width: 12px; height: 12px; background: #ef4444; border: 2px solid #fff; border-radius: 50%; display: none; }
+    .notification-dot.active { display: block; animation: pulse-red 2s infinite; }
+    @keyframes pulse-red { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
 
-    <style>
-        :root {
-            --primary: #6366f1;
-            --bg-app: #f8f9fc;
-            --mom-gradient: linear-gradient(135deg, #fff0f6 0%, #ffe3e8 100%);
-            --mom-accent: #db2777;
-            --dad-gradient: linear-gradient(135deg, #f0f7ff 0%, #dbeafe 100%);
-            --dad-accent: #2563eb;
-            --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-            --radius-card: 24px;
-        }
+    .role-badge { padding: 6px 12px; border-radius: 20px; font-weight: 700; font-size: 0.85rem; display: flex; align-items: center; gap: 6px; box-shadow: var(--shadow-card); }
+    .role-badge.mom { background: var(--mom-gradient); color: var(--mom-accent); border: 1px solid #fbcfe8; }
+    .role-badge.dad { background: var(--dad-gradient); color: var(--dad-accent); border: 1px solid #bfdbfe; }
 
-        /* Utility crítica para evitar parpadeos antes de que cargue Tailwind */
-        .hidden { display: none !important; }
+    /* LAYOUT */
+    .main-container { max-width: 1100px; margin: 0 auto; width: 100%; padding: 0 24px; display: grid; gap: 32px; grid-template-columns: 1fr; }
+    @media(min-width: 900px) { .main-container { grid-template-columns: 3fr 1fr; } }
+    
+    .calendar-section { background: #fff; border-radius: 32px; padding: 24px; box-shadow: var(--shadow-card); }
+    .calendar-controls { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+    .month-heading { font-size: 1.8rem; font-weight: 800; text-transform: capitalize; }
+    .nav-circle-btn { width: 44px; height: 44px; border-radius: 50%; background: #f3f4f6; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-main); }
+    
+    .week-header, .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 12px; }
+    .week-header { margin-bottom: 12px; }
+    .week-day-label { text-align: center; font-weight: 700; font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; }
 
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--bg-app);
-            -webkit-tap-highlight-color: transparent;
-        }
+    .day-card { aspect-ratio: 4/5; border-radius: 20px; padding: 10px; position: relative; cursor: pointer; background: #fff; border: 1px solid rgba(0,0,0,0.03); box-shadow: var(--shadow-card); display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; }
+    .day-card.empty { background: transparent; border: none; box-shadow: none; pointer-events: none; }
+    .is-mom { background: var(--mom-gradient); border-color: var(--mom-accent); }
+    .is-dad { background: var(--dad-gradient); border-color: var(--dad-accent); }
+    .is-today { box-shadow: 0 0 0 3px var(--primary) !important; }
+    .day-number { font-weight: 800; font-size: 1.1rem; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.7); border-radius: 12px; backdrop-filter: blur(4px); position: relative; z-index: 2;}
+    .bg-illustration { position: absolute; bottom: -10px; right: -10px; width: 80%; height: 80%; object-fit: contain; opacity: 0.25; pointer-events: none; z-index: 0; }
+    .events-container { display: flex; flex-wrap: wrap; gap: 4px; position: relative; z-index: 2; margin-top: auto; }
+    .event-chip { height: 24px; padding: 0 8px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .event-chip svg { width: 14px; height: 14px; }
+    .chip-medico { background: #ef4444; } .chip-dentista { background: #0ea5e9; } .chip-escuela { background: #f97316; } .chip-deporte { background: #8b5cf6; } .chip-cumple { background: #eab308; } .chip-parque { background: #84cc16; } .chip-general { background: #64748b; } .chip-vacaciones { background: #06b6d4; }
 
-        .day-card {
-            aspect-ratio: 4/5;
-            transition: all 0.2s ease;
-        }
-        .day-card:active { transform: scale(0.95); }
-        
-        .is-mom { background: var(--mom-gradient); border: 2px solid #fbcfe8; }
-        .is-dad { background: var(--dad-gradient); border: 2px solid #bfdbfe; }
-        .is-today { box-shadow: 0 0 0 3px var(--primary) !important; }
+    /* SIDEBAR */
+    .sidebar { display: flex; flex-direction: column; gap: 24px; }
+    .glass-panel { background: #fff; border-radius: 24px; padding: 24px; border: 1px solid #f3f4f6; box-shadow: var(--shadow-card); }
+    .panel-title { font-size: 1.1rem; font-weight: 800; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
 
-        .event-chip {
-            height: 22px;
-            width: 22px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 10px;
-        }
+    .requests-list-container { display: flex; flex-direction: column; gap: 12px; max-height: 400px; overflow-y: auto; }
+    .request-item { padding: 16px; background: #f8f9fc; border-radius: 16px; border: 1px solid #e5e7eb; font-size: 0.9rem; transition: all 0.3s ease; position: relative; }
+    .request-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .request-dates { font-weight: 700; font-size: 1rem; color: var(--text-main); }
+    .req-status { font-size: 0.7rem; padding: 4px 10px; border-radius: 99px; text-transform: uppercase; font-weight: 700; }
+    .req-status.pendiente { background: #fef3c7; color: #d97706; }
+    .req-status.aprobada { background: #dcfce7; color: #166534; }
+    .req-status.rechazada { background: #fee2e2; color: #991b1b; }
+    .request-meta { font-size: 0.8rem; color: var(--text-muted); margin-top: 8px; display: flex; justify-content: space-between; align-items: center;}
+    
+    .request-item.needs-action { border: 2px solid var(--primary); background: #eef2ff; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15); animation: subtlePulse 2s infinite; }
+    @keyframes subtlePulse { 0% { background: #eef2ff; } 50% { background: #e0e7ff; } 100% { background: #eef2ff; } }
+    
+    .request-actions { display: flex; gap: 8px; margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(0,0,0,0.05); }
+    .btn-action { flex: 1; padding: 10px; border-radius: 12px; border: none; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: transform 0.1s; }
+    .btn-action.approve { background: #dcfce7; color: #166534; }
+    .btn-action.reject { background: #fee2e2; color: #991b1b; }
 
-        .loader {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid var(--primary);
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        .modal-overlay {
-            background: rgba(0,0,0,0.4);
-            backdrop-filter: blur(4px);
-            transition: opacity 0.3s ease;
-        }
-
-        .request-item.needs-action {
-            border: 2px solid var(--primary);
-            animation: subtlePulse 2s infinite;
-        }
-        @keyframes subtlePulse {
-            0% { background: #fff; }
-            50% { background: #eef2ff; }
-            100% { background: #fff; }
-        }
-    </style>
+    /* MODAL */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(8px); z-index: 3000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: all 0.3s; }
+    .modal-overlay.open { opacity: 1; pointer-events: auto; }
+    .modal-card { background: #fff; width: 90%; max-width: 480px; border-radius: 32px; padding: 32px; box-shadow: var(--shadow-hover); transform: scale(0.95); transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+    .modal-overlay.open .modal-card { transform: scale(1); }
+    .selection-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+    .select-item { aspect-ratio: 1; background: #f8f9fc; border-radius: 20px; border: 2px solid transparent; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; }
+    .select-item.selected { background: #eef2ff; border-color: var(--primary); color: var(--primary); }
+    @media (max-width: 768px) { .main-container { padding: 0 16px; gap: 20px; } .calendar-section { padding: 16px; } .days-grid, .week-header { gap: 8px; } .day-card { padding: 8px; } .app-header { padding: 16px; } .brand-logo { font-size: 1.1rem; } }
+  </style>
 </head>
-<body class="min-h-screen">
+<body>
 
-<!-- VISTA DE CARGA / LOGIN -->
-<div id="auth-screen" class="fixed inset-0 z-[5000] bg-white flex items-center justify-center p-6">
-    <div class="w-full max-w-sm text-center">
-        <div class="text-6xl mb-6">👨‍👩‍👧‍👦</div>
-        <h1 class="text-2xl font-extrabold mb-2">Custodia Familiar</h1>
-        <p id="auth-status-text" class="text-gray-500 mb-8">Iniciando sesión segura...</p>
-        
-        <div id="login-container" class="hidden space-y-4">
-            <input type="email" id="email" placeholder="Email" class="w-full p-4 bg-gray-100 rounded-2xl border-none focus:ring-2 focus:ring-indigo-500 outline-none">
-            <input type="password" id="password" placeholder="Contraseña" class="w-full p-4 bg-gray-100 rounded-2xl border-none focus:ring-2 focus:ring-indigo-500 outline-none">
-            <button id="login-btn" class="w-full py-4 bg-gray-900 text-white font-bold rounded-2xl hover:bg-black transition-colors">Entrar</button>
-            <p id="auth-error" class="text-red-500 text-sm font-medium mt-4"></p>
-        </div>
-        
-        <div id="auth-loader" class="flex justify-center">
-            <div class="loader"></div>
-        </div>
+<div id="login-view" class="login-wrapper">
+  <div class="login-box">
+    <div style="font-size:3rem; margin-bottom:1rem;">👨‍👩‍👧‍👦</div>
+    <h1 style="font-size:1.5rem; font-weight:800; margin-bottom:0.5rem;">Custodia Familiar Alberto</h1>
+    <form id="login-form">
+      <input type="email" id="login-email" class="input-modern" required placeholder="Correo electrónico">
+      <input type="password" id="login-password" class="input-modern" required placeholder="Contraseña">
+      <button type="submit" class="btn-modern" style="margin-top:16px;">Entrar</button>
+      <div id="login-error" style="color:#ef4444; margin-top:20px; font-weight:600; font-size:0.9rem;"></div>
+    </form>
+  </div>
+</div>
+
+<div id="app-root" class="hidden">
+  <header class="app-header">
+    <div class="brand-logo">
+      <i data-lucide="calendar-heart" style="color:var(--primary);"></i>
+      <span>Custodia Familiar Alberto</span>
     </div>
-</div>
-
-<div id="app-content" class="hidden opacity-0 transition-opacity duration-500">
-    <!-- Header -->
-    <header class="max-w-6xl mx-auto px-6 py-6 flex flex-wrap items-center justify-between gap-4">
-        <div class="flex items-center gap-3">
-            <div class="bg-indigo-600 p-2 rounded-xl text-white">
-                <i data-lucide="calendar-heart"></i>
-            </div>
-            <h2 class="font-extrabold text-xl tracking-tight">Custodia Alberto</h2>
-        </div>
-        
-        <div class="flex items-center gap-3">
-            <div id="user-badge" class="px-4 py-2 rounded-full text-sm font-bold shadow-sm border"></div>
-            <button id="logout-btn" class="p-2 text-red-500 bg-red-50 rounded-full hover:bg-red-100 transition-colors">
-                <i data-lucide="log-out"></i>
-            </button>
-        </div>
-    </header>
-
-    <main class="max-w-6xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-3 gap-8 pb-12">
-        
-        <!-- Calendario -->
-        <div class="lg:col-span-2 space-y-6">
-            <div class="bg-white rounded-[32px] p-6 shadow-sm border border-gray-100">
-                <div class="flex items-center justify-between mb-8">
-                    <button id="prev-month" class="p-3 bg-gray-50 rounded-full hover:bg-gray-100 transition-colors">
-                        <i data-lucide="chevron-left"></i>
-                    </button>
-                    <div class="text-center">
-                        <h3 id="current-month-label" class="text-2xl font-black capitalize">Mes Año</h3>
-                        <select id="year-select" class="text-sm font-semibold text-gray-400 bg-transparent cursor-pointer"></select>
-                    </div>
-                    <button id="next-month" class="p-3 bg-gray-50 rounded-full hover:bg-gray-100 transition-colors">
-                        <i data-lucide="chevron-right"></i>
-                    </button>
-                </div>
-
-                <div class="grid grid-cols-7 gap-2 mb-4">
-                    <div class="text-center text-[10px] font-bold text-gray-400 uppercase tracking-widest">Lun</div>
-                    <div class="text-center text-[10px] font-bold text-gray-400 uppercase tracking-widest">Mar</div>
-                    <div class="text-center text-[10px] font-bold text-gray-400 uppercase tracking-widest">Mié</div>
-                    <div class="text-center text-[10px] font-bold text-gray-400 uppercase tracking-widest">Jue</div>
-                    <div class="text-center text-[10px] font-bold text-gray-400 uppercase tracking-widest">Vie</div>
-                    <div class="text-center text-[10px] font-bold text-gray-400 uppercase tracking-widest">Sáb</div>
-                    <div class="text-center text-[10px] font-bold text-gray-400 uppercase tracking-widest">Dom</div>
-                </div>
-
-                <div id="calendar-grid" class="grid grid-cols-7 gap-3">
-                    <!-- Dinámico -->
-                </div>
-            </div>
-        </div>
-
-        <!-- Sidebar -->
-        <aside class="space-y-6">
-            <!-- Formulario Solicitud -->
-            <div class="bg-white rounded-[28px] p-6 shadow-sm border border-gray-100">
-                <h4 class="font-extrabold mb-4 flex items-center gap-2">
-                    <i data-lucide="git-pull-request" class="text-indigo-600"></i> Solicitar Cambio
-                </h4>
-                <div class="space-y-3">
-                    <div class="grid grid-cols-2 gap-2">
-                        <div>
-                            <label class="text-[10px] font-bold text-gray-400 uppercase px-2">Inicio</label>
-                            <input type="date" id="req-start" class="w-full p-3 bg-gray-50 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-indigo-500">
-                        </div>
-                        <div>
-                            <label class="text-[10px] font-bold text-gray-400 uppercase px-2">Fin</label>
-                            <input type="date" id="req-end" class="w-full p-3 bg-gray-50 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-indigo-500">
-                        </div>
-                    </div>
-                    <input type="text" id="req-reason" placeholder="Motivo o nota..." class="w-full p-3 bg-gray-50 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-indigo-500">
-                    <button id="send-request-btn" class="w-full py-4 bg-indigo-600 text-white font-bold rounded-xl shadow-lg shadow-indigo-100 hover:bg-indigo-700 active:scale-95 transition-all">
-                        Enviar Solicitud
-                    </button>
-                </div>
-            </div>
-
-            <!-- Lista Solicitudes -->
-            <div class="bg-white rounded-[28px] p-6 shadow-sm border border-gray-100">
-                <h4 class="font-extrabold mb-4 flex items-center gap-2">
-                    <i data-lucide="list-checks" class="text-indigo-600"></i> Historial
-                </h4>
-                <div id="requests-list" class="space-y-3 max-h-[400px] overflow-y-auto pr-2">
-                    <p class="text-center text-gray-400 text-sm py-8">No hay solicitudes.</p>
-                </div>
-            </div>
-        </aside>
-    </main>
-</div>
-
-<!-- Modal Día -->
-<div id="day-modal" class="modal-overlay fixed inset-0 z-[6000] hidden flex items-center justify-center p-4">
-    <div class="bg-white w-full max-w-lg rounded-[32px] overflow-hidden shadow-2xl transform transition-all">
-        <div id="modal-banner" class="p-8 relative">
-            <button onclick="closeModal()" class="absolute top-6 right-6 p-2 bg-white/20 hover:bg-white/40 rounded-full text-white transition-colors">
-                <i data-lucide="x"></i>
-            </button>
-            <p id="modal-date-readable" class="text-white/80 font-bold uppercase tracking-widest text-xs mb-1"></p>
-            <h2 id="modal-owner-title" class="text-3xl font-black text-white">Día de Mamá</h2>
-        </div>
-        
-        <div class="p-8 space-y-6">
-            <div>
-                <label class="text-[10px] font-bold text-gray-400 uppercase px-1 mb-2 block">Nuevo Evento</label>
-                <div class="flex gap-2 mb-4">
-                    <input type="text" id="event-input" placeholder="Ej: Dentista 16:00" class="flex-1 p-3 bg-gray-50 rounded-xl outline-none border-2 border-transparent focus:border-indigo-500">
-                    <button id="add-event-btn" class="bg-gray-900 text-white p-3 rounded-xl hover:bg-black">
-                        <i data-lucide="plus"></i>
-                    </button>
-                </div>
-                <div class="flex flex-wrap gap-2" id="icon-selector">
-                    <button data-type="medico" class="icon-tag flex items-center gap-2 px-3 py-2 rounded-lg bg-red-50 text-red-600 border border-red-100 text-xs font-bold selected ring-2 ring-indigo-600" onclick="selectType('medico', this)"><i data-lucide="stethoscope" class="w-3"></i> Médico</button>
-                    <button data-type="escuela" class="icon-tag flex items-center gap-2 px-3 py-2 rounded-lg bg-orange-50 text-orange-600 border border-orange-100 text-xs font-bold" onclick="selectType('escuela', this)"><i data-lucide="backpack" class="w-3"></i> Cole</button>
-                    <button data-type="deporte" class="icon-tag flex items-center gap-2 px-3 py-2 rounded-lg bg-purple-50 text-purple-600 border border-purple-100 text-xs font-bold" onclick="selectType('deporte', this)"><i data-lucide="trophy" class="w-3"></i> Deporte</button>
-                    <button data-type="viaje" class="icon-tag flex items-center gap-2 px-3 py-2 rounded-lg bg-cyan-50 text-cyan-600 border border-cyan-100 text-xs font-bold" onclick="selectType('viaje', this)"><i data-lucide="palmtree" class="w-3"></i> Viaje</button>
-                </div>
-            </div>
-
-            <div class="space-y-3">
-                <label class="text-[10px] font-bold text-gray-400 uppercase px-1 block">Eventos del día</label>
-                <div id="modal-events-list" class="space-y-2">
-                    <!-- Listado -->
-                </div>
-            </div>
-        </div>
+    <div class="user-menu">
+      <div id="user-role-indicator" class="role-badge hidden"></div>
+      <select id="year-select" class="btn-icon-subtle" style="border:none; padding: 8px 16px;"></select>
+      <button id="logout-btn" class="btn-icon-subtle" style="color:#ef4444; background:#fef2f2;">
+        <i data-lucide="log-out" style="width:16px;"></i>
+        <div id="global-notif-dot" class="notification-dot"></div>
+      </button>
     </div>
+  </header>
+
+  <main class="main-container">
+    <section class="calendar-section" id="calendar-wrapper-swipe">
+      <div class="calendar-controls">
+        <button id="prev-period" class="nav-circle-btn"><i data-lucide="chevron-left"></i></button>
+        <div id="calendar-title" class="month-heading"></div>
+        <button id="next-period" class="nav-circle-btn"><i data-lucide="chevron-right"></i></button>
+      </div>
+      <div class="week-header">
+        <div class="week-day-label">Lun</div><div class="week-day-label">Mar</div><div class="week-day-label">Mié</div>
+        <div class="week-day-label">Jue</div><div class="week-day-label">Vie</div><div class="week-day-label">Sáb</div><div class="week-day-label">Dom</div>
+      </div>
+      <div id="calendar-grid" class="days-grid"></div>
+    </section>
+
+    <aside class="sidebar">
+      <div class="glass-panel">
+        <div class="panel-title"><i data-lucide="git-pull-request" style="color:var(--primary)"></i> Solicitar Cambio</div>
+        <form id="request-form-sidebar">
+          <div style="display:flex; gap:12px; margin-bottom:12px;">
+            <input type="date" id="req-start" class="input-modern" style="margin:0; padding:12px;" required>
+            <input type="date" id="req-end" class="input-modern" style="margin:0; padding:12px;" required>
+          </div>
+          <input type="text" id="req-reason" class="input-modern" placeholder="Motivo (opcional)">
+          <button type="submit" class="btn-modern" style="padding:12px; font-size:0.9rem;">Enviar Solicitud</button>
+        </form>
+      </div>
+
+      <div class="glass-panel">
+        <div class="panel-title">
+          <i data-lucide="list-checks" style="color:var(--primary)"></i> Estado Solicitudes
+        </div>
+        <div id="requests-status-list" class="requests-list-container">
+            <div style="text-align:center; color:var(--text-muted); padding:20px;">Cargando...</div>
+        </div>
+      </div>
+    </aside>
+  </main>
 </div>
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc, collection, query, onSnapshot, addDoc, updateDoc, deleteDoc, writeBatch, orderBy, limit } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+<div class="modal-overlay" id="day-modal">
+  <div class="modal-card">
+    <div style="display:flex; justify-content:space-between; margin-bottom:24px;"><h2 id="modal-date-title" style="margin:0;">Fecha</h2><button onclick="closeModal()" style="border:none;background:#f3f4f6;width:40px;height:40px;border-radius:50%;cursor:pointer;">X</button></div>
+    <div id="modal-custody-header-container"></div>
+    <input type="text" id="event-title" class="input-modern" placeholder="Añadir evento..." style="font-size:1.1rem;">
+    <div class="selection-grid">
+      <div class="select-item selected" onclick="selectIcon('medico',this)"><i data-lucide="stethoscope" style="color:#ef4444"></i><span>Médico</span></div>
+      <div class="select-item" onclick="selectIcon('dentista',this)"><i data-lucide="smile" style="color:#0ea5e9"></i><span>Dentista</span></div>
+      <div class="select-item" onclick="selectIcon('escuela',this)"><i data-lucide="backpack" style="color:#f97316"></i><span>Colegio</span></div>
+      <div class="select-item" onclick="selectIcon('deporte',this)"><i data-lucide="trophy" style="color:#8b5cf6"></i><span>Deporte</span></div>
+      <div class="select-item" onclick="selectIcon('cumple',this)"><i data-lucide="cake" style="color:#eab308"></i><span>Fiesta</span></div>
+      <div class="select-item" onclick="selectIcon('parque',this)"><i data-lucide="tree-deciduous" style="color:#84cc16"></i><span>Parque</span></div>
+      <div class="select-item" onclick="selectIcon('general',this)"><i data-lucide="star" style="color:#64748b"></i><span>Otro</span></div>
+      <div class="select-item" onclick="selectIcon('vacaciones',this)"><i data-lucide="palmtree" style="color:#06b6d4"></i><span>Viaje</span></div>
+    </div>
+    <button onclick="saveEvent()" class="btn-modern" style="margin-bottom:24px;">Guardar</button>
+    <div id="modal-event-list"></div>
+  </div>
+</div>
 
-    // --- CONFIGURACIÓN & ESTADO ---
-    let firebaseConfig;
-    let appId;
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+<script>
+  // ==========================================================
+  // CONFIGURACIÓN DE ROLES (¡REEMPLAZA CON EMAILS REALES!)
+  // ==========================================================
+  const USER_ROLES = {
+      'moya@custodia.com': 'padre', 
+      'alessia@custodia.com': 'madre'
+  };
+  // ==========================================================
+
+  const firebaseConfig = { apiKey: "AIzaSyAwgk4_l0zvaCUCgm1CjqqqXjJHr5KPBjc", authDomain: "custodia-familiar.firebaseapp.com", projectId: "custodia-familiar", storageBucket: "custodia-familiar.firebasestorage.app", messagingSenderId: "1038952432258", appId: "1:1038952432258:web:7608d6a48d8ad8308a6a9b" };
+  firebase.initializeApp(firebaseConfig); const db = firebase.firestore(); const auth = firebase.auth();
+  const IMG_MOM = "assets/madre.png"; const IMG_DAD = "assets/padre.png";
+
+  let todayInit = new Date(); let currentYear = todayInit.getFullYear(); let currentMonth = todayInit.getMonth(); if (currentYear < 2025) currentYear = 2025;
+  let overrides={}, eventsData={}; let selectedDateKey=null, selectedIconType='medico';
+  let currentUserEmail = null; let currentUserRole = null;
+
+  const monthNames = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+  const BASE_MONDAY = new Date(2026, 0, 5, 12, 0, 0); 
+
+  function getBaseOwner(y,m,d) { const date = new Date(y, m, d, 12, 0, 0); if(date.getFullYear()<2025 || date.getFullYear()>2027) return null; const diff = Math.round((date - BASE_MONDAY)/(1000*60*60*24)); return (Math.floor(diff/7)%2 === 0) ? "padre" : "madre"; }
+  function getIconName(t) { const m={'medico':'stethoscope','dentista':'smile','escuela':'backpack','deporte':'trophy','cumple':'cake','parque':'tree-deciduous','general':'star','vacaciones':'palmtree'}; return m[t]||'circle'; }
+
+  function renderCalendar() {
+    const grid = document.getElementById("calendar-grid"); document.getElementById("calendar-title").textContent = `${monthNames[currentMonth]} ${currentYear}`; grid.innerHTML = "";
+    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate(); const firstDay = new Date(currentYear, currentMonth, 1).getDay(); const startOffset = (firstDay === 0) ? 6 : firstDay - 1;
+    for(let i=0; i<startOffset; i++) grid.appendChild(createDayCard(null));
+    for(let day=1; day<=daysInMonth; day++) grid.appendChild(createDayCard(day));
+    lucide.createIcons();
+  }
+
+  function createDayCard(day) {
+    const card = document.createElement("div"); card.className = "day-card"; if(day === null) { card.classList.add("empty"); return card; }
+    const y=currentYear, m=currentMonth, d=day; const dKey = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const owner = overrides[dKey] || getBaseOwner(y,m,d); const isToday = (dKey === `${todayInit.getFullYear()}-${String(todayInit.getMonth()+1).padStart(2,'0')}-${String(todayInit.getDate()).padStart(2,'0')}`);
+    if(owner === "madre") card.classList.add("is-mom"); if(owner === "padre") card.classList.add("is-dad"); if(isToday) card.classList.add("is-today");
+    card.onclick = () => openDayModal(dKey, owner);
+    card.innerHTML = `<div style="display:flex;justify-content:space-between;position:relative;z-index:2;"><div class="day-number">${d}</div><i data-lucide="${owner==='madre'?'heart':'shield'}" style="color:${owner==='madre'?'var(--mom-accent)':'var(--dad-accent)'};opacity:0.7;width:20px;"></i></div><img src="${owner==="madre"?IMG_MOM:IMG_DAD}" class="bg-illustration">`;
+    const evts = eventsData[dKey] || []; if(evts.length > 0) { const ec = document.createElement("div"); ec.className = "events-container"; evts.slice(0, 3).forEach(e => { ec.innerHTML += `<div class="event-chip chip-${e.type}"><i data-lucide="${getIconName(e.type)}"></i></div>`; }); card.appendChild(ec); }
+    return card;
+  }
+
+  function openDayModal(dateKey, owner) { selectedDateKey = dateKey; document.getElementById("day-modal").classList.add("open"); const dObj = new Date(dateKey); document.getElementById("modal-date-title").textContent = dObj.toLocaleDateString('es-ES', {weekday:'long', day:'numeric', month:'long'}); document.getElementById("modal-custody-header-container").innerHTML = `<div style="display:flex;align-items:center;gap:20px;padding:20px;border-radius:24px;margin-bottom:24px;background:${owner==='madre'?'var(--mom-gradient)':'var(--dad-gradient)'}"><img src="${owner==='madre'?IMG_MOM:IMG_DAD}" style="width:80px;height:80px;border-radius:50%;background:#fff;padding:4px;box-shadow:var(--shadow-card);"><div><div style="font-size:0.9rem;font-weight:700;opacity:0.7;text-transform:uppercase;">Día de</div><div style="font-size:1.8rem;font-weight:900;">${owner==='madre'?'Mamá':'Papá'}</div></div></div>`; renderEventsList(); }
+  function closeModal() { document.getElementById("day-modal").classList.remove("open"); }
+  function selectIcon(t,el) { selectedIconType=t; document.querySelectorAll('.select-item').forEach(b=>b.classList.remove('selected')); el.classList.add('selected'); }
+  function renderEventsList() { const l = document.getElementById("modal-event-list"); l.innerHTML=""; const evts = eventsData[selectedDateKey] || []; if(evts.length===0) l.innerHTML="<div style='color:var(--text-muted);text-align:center;padding:20px;'>No hay eventos.</div>"; evts.forEach(e => { l.innerHTML += `<div style="display:flex;justify-content:space-between;align-items:center;padding:16px;background:#f8f9fc;border-radius:16px;margin-bottom:8px;"><div style="display:flex;gap:12px;align-items:center;"><div class="event-chip chip-${e.type}" style="width:32px;height:32px;"><i data-lucide="${getIconName(e.type)}" style="width:16px;"></i></div><strong>${e.title}</strong></div><button onclick="delEv('${e.id}')" style="border:none;color:#ef4444;background:none;cursor:pointer;"><i data-lucide="trash-2"></i></button></div>`; }); lucide.createIcons(); }
+  async function saveEvent() { const t=document.getElementById("event-title").value; if(t){await db.collection("events").add({date:selectedDateKey, title:t, type:selectedIconType, createdAt:firebase.firestore.FieldValue.serverTimestamp()}); document.getElementById("event-title").value=""; renderEventsList();} }
+  async function delEv(id){if(confirm("¿Eliminar?")){await db.collection("events").doc(id).delete(); renderEventsList();}}
+
+  // ==================================================
+  // LÓGICA DE SOLICITUDES ACTUALIZADA
+  // ==================================================
+
+  function updateHeaderRoleIndicator() {
+      const indicator = document.getElementById("user-role-indicator");
+      if (currentUserRole === 'padre') { indicator.innerHTML = '<i data-lucide="shield" style="width:16px;"></i> Padre'; indicator.className = 'role-badge dad'; } 
+      else if (currentUserRole === 'madre') { indicator.innerHTML = '<i data-lucide="heart" style="width:16px;"></i> Madre'; indicator.className = 'role-badge mom'; } 
+      else { indicator.className = 'hidden'; }
+      lucide.createIcons();
+  }
+
+  document.getElementById("request-form-sidebar").addEventListener("submit", async e => {
+      e.preventDefault();
+      const start = document.getElementById("req-start").value;
+      const end = document.getElementById("req-end").value;
+      if(!start || !end) return alert("Selecciona fechas");
+      if(!currentUserRole) return alert("Error de rol");
+      try {
+          await db.collection("requests").add({ startDate: start, endDate: end, reason: document.getElementById("req-reason").value || "Sin motivo", status: 'pendiente', requesterEmail: currentUserEmail, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+          alert("Solicitud enviada"); document.getElementById("request-form-sidebar").reset();
+      } catch (error) { alert("Error al enviar"); }
+  });
+
+  async function processRequest(requestId, newStatus) {
+    const reqDoc = await db.collection("requests").doc(requestId).get();
+    const reqData = reqDoc.data();
+
+    // BLOQUEO: No puedes procesar tu propia solicitud
+    if(reqData.requesterEmail === currentUserEmail) {
+        return alert("No puedes aprobar o rechazar tu propia solicitud.");
+    }
+
+    if(!confirm(`¿Marcar como ${newStatus}?`)) return;
+
     try {
-        firebaseConfig = JSON.parse(__firebase_config);
-        appId = typeof __app_id !== 'undefined' ? __app_id : 'custodia-alberto';
-    } catch (e) {
-        console.error("Error cargando configuración, usando defaults seguros para evitar crash");
-        firebaseConfig = {}; 
-        appId = 'custodia-alberto';
-    }
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    // Emails configurados para roles
-    const USER_ROLES = {
-        'mama@ejemplo.com': 'madre',
-        'papa@ejemplo.com': 'padre'
-    };
-
-    let state = {
-        user: null,
-        userRole: null,
-        currentYear: new Date().getFullYear(),
-        currentMonth: new Date().getMonth(),
-        overrides: {},
-        events: {},
-        requests: [],
-        selectedType: 'medico',
-        selectedDateKey: null
-    };
-
-    // --- LÓGICA CALENDARIO ---
-    const BASE_MONDAY = new Date(2026, 0, 5); 
-    const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-
-    function getBaseOwner(y, m, d) {
-        const date = new Date(y, m, d);
-        const diff = Math.round((date - BASE_MONDAY) / (1000 * 60 * 60 * 24));
-        return (Math.floor(diff / 7) % 2 === 0) ? "padre" : "madre";
-    }
-
-    // --- UI RENDER ---
-    function render() {
-        if (!state.user) return;
-        const { currentYear, currentMonth, overrides, events } = state;
-        document.getElementById('current-month-label').textContent = `${monthNames[currentMonth]} ${currentYear}`;
-        
-        const grid = document.getElementById('calendar-grid');
-        grid.innerHTML = '';
-
-        const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-        const firstDayIndex = new Date(currentYear, currentMonth, 1).getDay();
-        const offset = (firstDayIndex === 0) ? 6 : firstDayIndex - 1;
-
-        for(let i=0; i < offset; i++) {
-            grid.innerHTML += `<div class="p-2"></div>`;
-        }
-
-        const today = new Date();
-        const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
-
-        for(let d=1; d <= daysInMonth; d++) {
-            const dateKey = `${currentYear}-${String(currentMonth + 1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-            const owner = overrides[dateKey] || getBaseOwner(currentYear, currentMonth, d);
-            const isToday = dateKey === todayStr;
-            const dayEvents = events[dateKey] || [];
-
-            const card = document.createElement('div');
-            card.className = `day-card rounded-2xl p-3 flex flex-col justify-between cursor-pointer border shadow-sm ${owner === 'madre' ? 'is-mom' : 'is-dad'} ${isToday ? 'is-today' : ''}`;
-            card.onclick = () => openDayModal(dateKey, owner);
-
-            card.innerHTML = `
-                <div class="flex justify-between items-start">
-                    <span class="font-black text-lg">${d}</span>
-                    <i data-lucide="${owner === 'madre' ? 'heart' : 'shield'}" class="w-3 ${owner === 'madre' ? 'text-pink-500' : 'text-blue-500'} opacity-50"></i>
-                </div>
-                <div class="flex flex-wrap gap-1 mt-auto">
-                    ${dayEvents.slice(0, 3).map(e => `<div class="event-chip ${getChipClass(e.type)}"></div>`).join('')}
-                    ${dayEvents.length > 3 ? `<span class="text-[8px] font-bold text-gray-500">+${dayEvents.length - 3}</span>` : ''}
-                </div>
-            `;
-            grid.appendChild(card);
-        }
-        lucide.createIcons();
-    }
-
-    function getChipClass(type) {
-        const m = { medico: 'bg-red-500', escuela: 'bg-orange-500', deporte: 'bg-purple-500', viaje: 'bg-cyan-500' };
-        return m[type] || 'bg-gray-400';
-    }
-
-    function renderRequests() {
-        const container = document.getElementById('requests-list');
-        container.innerHTML = '';
-        
-        if (state.requests.length === 0) {
-            container.innerHTML = `<p class="text-center text-gray-400 text-sm py-8 italic">Sin actividad reciente.</p>`;
-            return;
-        }
-
-        state.requests.forEach(req => {
-            const isPending = req.status === 'pendiente';
-            // MEJORA: Comprobamos si el usuario actual es el solicitante por UID O por ROL
-            // Esto evita errores si la sesión cambia pero el rol (Padre/Madre) es el mismo.
-            const isMeRequester = req.requesterUid === state.user.uid || (state.userRole && req.requesterRole === state.userRole);
-            
-            let actionButtonsHTML = '';
-            if (isPending) {
-                if (isMeRequester) {
-                    actionButtonsHTML = `
-                        <button class="w-full py-2 bg-gray-100 text-gray-500 rounded-lg font-bold text-xs hover:bg-red-50 hover:text-red-600 transition-colors" onclick="cancelRequest('${req.id}')">
-                            Cancelar Mi Solicitud
-                        </button>
-                    `;
-                } else {
-                    actionButtonsHTML = `
-                        <div class="flex gap-2">
-                            <button class="flex-1 py-2 bg-green-500 text-white rounded-lg font-bold text-xs hover:bg-green-600" onclick="processRequest('${req.id}', 'aprobada')">Aceptar</button>
-                            <button class="flex-1 py-2 bg-red-500 text-white rounded-lg font-bold text-xs hover:bg-red-600" onclick="processRequest('${req.id}', 'rechazada')">Rechazar</button>
-                        </div>
-                    `;
-                }
-            } else {
-                actionButtonsHTML = `<div class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">${isMeRequester ? 'Tú la solicitaste' : 'Solicitada por el otro'}</div>`;
-            }
-
-            const div = document.createElement('div');
-            const needsAction = isPending && !isMeRequester;
-            div.className = `p-4 rounded-2xl border bg-white ${needsAction ? 'needs-action' : ''} text-sm transition-all`;
-            
-            div.innerHTML = `
-                <div class="flex justify-between items-start mb-2">
-                    <span class="font-bold">${new Date(req.start).toLocaleDateString()} - ${new Date(req.end).toLocaleDateString()}</span>
-                    <span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase ${getStatusClass(req.status)}">${req.status}</span>
-                </div>
-                <p class="text-gray-500 text-xs italic mb-3">"${req.reason}"</p>
-                <div class="mt-2">
-                    ${actionButtonsHTML}
-                </div>
-            `;
-            container.appendChild(div);
-        });
-        lucide.createIcons();
-    }
-
-    function getStatusClass(s) {
-        if (s === 'aprobada') return 'bg-green-100 text-green-700';
-        if (s === 'rechazada') return 'bg-red-100 text-red-700';
-        return 'bg-yellow-100 text-yellow-700';
-    }
-
-    // --- ACCIONES MODAL ---
-    window.openDayModal = (dateKey, owner) => {
-        state.selectedDateKey = dateKey;
-        const modal = document.getElementById('day-modal');
-        const banner = document.getElementById('modal-banner');
-        
-        state.selectedType = 'medico';
-        document.querySelectorAll('.icon-tag').forEach(b => b.classList.remove('ring-2', 'ring-indigo-600'));
-        document.querySelector('[data-type="medico"]').classList.add('ring-2', 'ring-indigo-600');
-
-        modal.classList.remove('hidden');
-        banner.className = `p-8 relative ${owner === 'madre' ? 'is-mom' : 'is-dad'}`;
-        document.getElementById('modal-date-readable').textContent = new Date(dateKey).toLocaleDateString('es-ES', { weekday:'long', day:'numeric', month:'long'});
-        document.getElementById('modal-owner-title').textContent = `Día de ${owner === 'madre' ? 'Mamá' : 'Papá'}`;
-        
-        renderModalEvents();
-    };
-
-    window.closeModal = () => document.getElementById('day-modal').classList.add('hidden');
-
-    window.selectType = (type, el) => {
-        state.selectedType = type;
-        document.querySelectorAll('.icon-tag').forEach(b => b.classList.remove('ring-2', 'ring-indigo-600'));
-        el.classList.add('ring-2', 'ring-indigo-600');
-    };
-
-    function renderModalEvents() {
-        const list = document.getElementById('modal-events-list');
-        const evts = state.events[state.selectedDateKey] || [];
-        list.innerHTML = evts.length ? '' : '<p class="text-center text-gray-400 py-4 text-xs italic">No hay eventos para hoy</p>';
-        
-        evts.forEach(e => {
-            const row = document.createElement('div');
-            row.className = "flex items-center justify-between p-3 bg-gray-50 rounded-xl";
-            row.innerHTML = `
-                <div class="flex items-center gap-3">
-                    <div class="p-2 rounded-lg ${getChipClass(e.type)} text-white">
-                        <i data-lucide="${getIconFromType(e.type)}" class="w-3"></i>
-                    </div>
-                    <span class="font-bold text-sm">${e.text}</span>
-                </div>
-                <button onclick="removeEvent('${e.id}')" class="text-red-400 hover:text-red-600">
-                    <i data-lucide="trash-2" class="w-4"></i>
-                </button>
-            `;
-            list.appendChild(row);
-        });
-        lucide.createIcons();
-    }
-
-    function getIconFromType(t) {
-        const m = { medico: 'stethoscope', escuela: 'backpack', deporte: 'trophy', viaje: 'palmtree' };
-        return m[t] || 'circle';
-    }
-
-    // --- PERSISTENCIA FIRESTORE ---
-
-    async function saveEvent() {
-        if (!state.user) return;
-        const input = document.getElementById('event-input');
-        if (!input.value.trim()) return;
-
-        const collectionRef = collection(db, 'artifacts', appId, 'public', 'data', 'events');
-        await addDoc(collectionRef, {
-            date: state.selectedDateKey,
-            text: input.value,
-            type: state.selectedType,
-            createdBy: state.user.uid,
-            createdAt: Date.now()
-        });
-        input.value = '';
-        renderModalEvents();
-    }
-
-    window.removeEvent = async (id) => {
-        if (!state.user) return;
-        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'events', id);
-        await deleteDoc(docRef);
-        renderModalEvents();
-    };
-
-    async function sendRequest() {
-        if (!state.user) return;
-        const start = document.getElementById('req-start').value;
-        const end = document.getElementById('req-end').value;
-        const reason = document.getElementById('req-reason').value || "Sin motivo";
-
-        if (!start || !end) return alert("Selecciona fechas");
-
-        const col = collection(db, 'artifacts', appId, 'public', 'data', 'requests');
-        await addDoc(col, {
-            start, end, reason,
-            status: 'pendiente',
-            requesterUid: state.user.uid,
-            requesterRole: state.userRole,
-            createdAt: Date.now()
-        });
-        
-        document.getElementById('req-start').value = '';
-        document.getElementById('req-end').value = '';
-        document.getElementById('req-reason').value = '';
-        alert("Solicitud enviada correctamente.");
-    }
-
-    window.cancelRequest = async (id) => {
-        if (!state.user) return;
-        if (!confirm("¿Seguro que quieres cancelar esta solicitud?")) return;
-        const reqRef = doc(db, 'artifacts', appId, 'public', 'data', 'requests', id);
-        await deleteDoc(reqRef);
-    };
-
-    window.processRequest = async (id, status) => {
-        if (!state.user) return;
-        const reqRef = doc(db, 'artifacts', appId, 'public', 'data', 'requests', id);
-        const reqSnap = await getDoc(reqRef);
-        const reqData = reqSnap.data();
-
-        // MEJORA: Validación robusta por UID o por ROL
-        if (reqData.requesterUid === state.user.uid || (state.userRole && reqData.requesterRole === state.userRole)) {
-            alert("No puedes aprobar tu propia solicitud.");
-            return;
-        }
-
-        if (status === 'aprobada') {
-            const batch = writeBatch(db);
-            const start = new Date(reqData.start);
-            const end = new Date(reqData.end);
-
+        if (newStatus === 'aprobada') {
+            const requesterRole = USER_ROLES[reqData.requesterEmail];
+            const start = new Date(reqData.startDate);
+            const end = new Date(reqData.endDate);
+            const batch = db.batch();
             for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-                const dateKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-                const ovRef = doc(db, 'artifacts', appId, 'public', 'data', 'overrides', dateKey);
-                batch.set(ovRef, { owner: reqData.requesterRole });
+                const dateKey = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+                batch.set(db.collection("overrides").doc(dateKey), { owner: requesterRole });
             }
             await batch.commit();
         }
+        await db.collection("requests").doc(requestId).update({ status: newStatus });
+    } catch (error) { alert("Error al procesar"); }
+  }
 
-        await updateDoc(reqRef, { status });
-    };
+  async function cancelRequest(requestId) {
+      if(!confirm("¿Cancelar esta solicitud?")) return;
+      try { await db.collection("requests").doc(requestId).delete(); } catch(e) { alert("Error"); }
+  }
 
-    // --- AUTH & INIT ---
-    let unsubscribes = [];
+  function renderRequestsList(docs) {
+      const container = document.getElementById("requests-status-list"); container.innerHTML = "";
+      const globalDot = document.getElementById("global-notif-dot");
+      let pendingForMe = 0;
 
-    function cleanupListeners() {
-        unsubscribes.forEach(u => u());
-        unsubscribes = [];
+      if (docs.length === 0) { 
+        container.innerHTML = "<div style='text-align:center;color:var(--text-muted);padding:20px;'>No hay solicitudes.</div>"; 
+        globalDot.classList.remove("active");
+        return; 
+      }
+
+      docs.forEach(doc => {
+          const data = doc.data();
+          const isMyRequest = data.requesterEmail === currentUserEmail;
+          const isPending = data.status === 'pendiente';
+          
+          const needsMyAction = isPending && !isMyRequest;
+          const canICancel = isPending && isMyRequest;
+
+          if(needsMyAction) pendingForMe++;
+
+          const item = document.createElement("div");
+          item.className = `request-item ${needsMyAction ? 'needs-action' : ''}`;
+          
+          const startF = new Date(data.startDate).toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit'});
+          const endF = new Date(data.endDate).toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit'});
+
+          let actionButtonsHTML = '';
+          if(needsMyAction) {
+              actionButtonsHTML = `
+                <div class="request-actions">
+                  <button onclick="processRequest('${doc.id}', 'aprobada')" class="btn-action approve"><i data-lucide="check"></i> Aprobar</button>
+                  <button onclick="processRequest('${doc.id}', 'rechazada')" class="btn-action reject"><i data-lucide="x"></i> Rechazar</button>
+                </div>`;
+          } else if (canICancel) {
+              actionButtonsHTML = `
+                <div class="request-actions">
+                  <button onclick="cancelRequest('${doc.id}')" class="btn-action" style="background:#f3f4f6; color:#4b5563;"><i data-lucide="trash-2"></i> Cancelar</button>
+                </div>`;
+          }
+
+          item.innerHTML = `
+              <div class="request-header"><div class="request-dates">${startF} - ${endF}</div><div class="req-status ${data.status}">${data.status}</div></div>
+              <div style="font-size:0.85rem; margin-bottom:8px;">"${data.reason}"</div>
+              <div class="request-meta"><div>${isMyRequest ? 'Tú la pediste' : 'Te la han pedido'}</div></div>
+              ${actionButtonsHTML}
+          `;
+          container.appendChild(item);
+      });
+
+      // Activar punto rojo si hay algo pendiente de mi aprobación
+      if(pendingForMe > 0) globalDot.classList.add("active");
+      else globalDot.classList.remove("active");
+
+      lucide.createIcons();
+  }
+
+  // AUTH STATE
+  auth.onAuthStateChanged(u=>{
+    if(u){
+      currentUserEmail = u.email;
+      currentUserRole = USER_ROLES[currentUserEmail] || null;
+      document.getElementById("login-view").classList.add("hidden"); document.getElementById("app-root").classList.remove("hidden");
+      updateHeaderRoleIndicator();
+      db.collection("overrides").onSnapshot(s=>{overrides={};s.forEach(d=>overrides[d.id]=d.data().owner);renderCalendar();});
+      db.collection("events").orderBy("createdAt").onSnapshot(s=>{eventsData={};s.forEach(d=>{const v=d.data();if(!eventsData[v.date])eventsData[v.date]=[];eventsData[v.date].push({id:d.id,...v})});renderCalendar();});
+      db.collection("requests").orderBy("createdAt","desc").limit(10).onSnapshot(snapshot => renderRequestsList(snapshot.docs));
+    } else {
+      currentUserEmail = null; currentUserRole = null;
+      document.getElementById("login-view").classList.remove("hidden"); document.getElementById("app-root").classList.add("hidden");
     }
+  });
 
-    function showLoginScreen(message = "Inicia sesión para continuar") {
-        document.getElementById('auth-status-text').textContent = message;
-        document.getElementById('login-container').classList.remove('hidden');
-        document.getElementById('auth-loader').classList.add('hidden');
-        document.getElementById('auth-screen').classList.remove('hidden');
-        document.getElementById('app-content').classList.add('hidden');
-    }
-
-    async function initAuth() {
-        try {
-            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                await signInWithCustomToken(auth, __initial_auth_token);
-            } else {
-                await signInAnonymously(auth);
-            }
-        } catch (error) {
-            console.error("Auto-Auth error:", error);
-            showLoginScreen("Sesión no iniciada automáticamente. Entra manualmente.");
-        }
-    }
-
-    async function init() {
-        // Setup selectores UI
-        const ys = document.getElementById('year-select');
-        [2025, 2026, 2027].forEach(y => {
-            const opt = document.createElement('option');
-            opt.value = y; opt.textContent = y;
-            if(y === state.currentYear) opt.selected = true;
-            ys.appendChild(opt);
-        });
-
-        ys.onchange = (e) => { state.currentYear = parseInt(e.target.value); render(); };
-        document.getElementById('prev-month').onclick = () => { state.currentMonth--; if(state.currentMonth < 0) { state.currentMonth = 11; state.currentYear--; } render(); };
-        document.getElementById('next-month').onclick = () => { state.currentMonth++; if(state.currentMonth > 11) { state.currentMonth = 0; state.currentYear++; } render(); };
-        document.getElementById('add-event-btn').onclick = saveEvent;
-        document.getElementById('send-request-btn').onclick = sendRequest;
-        document.getElementById('logout-btn').onclick = () => signOut(auth).then(() => window.location.reload());
-
-        document.getElementById('login-btn').onclick = async () => {
-            const email = document.getElementById('email').value;
-            const pass = document.getElementById('password').value;
-            if (!email || !pass) return;
-            document.getElementById('auth-error').textContent = "";
-            document.getElementById('login-btn').disabled = true;
-            try {
-                await signInWithEmailAndPassword(auth, email, pass);
-            } catch (e) {
-                document.getElementById('auth-error').textContent = "Credenciales incorrectas o usuario no encontrado.";
-                document.getElementById('login-btn').disabled = false;
-            }
-        };
-
-        // Escuchar cambios de autenticación
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                state.user = user;
-                state.userRole = USER_ROLES[user.email] || 'visitante';
-                
-                // Limpiar listeners anteriores para evitar fugas/bucles
-                cleanupListeners();
-                
-                try {
-                    setupListeners();
-                } catch(err) { console.error("Error setting up listeners", err); }
-                
-                document.getElementById('auth-screen').classList.add('hidden');
-                document.getElementById('app-content').classList.remove('hidden');
-                setTimeout(() => document.getElementById('app-content').classList.add('opacity-100'), 50);
-                
-                const badge = document.getElementById('user-badge');
-                badge.textContent = state.userRole.toUpperCase();
-                badge.className = `px-4 py-2 rounded-full text-xs font-black shadow-sm border ${state.userRole === 'madre' ? 'bg-pink-50 border-pink-200 text-pink-600' : 'bg-blue-50 border-blue-200 text-blue-600'}`;
-                
-                render();
-            } else {
-                state.user = null;
-                cleanupListeners();
-                // Si no hay usuario y no estamos en medio de un proceso de carga inicial...
-                // Pero aquí dejamos que initAuth maneje el error inicial. 
-                // Si el usuario hace logout manual, esto también es correcto.
-            }
-        });
-
-        // FALLBACK DE SEGURIDAD
-        setTimeout(() => {
-            const loader = document.getElementById('auth-loader');
-            const login = document.getElementById('login-container');
-            if (!loader.classList.contains('hidden') && login.classList.contains('hidden') && !state.user) {
-                console.warn("Auth timed out (fallback trigged).");
-                showLoginScreen("Tiempo de espera agotado.");
-            }
-        }, 3000);
-
-        // Lanzar proceso de auth
-        initAuth();
-    }
-
-    function setupListeners() {
-        if (!state.user) return;
-
-        // REGLA 1: Paths estrictos + Gestión de memoria
-        const qOverrides = query(collection(db, 'artifacts', appId, 'public', 'data', 'overrides'));
-        const u1 = onSnapshot(qOverrides, (s) => {
-            state.overrides = {};
-            s.forEach(d => state.overrides[d.id] = d.data().owner);
-            render();
-        }, (err) => console.error("Error overrides", err));
-        unsubscribes.push(u1);
-
-        const qEvents = query(collection(db, 'artifacts', appId, 'public', 'data', 'events'));
-        const u2 = onSnapshot(qEvents, (s) => {
-            state.events = {};
-            s.forEach(d => {
-                const data = { id: d.id, ...d.data() };
-                if (!state.events[data.date]) state.events[data.date] = [];
-                state.events[data.date].push(data);
-            });
-            render();
-            if (state.selectedDateKey) renderModalEvents();
-        }, (err) => console.error("Error eventos", err));
-        unsubscribes.push(u2);
-
-        const qReqs = query(collection(db, 'artifacts', appId, 'public', 'data', 'requests'), limit(20));
-        const u3 = onSnapshot(qReqs, (s) => {
-            state.requests = s.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b) => b.createdAt - a.createdAt);
-            renderRequests();
-        }, (err) => console.error("Error solicitudes", err));
-        unsubscribes.push(u3);
-    }
-
-    init();
+  const el=document.getElementById("calendar-wrapper-swipe"); let sx=0,sy=0; el.addEventListener('touchstart',e=>{sx=e.changedTouches[0].screenX;sy=e.changedTouches[0].screenY},{passive:true}); el.addEventListener('touchend',e=>{const dx=sx-e.changedTouches[0].screenX,dy=sy-e.changedTouches[0].screenY;if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>50){dx>0?currentMonth++:currentMonth--;chkM();renderCalendar();}},{passive:true}); function chkM(){if(currentMonth>11){currentMonth=0;currentYear++}if(currentMonth<0){currentMonth=11;currentYear--}}
+  document.getElementById("login-form").addEventListener("submit",e=>{e.preventDefault();auth.signInWithEmailAndPassword(document.getElementById("login-email").value,document.getElementById("login-password").value).catch(err=>document.getElementById("login-error").textContent="Credenciales incorrectas");}); document.getElementById("logout-btn").onclick=()=>auth.signOut(); document.getElementById("prev-period").onclick=()=>{currentMonth--;chkM();renderCalendar();}; document.getElementById("next-period").onclick=()=>{currentMonth++;chkM();renderCalendar();}; const ys=document.getElementById("year-select");[2025,2026,2027].forEach(y=>{const o=document.createElement("option");o.value=y;o.textContent=y;if(y===currentYear)o.selected=true;ys.appendChild(o)});ys.onchange=e=>{currentYear=parseInt(e.target.value);renderCalendar();}; renderCalendar();
 </script>
 </body>
 </html>

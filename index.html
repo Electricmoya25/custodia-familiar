@@ -52,11 +52,8 @@
     .user-menu { display: flex; gap: 12px; align-items: center; }
     .btn-icon-subtle { background: #fff; border: 1px solid #e5e7eb; color: var(--text-main); padding: 8px 12px; border-radius: 99px; font-weight: 600; font-size: 0.9rem; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: var(--shadow-card); }
     
-    /* NUEVO: Insignia de Rol en Header */
-    .role-badge {
-        padding: 6px 12px; border-radius: 20px; font-weight: 700; font-size: 0.85rem;
-        display: flex; align-items: center; gap: 6px; box-shadow: var(--shadow-card);
-    }
+    /* Insignia de Rol */
+    .role-badge { padding: 6px 12px; border-radius: 20px; font-weight: 700; font-size: 0.85rem; display: flex; align-items: center; gap: 6px; box-shadow: var(--shadow-card); }
     .role-badge.mom { background: var(--mom-gradient); color: var(--mom-accent); border: 1px solid #fbcfe8; }
     .role-badge.dad { background: var(--dad-gradient); color: var(--dad-accent); border: 1px solid #bfdbfe; }
 
@@ -75,11 +72,7 @@
     .week-day-label { text-align: center; font-weight: 700; font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; }
 
     /* TARJETA DÍA */
-    .day-card {
-      aspect-ratio: 4/5; border-radius: 20px; padding: 10px; position: relative; cursor: pointer;
-      background: #fff; border: 1px solid rgba(0,0,0,0.03); box-shadow: var(--shadow-card);
-      display: flex; flex-direction: column; justify-content: space-between; overflow: hidden;
-    }
+    .day-card { aspect-ratio: 4/5; border-radius: 20px; padding: 10px; position: relative; cursor: pointer; background: #fff; border: 1px solid rgba(0,0,0,0.03); box-shadow: var(--shadow-card); display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; }
     .day-card.empty { background: transparent; border: none; box-shadow: none; pointer-events: none; }
     .is-mom { background: var(--mom-gradient); border-color: var(--mom-accent); }
     .is-dad { background: var(--dad-gradient); border-color: var(--dad-accent); }
@@ -89,7 +82,6 @@
     .events-container { display: flex; flex-wrap: wrap; gap: 4px; position: relative; z-index: 2; margin-top: auto; }
     .event-chip { height: 24px; padding: 0 8px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
     .event-chip svg { width: 14px; height: 14px; }
-    /* Colores Chips */
     .chip-medico { background: #ef4444; } .chip-dentista { background: #0ea5e9; } .chip-escuela { background: #f97316; } .chip-deporte { background: #8b5cf6; } .chip-cumple { background: #eab308; } .chip-parque { background: #84cc16; } .chip-general { background: #64748b; } .chip-vacaciones { background: #06b6d4; }
 
     /* --- SIDEBAR & SOLICITUDES --- */
@@ -97,12 +89,9 @@
     .glass-panel { background: #fff; border-radius: 24px; padding: 24px; border: 1px solid #f3f4f6; box-shadow: var(--shadow-card); }
     .panel-title { font-size: 1.1rem; font-weight: 800; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
 
-    /* NUEVO: Estilos Lista Solicitudes */
+    /* Estilos Lista Solicitudes */
     .requests-list-container { display: flex; flex-direction: column; gap: 12px; max-height: 400px; overflow-y: auto; }
-    .request-item {
-        padding: 16px; background: #f8f9fc; border-radius: 16px; border: 1px solid #e5e7eb;
-        font-size: 0.9rem; transition: all 0.3s ease; position: relative;
-    }
+    .request-item { padding: 16px; background: #f8f9fc; border-radius: 16px; border: 1px solid #e5e7eb; font-size: 0.9rem; transition: all 0.3s ease; position: relative; }
     .request-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
     .request-dates { font-weight: 700; font-size: 1rem; color: var(--text-main); }
     .req-status { font-size: 0.7rem; padding: 4px 10px; border-radius: 99px; text-transform: uppercase; font-weight: 700; }
@@ -111,18 +100,18 @@
     .req-status.rechazada { background: #fee2e2; color: #991b1b; }
     .request-meta { font-size: 0.8rem; color: var(--text-muted); margin-top: 8px; display: flex; justify-content: space-between; align-items: center;}
     
-    /* NUEVO: Estilo para solicitud que requiere MI atención */
-    .request-item.needs-action {
-        border: 2px solid var(--primary);
-        background: #eef2ff; /* Fondo azul claro */
-        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
-        animation: subtlePulse 2s infinite;
-    }
+    /* Estilo para solicitud que requiere MI atención */
+    .request-item.needs-action { border: 2px solid var(--primary); background: #eef2ff; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15); animation: subtlePulse 2s infinite; }
     @keyframes subtlePulse { 0% { background: #eef2ff; } 50% { background: #e0e7ff; } 100% { background: #eef2ff; } }
-    .action-tag { font-size: 0.7rem; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 4px; }
+    
+    /* NUEVO: Botones de Acción en Solicitudes */
+    .request-actions { display: flex; gap: 8px; margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(0,0,0,0.05); }
+    .btn-action { flex: 1; padding: 10px; border-radius: 12px; border: none; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: transform 0.1s; }
+    .btn-action:active { transform: scale(0.97); }
+    .btn-action.approve { background: #dcfce7; color: #166534; }
+    .btn-action.reject { background: #fee2e2; color: #991b1b; }
 
-
-    /* --- MODAL & RESPONSIVE (Sin cambios mayores) --- */
+    /* --- MODAL & RESPONSIVE --- */
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(8px); z-index: 3000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: all 0.3s; }
     .modal-overlay.open { opacity: 1; pointer-events: auto; }
     .modal-card { background: #fff; width: 90%; max-width: 480px; border-radius: 32px; padding: 32px; box-shadow: var(--shadow-hover); transform: scale(0.95); transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
@@ -156,11 +145,8 @@
     </div>
     <div class="user-menu">
       <div id="user-role-indicator" class="role-badge hidden"></div>
-      
       <select id="year-select" class="btn-icon-subtle" style="border:none; padding: 8px 16px;"></select>
-      <button id="logout-btn" class="btn-icon-subtle" style="color:#ef4444; background:#fef2f2;">
-        <i data-lucide="log-out" style="width:16px;"></i>
-      </button>
+      <button id="logout-btn" class="btn-icon-subtle" style="color:#ef4444; background:#fef2f2;"><i data-lucide="log-out" style="width:16px;"></i></button>
     </div>
   </header>
 
@@ -192,9 +178,7 @@
       </div>
 
       <div class="glass-panel">
-        <div class="panel-title">
-            <i data-lucide="list-checks" style="color:var(--primary)"></i> Estado Solicitudes
-        </div>
+        <div class="panel-title"><i data-lucide="list-checks" style="color:var(--primary)"></i> Estado Solicitudes</div>
         <div id="requests-status-list" class="requests-list-container">
             <div style="text-align:center; color:var(--text-muted); padding:20px;">Cargando...</div>
         </div>
@@ -228,16 +212,16 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 
 <script>
-  // ==========================================
-  // CONFIGURACIÓN DE ROLES (¡IMPORTANTE!)
-  // ==========================================
-  // SUSTITUYE ESTOS EMAILS por los que usáis para hacer login en la app.
-  // Esto es necesario para saber quién es quién y qué solicitudes remarcar.
+  // ==========================================================
+  // ⚙️ CONFIGURACIÓN DE ROLES (¡IMPRESCINDIBLE EDITAR!) ⚙️
+  // ==========================================================
+  // Pon aquí los emails REALES que usáis para hacer login.
+  // Si no lo haces, los botones de aprobar/rechazar NO aparecerán.
   const USER_ROLES = {
       'moya@custodia.com': 'padre',  // <-- PON AQUÍ EL EMAIL REAL DEL PADRE
       'alessia@custodia.com': 'madre'   // <-- PON AQUÍ EL EMAIL REAL DE LA MADRE
   };
-  // ==========================================
+  // ==========================================================
 
   const firebaseConfig = { apiKey: "AIzaSyAwgk4_l0zvaCUCgm1CjqqqXjJHr5KPBjc", authDomain: "custodia-familiar.firebaseapp.com", projectId: "custodia-familiar", storageBucket: "custodia-familiar.firebasestorage.app", messagingSenderId: "1038952432258", appId: "1:1038952432258:web:7608d6a48d8ad8308a6a9b" };
   firebase.initializeApp(firebaseConfig); const db = firebase.firestore(); const auth = firebase.auth();
@@ -245,9 +229,7 @@
 
   let todayInit = new Date(); let currentYear = todayInit.getFullYear(); let currentMonth = todayInit.getMonth(); if (currentYear < 2025) currentYear = 2025;
   let overrides={}, eventsData={}; let selectedDateKey=null, selectedIconType='medico';
-  // VARIABLES NUEVAS PARA USUARIO ACTUAL
-  let currentUserEmail = null;
-  let currentUserRole = null; // 'padre', 'madre', o null
+  let currentUserEmail = null; let currentUserRole = null;
 
   const monthNames = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
   const BASE_MONDAY = new Date(2026, 0, 5, 12, 0, 0); 
@@ -255,7 +237,7 @@
   function getBaseOwner(y,m,d) { const date = new Date(y, m, d, 12, 0, 0); if(date.getFullYear()<2025 || date.getFullYear()>2027) return null; const diff = Math.round((date - BASE_MONDAY)/(1000*60*60*24)); return (Math.floor(diff/7)%2 === 0) ? "padre" : "madre"; }
   function getIconName(t) { const m={'medico':'stethoscope','dentista':'smile','escuela':'backpack','deporte':'trophy','cumple':'cake','parque':'tree-deciduous','general':'star','vacaciones':'palmtree'}; return m[t]||'circle'; }
 
-  // RENDER CALENDARIO (Sin cambios sustanciales)
+  // RENDER CALENDARIO
   function renderCalendar() {
     const grid = document.getElementById("calendar-grid"); document.getElementById("calendar-title").textContent = `${monthNames[currentMonth]} ${currentYear}`; grid.innerHTML = "";
     const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate(); const firstDay = new Date(currentYear, currentMonth, 1).getDay(); const startOffset = (firstDay === 0) ? 6 : firstDay - 1;
@@ -275,7 +257,7 @@
     return card;
   }
 
-  // MODAL (Sin cambios sustanciales)
+  // MODAL
   function openDayModal(dateKey, owner) { selectedDateKey = dateKey; document.getElementById("day-modal").classList.add("open"); const dObj = new Date(dateKey); document.getElementById("modal-date-title").textContent = dObj.toLocaleDateString('es-ES', {weekday:'long', day:'numeric', month:'long'}); document.getElementById("modal-custody-header-container").innerHTML = `<div style="display:flex;align-items:center;gap:20px;padding:20px;border-radius:24px;margin-bottom:24px;background:${owner==='madre'?'var(--mom-gradient)':'var(--dad-gradient)'}"><img src="${owner==='madre'?IMG_MOM:IMG_DAD}" style="width:80px;height:80px;border-radius:50%;background:#fff;padding:4px;box-shadow:var(--shadow-card);"><div><div style="font-size:0.9rem;font-weight:700;opacity:0.7;text-transform:uppercase;">Día de</div><div style="font-size:1.8rem;font-weight:900;">${owner==='madre'?'Mamá':'Papá'}</div></div></div>`; renderEventsList(); }
   function closeModal() { document.getElementById("day-modal").classList.remove("open"); }
   function selectIcon(t,el) { selectedIconType=t; document.querySelectorAll('.select-item').forEach(b=>b.classList.remove('selected')); el.classList.add('selected'); }
@@ -284,129 +266,133 @@
   async function delEv(id){if(confirm("¿Eliminar?")){await db.collection("events").doc(id).delete(); renderEventsList();}}
 
   // ==================================================
-  // NUEVA LÓGICA: SOLICITUDES Y ROLES
+  // LÓGICA DE SOLICITUDES COMPLETA
   // ==================================================
 
-  // 1. Actualizar Insignia en Header
   function updateHeaderRoleIndicator() {
       const indicator = document.getElementById("user-role-indicator");
-      if (currentUserRole === 'padre') {
-          indicator.innerHTML = '<i data-lucide="shield" style="width:16px;"></i> Padre';
-          indicator.className = 'role-badge dad';
-      } else if (currentUserRole === 'madre') {
-          indicator.innerHTML = '<i data-lucide="heart" style="width:16px;"></i> Madre';
-          indicator.className = 'role-badge mom';
-      } else {
-          indicator.className = 'hidden';
-      }
+      if (currentUserRole === 'padre') { indicator.innerHTML = '<i data-lucide="shield" style="width:16px;"></i> Padre'; indicator.className = 'role-badge dad'; } 
+      else if (currentUserRole === 'madre') { indicator.innerHTML = '<i data-lucide="heart" style="width:16px;"></i> Madre'; indicator.className = 'role-badge mom'; } 
+      else { indicator.className = 'hidden'; }
       lucide.createIcons();
   }
 
-  // 2. Enviar Solicitud (Guardando quién la pide)
   document.getElementById("request-form-sidebar").addEventListener("submit", async e => {
       e.preventDefault();
       const start = document.getElementById("req-start").value;
       const end = document.getElementById("req-end").value;
-      const reason = document.getElementById("req-reason").value;
       if(!start || !end) return alert("Selecciona fechas");
-
       try {
-          await db.collection("requests").add({
-              startDate: start,
-              endDate: end,
-              reason: reason || "Sin motivo",
-              status: 'pendiente',
-              requesterEmail: currentUserEmail, // GUARDAMOS QUIÉN LO PIDE
-              createdAt: firebase.firestore.FieldValue.serverTimestamp()
-          });
-          alert("Solicitud enviada correctamente");
-          document.getElementById("request-form-sidebar").reset();
-      } catch (error) {
-          console.error("Error al solicitar:", error);
-          alert("Error al enviar solicitud");
-      }
+          await db.collection("requests").add({ startDate: start, endDate: end, reason: document.getElementById("req-reason").value || "Sin motivo", status: 'pendiente', requesterEmail: currentUserEmail, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+          alert("Solicitud enviada"); document.getElementById("request-form-sidebar").reset();
+      } catch (error) { console.error(error); alert("Error al enviar"); }
   });
 
-  // 3. Renderizar Lista de Solicitudes (Con lógica de resaltado)
+  // FUNCIÓN CLAVE: Procesar Aprobación/Rechazo
+  async function processRequest(requestId, newStatus) {
+    if(!confirm(`¿Estás seguro de que quieres marcar esto como ${newStatus}?`)) return;
+
+    try {
+        // 1. Obtener datos de la solicitud
+        const reqDoc = await db.collection("requests").doc(requestId).get();
+        const reqData = reqDoc.data();
+
+        // 2. Si se APRUEBA, hay que cambiar el calendario (crear overrides)
+        if (newStatus === 'aprobada') {
+            const requesterRole = USER_ROLES[reqData.requesterEmail];
+            if(!requesterRole) { alert("Error crítico: No se puede determinar el rol del solicitante. Revisa la configuración USER_ROLES."); return; }
+
+            const start = new Date(reqData.startDate);
+            const end = new Date(reqData.endDate);
+            const batch = db.batch(); // Usamos batch para que sea todo o nada
+
+            // Iterar por cada día del rango
+            for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+                const year = d.getFullYear();
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                const dayStr = String(d.getDate()).padStart(2, '0');
+                const dateKey = `${year}-${month}-${dayStr}`;
+
+                // El nuevo dueño es quien lo pidió
+                const newOwner = (requesterRole === 'padre') ? 'padre' : 'madre';
+
+                // Crear/Sobreescribir el documento de override para ese día
+                const overrideRef = db.collection("overrides").doc(dateKey);
+                batch.set(overrideRef, { owner: newOwner });
+            }
+            // Ejecutar todos los cambios de calendario
+            await batch.commit();
+        }
+
+        // 3. Finalmente, actualizar el estado de la solicitud
+        await db.collection("requests").doc(requestId).update({ status: newStatus });
+        
+    } catch (error) {
+        console.error("Error procesando solicitud:", error);
+        alert("Hubo un error al procesar la solicitud.");
+    }
+  }
+
+
   function renderRequestsList(docs) {
-      const container = document.getElementById("requests-status-list");
-      container.innerHTML = "";
-      if (docs.length === 0) {
-          container.innerHTML = "<div style='text-align:center;color:var(--text-muted);padding:20px;font-style:italic;'>No hay solicitudes recientes.</div>";
-          return;
-      }
+      const container = document.getElementById("requests-status-list"); container.innerHTML = "";
+      if (docs.length === 0) { container.innerHTML = "<div style='text-align:center;color:var(--text-muted);padding:20px;font-style:italic;'>No hay solicitudes recientes.</div>"; return; }
 
       docs.forEach(doc => {
           const data = doc.data();
           const isMyRequest = data.requesterEmail === currentUserEmail;
           const isPending = data.status === 'pendiente';
-          
-          // LÓGICA CLAVE: ¿Requiere MI acción?
-          // Si está pendiente Y NO la pedí yo Y tengo un rol definido (padre/madre), entonces me toca a mí.
+          // Si está pendiente, NO la pedí yo, y tengo un rol conocido, me toca a mí.
           const needsMyAction = isPending && !isMyRequest && (currentUserRole === 'padre' || currentUserRole === 'madre');
 
           const item = document.createElement("div");
-          // Añadimos clase especial si requiere acción
           item.className = `request-item ${needsMyAction ? 'needs-action' : ''}`;
           
-          // Formatear fechas un poco mejor
           const startF = new Date(data.startDate).toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit'});
           const endF = new Date(data.endDate).toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit'});
 
-          let actionLabel = '';
+          let metaInfo = isMyRequest ? 'Solicitado por ti' : 'Solicitado por la otra parte';
+          if(needsMyAction) metaInfo = `<strong>Requiere tu aprobación</strong>`;
+
+          // NUEVO: Generar botones si requiere acción
+          let actionButtonsHTML = '';
           if(needsMyAction) {
-             actionLabel = `<div class="action-tag"><i data-lucide="alert-circle" style="width:14px;"></i> Requiere tu aprobación</div>`;
-          } else if (isMyRequest && isPending) {
-             actionLabel = `<div style="font-size:0.7rem;color:var(--text-muted);">Esperando respuesta...</div>`;
+              actionButtonsHTML = `
+                <div class="request-actions">
+                  <button onclick="processRequest('${doc.id}', 'aprobada')" class="btn-action approve"><i data-lucide="check"></i> Aprobar</button>
+                  <button onclick="processRequest('${doc.id}', 'rechazada')" class="btn-action reject"><i data-lucide="x"></i> Rechazar</button>
+                </div>
+              `;
           }
 
           item.innerHTML = `
-              <div class="request-header">
-                  <div class="request-dates">${startF} - ${endF}</div>
-                  <div class="req-status ${data.status}">${data.status}</div>
-              </div>
+              <div class="request-header"><div class="request-dates">${startF} - ${endF}</div><div class="req-status ${data.status}">${data.status}</div></div>
               <div style="font-size:0.85rem; margin-bottom:8px;">"${data.reason}"</div>
-              <div class="request-meta">
-                  <div>${isMyRequest ? 'Solicitado por ti' : 'Solicitado por la otra parte'}</div>
-                  ${actionLabel}
-              </div>
+              <div class="request-meta"><div>${metaInfo}</div></div>
+              ${actionButtonsHTML}
           `;
           container.appendChild(item);
       });
       lucide.createIcons();
   }
 
-
-  // AUTH STATE & LISTENERS
+  // AUTH STATE
   auth.onAuthStateChanged(u=>{
     if(u){
-      // USUARIO LOGUEADO
       currentUserEmail = u.email;
-      // Determinamos el rol basado en la configuración inicial
-      currentUserRole = USER_ROLES[currentUserEmail] || null;
-      
-      document.getElementById("login-view").classList.add("hidden");
-      document.getElementById("app-root").classList.remove("hidden");
-      
-      updateHeaderRoleIndicator(); // Actualizar header
-
+      currentUserRole = USER_ROLES[currentUserEmail] || null; // Determinar rol
+      document.getElementById("login-view").classList.add("hidden"); document.getElementById("app-root").classList.remove("hidden");
+      updateHeaderRoleIndicator();
       db.collection("overrides").onSnapshot(s=>{overrides={};s.forEach(d=>overrides[d.id]=d.data().owner);renderCalendar();});
       db.collection("events").orderBy("createdAt").onSnapshot(s=>{eventsData={};s.forEach(d=>{const v=d.data();if(!eventsData[v.date])eventsData[v.date]=[];eventsData[v.date].push({id:d.id,...v})});renderCalendar();});
-      
-      // LISTENER DE SOLICITUDES ACTUALIZADO
-      db.collection("requests").orderBy("createdAt","desc").limit(10).onSnapshot(snapshot => {
-        renderRequestsList(snapshot.docs);
-      });
-
+      db.collection("requests").orderBy("createdAt","desc").limit(10).onSnapshot(snapshot => renderRequestsList(snapshot.docs));
     } else {
-      // USUARIO NO LOGUEADO
       currentUserEmail = null; currentUserRole = null;
-      document.getElementById("login-view").classList.remove("hidden");
-      document.getElementById("app-root").classList.add("hidden");
+      document.getElementById("login-view").classList.remove("hidden"); document.getElementById("app-root").classList.add("hidden");
     }
   });
 
-  // SWIPE & BOTONES (Igual)
+  // SWIPE & BASIC EVENTS
   const el=document.getElementById("calendar-wrapper-swipe"); let sx=0,sy=0; el.addEventListener('touchstart',e=>{sx=e.changedTouches[0].screenX;sy=e.changedTouches[0].screenY},{passive:true}); el.addEventListener('touchend',e=>{const dx=sx-e.changedTouches[0].screenX,dy=sy-e.changedTouches[0].screenY;if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>50){dx>0?currentMonth++:currentMonth--;chkM();renderCalendar();}},{passive:true}); function chkM(){if(currentMonth>11){currentMonth=0;currentYear++}if(currentMonth<0){currentMonth=11;currentYear--}}
   document.getElementById("login-form").addEventListener("submit",e=>{e.preventDefault();auth.signInWithEmailAndPassword(document.getElementById("login-email").value,document.getElementById("login-password").value).catch(err=>document.getElementById("login-error").textContent="Credenciales incorrectas");}); document.getElementById("logout-btn").onclick=()=>auth.signOut(); document.getElementById("prev-period").onclick=()=>{currentMonth--;chkM();renderCalendar();}; document.getElementById("next-period").onclick=()=>{currentMonth++;chkM();renderCalendar();}; const ys=document.getElementById("year-select");[2025,2026,2027].forEach(y=>{const o=document.createElement("option");o.value=y;o.textContent=y;if(y===currentYear)o.selected=true;ys.appendChild(o)});ys.onchange=e=>{currentYear=parseInt(e.target.value);renderCalendar();}; renderCalendar();
 </script>

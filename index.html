@@ -1,403 +1,650 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <title>Custodia Familiar Alberto</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' x='0.1em' font-size='80'%3E%F0%9F%91%A8%E2%80%8D%F0%9F%91%A9%E2%80%8D%F0%9F%91%A7%E2%80%8D%F0%9F%91%A6%3C/text%3E%3C/svg%3E">
-  
-  <script src="https://unpkg.com/lucide@latest"></script>
+import React, { useState, useEffect, useMemo } from 'react';
+import { initializeApp } from 'firebase/app';
+import { 
+  getAuth, 
+  onAuthStateChanged, 
+  signInAnonymously, 
+  signInWithCustomToken,
+  signOut 
+} from 'firebase/auth';
+import { 
+  getFirestore, 
+  collection, 
+  doc, 
+  onSnapshot, 
+  setDoc, 
+  addDoc, 
+  updateDoc, 
+  deleteDoc, 
+  query, 
+  serverTimestamp 
+} from 'firebase/firestore';
+import { 
+  Calendar as CalendarIcon, 
+  ChevronLeft, 
+  ChevronRight, 
+  Heart, 
+  Shield, 
+  LogOut, 
+  Plus, 
+  Stethoscope, 
+  Smile, 
+  Backpack, 
+  Trophy, 
+  Cake, 
+  TreeDeciduous, 
+  Star, 
+  Palmtree, 
+  Trash2, 
+  Check, 
+  X,
+  MessageSquare,
+  Sparkles,
+  Info
+} from 'lucide-react';
 
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+// --- CONFIGURACIÓN Y CONSTANTES ---
+const firebaseConfig = JSON.parse(__firebase_config);
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const appId = typeof __app_id !== 'undefined' ? __app_id : 'custodia-familiar-alberto';
 
-  <style>
-    :root {
-      /* PALETA PREMIUM */
-      --primary: #6366f1;
-      --bg-app: #f8f9fc;
-      --text-main: #111827;
-      --text-muted: #6b7280;
-      
-      /* CUSTODIA - DEGRADADOS */
-      --mom-gradient: linear-gradient(135deg, #fff0f6 0%, #ffe3e8 100%);
-      --mom-accent: #db2777;
-      --dad-gradient: linear-gradient(135deg, #f0f7ff 0%, #dbeafe 100%);
-      --dad-accent: #2563eb;
+const USER_ROLES = {
+  'padre': { label: 'Papá', color: 'blue', icon: Shield, gradient: 'from-blue-50 to-blue-100', accent: 'text-blue-600', border: 'border-blue-200' },
+  'madre': { label: 'Mamá', color: 'pink', icon: Heart, gradient: 'from-pink-50 to-pink-100', accent: 'text-pink-600', border: 'border-pink-200' }
+};
 
-      /* SOMBRAS & RADIOS */
-      --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-      --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
-      --radius-card: 24px;
-    }
+const EVENT_TYPES = {
+  medico: { icon: Stethoscope, color: 'bg-red-500', label: 'Médico' },
+  dentista: { icon: Smile, color: 'bg-sky-500', label: 'Dentista' },
+  escuela: { icon: Backpack, color: 'bg-orange-500', label: 'Colegio' },
+  deporte: { icon: Trophy, color: 'bg-purple-500', label: 'Deporte' },
+  cumple: { icon: Cake, color: 'bg-yellow-500', label: 'Fiesta' },
+  parque: { icon: TreeDeciduous, color: 'bg-green-500', label: 'Parque' },
+  general: { icon: Star, color: 'bg-slate-500', label: 'Otro' },
+  vacaciones: { icon: Palmtree, color: 'bg-cyan-500', label: 'Viaje' }
+};
 
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    
-    body {
-      margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-app); color: var(--text-main);
-      min-height: 100vh; display: flex; flex-direction: column; padding-bottom: 40px;
-    }
-    .hidden { display: none !important; }
+const BASE_MONDAY = new Date(2026, 0, 5, 12, 0, 0); // Lunes de referencia (Custodia Papá)
 
-    /* --- LOGIN --- */
-    .login-wrapper { position: fixed; inset: 0; z-index: 2000; background: #fff; display: flex; align-items: center; justify-content: center; padding: 24px; }
-    .login-box { width: 100%; max-width: 380px; text-align: center; }
-    .input-modern { width: 100%; padding: 16px 20px; margin-bottom: 12px; background: #f3f4f6; border: 2px solid transparent; border-radius: 16px; font-size: 1rem; font-family: inherit; transition: all 0.2s; }
-    .input-modern:focus { background: #fff; border-color: var(--primary); outline: none; }
-    .btn-modern { width: 100%; padding: 16px; background: var(--text-main); color: #fff; border: none; border-radius: 16px; font-weight: 700; font-size: 1rem; cursor: pointer; }
+// --- UTILIDADES ---
+const formatDateKey = (date) => {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+};
 
-    /* --- HEADER --- */
-    .app-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; }
-    .brand-logo { font-size: 1.3rem; font-weight: 800; display: flex; align-items: center; gap: 8px; }
-    .user-menu { display: flex; gap: 12px; align-items: center; }
-    .btn-icon-subtle { background: #fff; border: 1px solid #e5e7eb; color: var(--text-main); padding: 8px 12px; border-radius: 99px; font-weight: 600; font-size: 0.9rem; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: var(--shadow-card); }
-    
-    /* Insignia de Rol */
-    .role-badge { padding: 6px 12px; border-radius: 20px; font-weight: 700; font-size: 0.85rem; display: flex; align-items: center; gap: 6px; box-shadow: var(--shadow-card); }
-    .role-badge.mom { background: var(--mom-gradient); color: var(--mom-accent); border: 1px solid #fbcfe8; }
-    .role-badge.dad { background: var(--dad-gradient); color: var(--dad-accent); border: 1px solid #bfdbfe; }
+const getBaseOwner = (date) => {
+  const diff = Math.round((date - BASE_MONDAY) / (1000 * 60 * 60 * 24));
+  return (Math.floor(diff / 7) % 2 === 0) ? "padre" : "madre";
+};
 
+// --- COMPONENTES PRINCIPALES ---
 
-    /* --- LAYOUT & CALENDARIO --- */
-    .main-container { max-width: 1100px; margin: 0 auto; width: 100%; padding: 0 24px; display: grid; gap: 32px; grid-template-columns: 1fr; }
-    @media(min-width: 900px) { .main-container { grid-template-columns: 3fr 1fr; } }
-    
-    .calendar-section { background: #fff; border-radius: 32px; padding: 24px; box-shadow: var(--shadow-card); }
-    .calendar-controls { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
-    .month-heading { font-size: 1.8rem; font-weight: 800; text-transform: capitalize; }
-    .nav-circle-btn { width: 44px; height: 44px; border-radius: 50%; background: #f3f4f6; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-main); }
-    
-    .week-header, .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 12px; }
-    .week-header { margin-bottom: 12px; }
-    .week-day-label { text-align: center; font-weight: 700; font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; }
+export default function App() {
+  const [user, setUser] = useState(null);
+  const [role, setRole] = useState(null); // 'padre' o 'madre'
+  const [viewDate, setViewDate] = useState(new Date());
+  const [events, setEvents] = useState({});
+  const [overrides, setOverrides] = useState({});
+  const [requests, setRequests] = useState([]);
+  const [selectedDay, setSelectedDay] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [notification, setNotification] = useState(null);
+  const [aiAnalysis, setAiAnalysis] = useState("");
+  const [isAiLoading, setIsAiLoading] = useState(false);
 
-    /* TARJETA DÍA */
-    .day-card { aspect-ratio: 4/5; border-radius: 20px; padding: 10px; position: relative; cursor: pointer; background: #fff; border: 1px solid rgba(0,0,0,0.03); box-shadow: var(--shadow-card); display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; }
-    .day-card.empty { background: transparent; border: none; box-shadow: none; pointer-events: none; }
-    .is-mom { background: var(--mom-gradient); border-color: var(--mom-accent); }
-    .is-dad { background: var(--dad-gradient); border-color: var(--dad-accent); }
-    .is-today { box-shadow: 0 0 0 3px var(--primary) !important; }
-    .day-number { font-weight: 800; font-size: 1.1rem; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.7); border-radius: 12px; backdrop-filter: blur(4px); position: relative; z-index: 2;}
-    .bg-illustration { position: absolute; bottom: -10px; right: -10px; width: 80%; height: 80%; object-fit: contain; opacity: 0.25; pointer-events: none; z-index: 0; }
-    .events-container { display: flex; flex-wrap: wrap; gap: 4px; position: relative; z-index: 2; margin-top: auto; }
-    .event-chip { height: 24px; padding: 0 8px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-    .event-chip svg { width: 14px; height: 14px; }
-    .chip-medico { background: #ef4444; } .chip-dentista { background: #0ea5e9; } .chip-escuela { background: #f97316; } .chip-deporte { background: #8b5cf6; } .chip-cumple { background: #eab308; } .chip-parque { background: #84cc16; } .chip-general { background: #64748b; } .chip-vacaciones { background: #06b6d4; }
-
-    /* --- SIDEBAR & SOLICITUDES --- */
-    .sidebar { display: flex; flex-direction: column; gap: 24px; }
-    .glass-panel { background: #fff; border-radius: 24px; padding: 24px; border: 1px solid #f3f4f6; box-shadow: var(--shadow-card); }
-    .panel-title { font-size: 1.1rem; font-weight: 800; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
-
-    /* Estilos Lista Solicitudes */
-    .requests-list-container { display: flex; flex-direction: column; gap: 12px; max-height: 400px; overflow-y: auto; }
-    .request-item { padding: 16px; background: #f8f9fc; border-radius: 16px; border: 1px solid #e5e7eb; font-size: 0.9rem; transition: all 0.3s ease; position: relative; }
-    .request-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-    .request-dates { font-weight: 700; font-size: 1rem; color: var(--text-main); }
-    .req-status { font-size: 0.7rem; padding: 4px 10px; border-radius: 99px; text-transform: uppercase; font-weight: 700; }
-    .req-status.pendiente { background: #fef3c7; color: #d97706; }
-    .req-status.aprobada { background: #dcfce7; color: #166534; }
-    .req-status.rechazada { background: #fee2e2; color: #991b1b; }
-    .request-meta { font-size: 0.8rem; color: var(--text-muted); margin-top: 8px; display: flex; justify-content: space-between; align-items: center;}
-    
-    /* Estilo para solicitud que requiere MI atención */
-    .request-item.needs-action { border: 2px solid var(--primary); background: #eef2ff; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15); animation: subtlePulse 2s infinite; }
-    @keyframes subtlePulse { 0% { background: #eef2ff; } 50% { background: #e0e7ff; } 100% { background: #eef2ff; } }
-    
-    /* Botones de Acción en Solicitudes */
-    .request-actions { display: flex; gap: 8px; margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(0,0,0,0.05); }
-    .btn-action { flex: 1; padding: 10px; border-radius: 12px; border: none; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: transform 0.1s; }
-    .btn-action:active { transform: scale(0.97); }
-    .btn-action.approve { background: #dcfce7; color: #166534; }
-    .btn-action.reject { background: #fee2e2; color: #991b1b; }
-
-    /* --- MODAL & RESPONSIVE --- */
-    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(8px); z-index: 3000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: all 0.3s; }
-    .modal-overlay.open { opacity: 1; pointer-events: auto; }
-    .modal-card { background: #fff; width: 90%; max-width: 480px; border-radius: 32px; padding: 32px; box-shadow: var(--shadow-hover); transform: scale(0.95); transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
-    .modal-overlay.open .modal-card { transform: scale(1); }
-    .selection-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
-    .select-item { aspect-ratio: 1; background: #f8f9fc; border-radius: 20px; border: 2px solid transparent; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; }
-    .select-item.selected { background: #eef2ff; border-color: var(--primary); color: var(--primary); }
-    @media (max-width: 768px) { .main-container { padding: 0 16px; gap: 20px; } .calendar-section { padding: 16px; } .days-grid, .week-header { gap: 8px; } .day-card { padding: 8px; } .app-header { padding: 16px; } .brand-logo { font-size: 1.1rem; } }
-  </style>
-</head>
-<body>
-
-<div id="login-view" class="login-wrapper">
-  <div class="login-box">
-    <div style="font-size:3rem; margin-bottom:1rem;">👨‍👩‍👧‍👦</div>
-    <h1 style="font-size:1.5rem; font-weight:800; margin-bottom:0.5rem;">Custodia Familiar Alberto</h1>
-    <form id="login-form">
-      <input type="email" id="login-email" class="input-modern" required placeholder="Correo electrónico">
-      <input type="password" id="login-password" class="input-modern" required placeholder="Contraseña">
-      <button type="submit" class="btn-modern" style="margin-top:16px;">Entrar</button>
-      <div id="login-error" style="color:#ef4444; margin-top:20px; font-weight:600; font-size:0.9rem;"></div>
-    </form>
-  </div>
-</div>
-
-<div id="app-root" class="hidden">
-  <header class="app-header">
-    <div class="brand-logo">
-      <i data-lucide="calendar-heart" style="color:var(--primary);"></i>
-      <span>Custodia Familiar Alberto</span>
-    </div>
-    <div class="user-menu">
-      <div id="user-role-indicator" class="role-badge hidden"></div>
-      <select id="year-select" class="btn-icon-subtle" style="border:none; padding: 8px 16px;"></select>
-      <button id="logout-btn" class="btn-icon-subtle" style="color:#ef4444; background:#fef2f2;"><i data-lucide="log-out" style="width:16px;"></i></button>
-    </div>
-  </header>
-
-  <main class="main-container">
-    <section class="calendar-section" id="calendar-wrapper-swipe">
-      <div class="calendar-controls">
-        <button id="prev-period" class="nav-circle-btn"><i data-lucide="chevron-left"></i></button>
-        <div id="calendar-title" class="month-heading"></div>
-        <button id="next-period" class="nav-circle-btn"><i data-lucide="chevron-right"></i></button>
-      </div>
-      <div class="week-header">
-        <div class="week-day-label">Lun</div><div class="week-day-label">Mar</div><div class="week-day-label">Mié</div>
-        <div class="week-day-label">Jue</div><div class="week-day-label">Vie</div><div class="week-day-label">Sáb</div><div class="week-day-label">Dom</div>
-      </div>
-      <div id="calendar-grid" class="days-grid"></div>
-    </section>
-
-    <aside class="sidebar">
-      <div class="glass-panel">
-        <div class="panel-title"><i data-lucide="git-pull-request" style="color:var(--primary)"></i> Solicitar Cambio</div>
-        <form id="request-form-sidebar">
-          <div style="display:flex; gap:12px; margin-bottom:12px;">
-            <input type="date" id="req-start" class="input-modern" style="margin:0; padding:12px;" required>
-            <input type="date" id="req-end" class="input-modern" style="margin:0; padding:12px;" required>
-          </div>
-          <input type="text" id="req-reason" class="input-modern" placeholder="Motivo (opcional)">
-          <button type="submit" class="btn-modern" style="padding:12px; font-size:0.9rem;">Enviar Solicitud</button>
-        </form>
-      </div>
-
-      <div class="glass-panel">
-        <div class="panel-title"><i data-lucide="list-checks" style="color:var(--primary)"></i> Estado Solicitudes</div>
-        <div id="requests-status-list" class="requests-list-container">
-            <div style="text-align:center; color:var(--text-muted); padding:20px;">Cargando...</div>
-        </div>
-      </div>
-    </aside>
-  </main>
-</div>
-
-<div class="modal-overlay" id="day-modal">
-  <div class="modal-card">
-    <div style="display:flex; justify-content:space-between; margin-bottom:24px;"><h2 id="modal-date-title" style="margin:0;">Fecha</h2><button onclick="closeModal()" style="border:none;background:#f3f4f6;width:40px;height:40px;border-radius:50%;cursor:pointer;">X</button></div>
-    <div id="modal-custody-header-container"></div>
-    <input type="text" id="event-title" class="input-modern" placeholder="Añadir evento..." style="font-size:1.1rem;">
-    <div class="selection-grid">
-      <div class="select-item selected" onclick="selectIcon('medico',this)"><i data-lucide="stethoscope" style="color:#ef4444"></i><span>Médico</span></div>
-      <div class="select-item" onclick="selectIcon('dentista',this)"><i data-lucide="smile" style="color:#0ea5e9"></i><span>Dentista</span></div>
-      <div class="select-item" onclick="selectIcon('escuela',this)"><i data-lucide="backpack" style="color:#f97316"></i><span>Colegio</span></div>
-      <div class="select-item" onclick="selectIcon('deporte',this)"><i data-lucide="trophy" style="color:#8b5cf6"></i><span>Deporte</span></div>
-      <div class="select-item" onclick="selectIcon('cumple',this)"><i data-lucide="cake" style="color:#eab308"></i><span>Fiesta</span></div>
-      <div class="select-item" onclick="selectIcon('parque',this)"><i data-lucide="tree-deciduous" style="color:#84cc16"></i><span>Parque</span></div>
-      <div class="select-item" onclick="selectIcon('general',this)"><i data-lucide="star" style="color:#64748b"></i><span>Otro</span></div>
-      <div class="select-item" onclick="selectIcon('vacaciones',this)"><i data-lucide="palmtree" style="color:#06b6d4"></i><span>Viaje</span></div>
-    </div>
-    <button onclick="saveEvent()" class="btn-modern" style="margin-bottom:24px;">Guardar</button>
-    <div id="modal-event-list"></div>
-  </div>
-</div>
-
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-
-<script>
-  // ==========================================================
-  // ⚙️ CONFIGURACIÓN DE ROLES (¡IMPRESCINDIBLE EDITAR!) ⚙️
-  // ==========================================================
-  // Pon aquí los emails REALES que usáis para hacer login.
-  // Si no lo haces, los botones de aprobar/rechazar NO aparecerán.
-  const USER_ROLES = {
-      'moya@custodia.com': 'padre', 
-      'alessia@custodia.com': 'madre'
-  };
-  // ==========================================================
-
-  // Configuración de Firebase original (NO TOCAR)
-  const firebaseConfig = { apiKey: "AIzaSyAwgk4_l0zvaCUCgm1CjqqqXjJHr5KPBjc", authDomain: "custodia-familiar.firebaseapp.com", projectId: "custodia-familiar", storageBucket: "custodia-familiar.firebasestorage.app", messagingSenderId: "1038952432258", appId: "1:1038952432258:web:7608d6a48d8ad8308a6a9b" };
-  firebase.initializeApp(firebaseConfig); const db = firebase.firestore(); const auth = firebase.auth();
-  const IMG_MOM = "assets/madre.png"; const IMG_DAD = "assets/padre.png";
-
-  let todayInit = new Date(); let currentYear = todayInit.getFullYear(); let currentMonth = todayInit.getMonth(); if (currentYear < 2025) currentYear = 2025;
-  let overrides={}, eventsData={}; let selectedDateKey=null, selectedIconType='medico';
-  let currentUserEmail = null; let currentUserRole = null;
-
-  const monthNames = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
-  const BASE_MONDAY = new Date(2026, 0, 5, 12, 0, 0); 
-
-  function getBaseOwner(y,m,d) { const date = new Date(y, m, d, 12, 0, 0); if(date.getFullYear()<2025 || date.getFullYear()>2027) return null; const diff = Math.round((date - BASE_MONDAY)/(1000*60*60*24)); return (Math.floor(diff/7)%2 === 0) ? "padre" : "madre"; }
-  function getIconName(t) { const m={'medico':'stethoscope','dentista':'smile','escuela':'backpack','deporte':'trophy','cumple':'cake','parque':'tree-deciduous','general':'star','vacaciones':'palmtree'}; return m[t]||'circle'; }
-
-  // RENDER CALENDARIO
-  function renderCalendar() {
-    const grid = document.getElementById("calendar-grid"); document.getElementById("calendar-title").textContent = `${monthNames[currentMonth]} ${currentYear}`; grid.innerHTML = "";
-    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate(); const firstDay = new Date(currentYear, currentMonth, 1).getDay(); const startOffset = (firstDay === 0) ? 6 : firstDay - 1;
-    for(let i=0; i<startOffset; i++) grid.appendChild(createDayCard(null));
-    for(let day=1; day<=daysInMonth; day++) grid.appendChild(createDayCard(day));
-    lucide.createIcons();
-  }
-
-  function createDayCard(day) {
-    const card = document.createElement("div"); card.className = "day-card"; if(day === null) { card.classList.add("empty"); return card; }
-    const y=currentYear, m=currentMonth, d=day; const dKey = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-    const owner = overrides[dKey] || getBaseOwner(y,m,d); const isToday = (dKey === `${todayInit.getFullYear()}-${String(todayInit.getMonth()+1).padStart(2,'0')}-${String(todayInit.getDate()).padStart(2,'0')}`);
-    if(owner === "madre") card.classList.add("is-mom"); if(owner === "padre") card.classList.add("is-dad"); if(isToday) card.classList.add("is-today");
-    card.onclick = () => openDayModal(dKey, owner);
-    card.innerHTML = `<div style="display:flex;justify-content:space-between;position:relative;z-index:2;"><div class="day-number">${d}</div><i data-lucide="${owner==='madre'?'heart':'shield'}" style="color:${owner==='madre'?'var(--mom-accent)':'var(--dad-accent)'};opacity:0.7;width:20px;"></i></div><img src="${owner==="madre"?IMG_MOM:IMG_DAD}" class="bg-illustration">`;
-    const evts = eventsData[dKey] || []; if(evts.length > 0) { const ec = document.createElement("div"); ec.className = "events-container"; evts.slice(0, 3).forEach(e => { ec.innerHTML += `<div class="event-chip chip-${e.type}"><i data-lucide="${getIconName(e.type)}"></i></div>`; }); card.appendChild(ec); }
-    return card;
-  }
-
-  // MODAL
-  function openDayModal(dateKey, owner) { selectedDateKey = dateKey; document.getElementById("day-modal").classList.add("open"); const dObj = new Date(dateKey); document.getElementById("modal-date-title").textContent = dObj.toLocaleDateString('es-ES', {weekday:'long', day:'numeric', month:'long'}); document.getElementById("modal-custody-header-container").innerHTML = `<div style="display:flex;align-items:center;gap:20px;padding:20px;border-radius:24px;margin-bottom:24px;background:${owner==='madre'?'var(--mom-gradient)':'var(--dad-gradient)'}"><img src="${owner==='madre'?IMG_MOM:IMG_DAD}" style="width:80px;height:80px;border-radius:50%;background:#fff;padding:4px;box-shadow:var(--shadow-card);"><div><div style="font-size:0.9rem;font-weight:700;opacity:0.7;text-transform:uppercase;">Día de</div><div style="font-size:1.8rem;font-weight:900;">${owner==='madre'?'Mamá':'Papá'}</div></div></div>`; renderEventsList(); }
-  function closeModal() { document.getElementById("day-modal").classList.remove("open"); }
-  function selectIcon(t,el) { selectedIconType=t; document.querySelectorAll('.select-item').forEach(b=>b.classList.remove('selected')); el.classList.add('selected'); }
-  function renderEventsList() { const l = document.getElementById("modal-event-list"); l.innerHTML=""; const evts = eventsData[selectedDateKey] || []; if(evts.length===0) l.innerHTML="<div style='color:var(--text-muted);text-align:center;padding:20px;'>No hay eventos.</div>"; evts.forEach(e => { l.innerHTML += `<div style="display:flex;justify-content:space-between;align-items:center;padding:16px;background:#f8f9fc;border-radius:16px;margin-bottom:8px;"><div style="display:flex;gap:12px;align-items:center;"><div class="event-chip chip-${e.type}" style="width:32px;height:32px;"><i data-lucide="${getIconName(e.type)}" style="width:16px;"></i></div><strong>${e.title}</strong></div><button onclick="delEv('${e.id}')" style="border:none;color:#ef4444;background:none;cursor:pointer;"><i data-lucide="trash-2"></i></button></div>`; }); lucide.createIcons(); }
-  async function saveEvent() { const t=document.getElementById("event-title").value; if(t){await db.collection("events").add({date:selectedDateKey, title:t, type:selectedIconType, createdAt:firebase.firestore.FieldValue.serverTimestamp()}); document.getElementById("event-title").value=""; renderEventsList();} }
-  async function delEv(id){if(confirm("¿Eliminar?")){await db.collection("events").doc(id).delete(); renderEventsList();}}
-
-  // ==================================================
-  // LÓGICA DE SOLICITUDES COMPLETA
-  // ==================================================
-
-  function updateHeaderRoleIndicator() {
-      const indicator = document.getElementById("user-role-indicator");
-      if (currentUserRole === 'padre') { indicator.innerHTML = '<i data-lucide="shield" style="width:16px;"></i> Padre'; indicator.className = 'role-badge dad'; } 
-      else if (currentUserRole === 'madre') { indicator.innerHTML = '<i data-lucide="heart" style="width:16px;"></i> Madre'; indicator.className = 'role-badge mom'; } 
-      else { indicator.className = 'hidden'; }
-      lucide.createIcons();
-  }
-
-  document.getElementById("request-form-sidebar").addEventListener("submit", async e => {
-      e.preventDefault();
-      const start = document.getElementById("req-start").value;
-      const end = document.getElementById("req-end").value;
-      if(!start || !end) return alert("Selecciona fechas");
-      // Verificar que el usuario tiene un rol asignado antes de pedir
-      if(!currentUserRole) { return alert("Error: Tu usuario no tiene un rol asignado (padre/madre). Contacta con el administrador."); }
+  // 1. Autenticación
+  useEffect(() => {
+    const initAuth = async () => {
       try {
-          await db.collection("requests").add({ startDate: start, endDate: end, reason: document.getElementById("req-reason").value || "Sin motivo", status: 'pendiente', requesterEmail: currentUserEmail, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
-          alert("Solicitud enviada"); document.getElementById("request-form-sidebar").reset();
-      } catch (error) { console.error(error); alert("Error al enviar"); }
-  });
+        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+          await signInWithCustomToken(auth, __initial_auth_token);
+        } else {
+          await signInAnonymously(auth);
+        }
+      } catch (err) {
+        console.error("Auth error", err);
+      }
+    };
+    initAuth();
+    const unsubscribe = onAuthStateChanged(auth, (u) => {
+      setUser(u);
+      // Por defecto en esta app demo/local, permitimos elegir rol si no está definido
+      // En producción, esto se sacaría del email o custom claims
+    });
+    return () => unsubscribe();
+  }, []);
 
-  // FUNCIÓN CLAVE: Procesar Aprobación/Rechazo
-  async function processRequest(requestId, newStatus) {
-    if(!confirm(`¿Estás seguro de que quieres marcar esto como ${newStatus}?`)) return;
+  // 2. Carga de Datos (Firestore)
+  useEffect(() => {
+    if (!user) return;
+
+    const unsubEvents = onSnapshot(
+      collection(db, 'artifacts', appId, 'public', 'data', 'events'),
+      (snapshot) => {
+        const evs = {};
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          if (!evs[data.date]) evs[data.date] = [];
+          evs[data.date].push({ id: doc.id, ...data });
+        });
+        setEvents(evs);
+      },
+      (err) => console.error("Firestore events error", err)
+    );
+
+    const unsubOverrides = onSnapshot(
+      collection(db, 'artifacts', appId, 'public', 'data', 'overrides'),
+      (snapshot) => {
+        const ovs = {};
+        snapshot.forEach(doc => {
+          ovs[doc.id] = doc.data().owner;
+        });
+        setOverrides(ovs);
+      },
+      (err) => console.error("Firestore overrides error", err)
+    );
+
+    const unsubRequests = onSnapshot(
+      collection(db, 'artifacts', appId, 'public', 'data', 'requests'),
+      (snapshot) => {
+        const reqs = [];
+        snapshot.forEach(doc => reqs.push({ id: doc.id, ...doc.data() }));
+        // Ordenar por fecha de creación descendente en memoria
+        setRequests(reqs.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0)));
+      },
+      (err) => console.error("Firestore requests error", err)
+    );
+
+    return () => { unsubEvents(); unsubOverrides(); unsubRequests(); };
+  }, [user]);
+
+  // --- ACCIONES ---
+
+  const notify = (text, type = 'info') => {
+    setNotification({ text, type });
+    setTimeout(() => setNotification(null), 3000);
+  };
+
+  const addEvent = async (dateKey, title, type) => {
+    if (!title.trim()) return;
+    try {
+      await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'events'), {
+        date: dateKey,
+        title,
+        type,
+        createdBy: user.uid,
+        createdAt: serverTimestamp()
+      });
+      notify("Evento añadido correctamente", "success");
+    } catch (e) {
+      notify("Error al guardar evento", "error");
+    }
+  };
+
+  const deleteEvent = async (id) => {
+    try {
+      await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'events', id));
+      notify("Evento eliminado");
+    } catch (e) {
+      notify("Error al eliminar", "error");
+    }
+  };
+
+  const submitSwapRequest = async (e) => {
+    e.preventDefault();
+    const start = e.target.start.value;
+    const end = e.target.end.value;
+    const reason = e.target.reason.value;
+
+    if (!start || !end || !role) {
+      notify("Completa las fechas y asegúrate de tener un rol", "error");
+      return;
+    }
 
     try {
-        // 1. Obtener datos de la solicitud
-        const reqDoc = await db.collection("requests").doc(requestId).get();
-        const reqData = reqDoc.data();
-
-        // 2. Si se APRUEBA, hay que cambiar el calendario (crear overrides)
-        if (newStatus === 'aprobada') {
-            const requesterRole = USER_ROLES[reqData.requesterEmail];
-            if(!requesterRole) { alert("Error crítico: No se puede determinar el rol del solicitante. Revisa la configuración USER_ROLES."); return; }
-
-            const start = new Date(reqData.startDate);
-            const end = new Date(reqData.endDate);
-            const batch = db.batch(); // Usamos batch para que sea todo o nada
-
-            // Iterar por cada día del rango para cambiar el dueño
-            for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-                const year = d.getFullYear();
-                const month = String(d.getMonth() + 1).padStart(2, '0');
-                const dayStr = String(d.getDate()).padStart(2, '0');
-                const dateKey = `${year}-${month}-${dayStr}`;
-
-                // El nuevo dueño es quien lo pidió
-                const newOwner = (requesterRole === 'padre') ? 'padre' : 'madre';
-
-                // Crear/Sobreescribir el documento de override para ese día
-                const overrideRef = db.collection("overrides").doc(dateKey);
-                batch.set(overrideRef, { owner: newOwner });
-            }
-            // Ejecutar todos los cambios de calendario
-            await batch.commit();
-        }
-
-        // 3. Finalmente, actualizar el estado de la solicitud
-        await db.collection("requests").doc(requestId).update({ status: newStatus });
-        
-    } catch (error) {
-        console.error("Error procesando solicitud:", error);
-        alert("Hubo un error al procesar la solicitud.");
-    }
-  }
-
-
-  function renderRequestsList(docs) {
-      const container = document.getElementById("requests-status-list"); container.innerHTML = "";
-      if (docs.length === 0) { container.innerHTML = "<div style='text-align:center;color:var(--text-muted);padding:20px;font-style:italic;'>No hay solicitudes recientes.</div>"; return; }
-
-      docs.forEach(doc => {
-          const data = doc.data();
-          const isMyRequest = data.requesterEmail === currentUserEmail;
-          const isPending = data.status === 'pendiente';
-          // Si está pendiente, NO la pedí yo, y tengo un rol conocido, me toca a mí aprobarla.
-          const needsMyAction = isPending && !isMyRequest && (currentUserRole === 'padre' || currentUserRole === 'madre');
-
-          const item = document.createElement("div");
-          item.className = `request-item ${needsMyAction ? 'needs-action' : ''}`;
-          
-          const startF = new Date(data.startDate).toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit'});
-          const endF = new Date(data.endDate).toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit'});
-
-          let metaInfo = isMyRequest ? 'Solicitado por ti' : 'Solicitado por la otra parte';
-          if(needsMyAction) metaInfo = `<strong>Requiere tu aprobación</strong>`;
-
-          // Generar botones SOLO si requiere acción
-          let actionButtonsHTML = '';
-          if(needsMyAction) {
-              actionButtonsHTML = `
-                <div class="request-actions">
-                  <button onclick="processRequest('${doc.id}', 'aprobada')" class="btn-action approve"><i data-lucide="check"></i> Aprobar</button>
-                  <button onclick="processRequest('${doc.id}', 'rechazada')" class="btn-action reject"><i data-lucide="x"></i> Rechazar</button>
-                </div>
-              `;
-          }
-
-          item.innerHTML = `
-              <div class="request-header"><div class="request-dates">${startF} - ${endF}</div><div class="req-status ${data.status}">${data.status}</div></div>
-              <div style="font-size:0.85rem; margin-bottom:8px;">"${data.reason}"</div>
-              <div class="request-meta"><div>${metaInfo}</div></div>
-              ${actionButtonsHTML}
-          `;
-          container.appendChild(item);
+      await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'requests'), {
+        startDate: start,
+        endDate: end,
+        reason: reason || "Sin motivo",
+        status: 'pendiente',
+        requesterId: user.uid,
+        requesterRole: role,
+        createdAt: serverTimestamp()
       });
-      lucide.createIcons();
+      notify("Solicitud de cambio enviada", "success");
+      e.target.reset();
+    } catch (e) {
+      notify("Error al enviar solicitud", "error");
+    }
+  };
+
+  const handleRequestAction = async (request, newStatus) => {
+    try {
+      if (newStatus === 'aprobada') {
+        const start = new Date(request.startDate);
+        const end = new Date(request.endDate);
+        
+        // Generar overrides para el rango
+        for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+          const key = formatDateKey(d);
+          await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'overrides', key), {
+            owner: request.requesterRole
+          });
+        }
+      }
+      
+      await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'requests', request.id), {
+        status: newStatus,
+        resolvedAt: serverTimestamp()
+      });
+      notify(`Solicitud ${newStatus}`);
+    } catch (e) {
+      notify("Error al procesar solicitud", "error");
+    }
+  };
+
+  const analyzeWithAI = async () => {
+    setIsAiLoading(true);
+    setAiAnalysis("");
+    const monthName = viewDate.toLocaleString('es-ES', { month: 'long' });
+    const eventsThisMonth = Object.entries(events)
+      .filter(([date]) => date.startsWith(formatDateKey(viewDate).substring(0, 7)))
+      .map(([date, list]) => `${date}: ${list.map(e => e.title).join(', ')}`)
+      .join('\n');
+
+    const prompt = `Como asistente de co-paternidad, analiza los siguientes eventos del mes de ${monthName} de 2026 y ofrece 3 consejos prácticos o recordatorios importantes para los padres. Sé amable y constructivo.\nEventos:\n${eventsThisMonth || 'No hay eventos registrados aún.'}`;
+
+    try {
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+      });
+      const data = await response.json();
+      setAiAnalysis(data.candidates?.[0]?.content?.parts?.[0]?.text || "No pude generar el análisis.");
+    } catch (e) {
+      setAiAnalysis("Error conectando con la IA.");
+    } finally {
+      setIsAiLoading(false);
+    }
+  };
+
+  // --- RENDER HELPERS ---
+
+  const calendarDays = useMemo(() => {
+    const year = viewDate.getFullYear();
+    const month = viewDate.getMonth();
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const startOffset = (firstDay === 0) ? 6 : firstDay - 1;
+    
+    const days = [];
+    for (let i = 0; i < startOffset; i++) days.push(null);
+    for (let d = 1; d <= daysInMonth; d++) {
+      const date = new Date(year, month, d);
+      const key = formatDateKey(date);
+      days.push({
+        day: d,
+        date: date,
+        key: key,
+        owner: overrides[key] || getBaseOwner(date),
+        events: events[key] || []
+      });
+    }
+    return days;
+  }, [viewDate, overrides, events]);
+
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 p-6">
+        <div className="animate-pulse text-slate-400 flex flex-col items-center">
+          <CalendarIcon size={48} className="mb-4" />
+          <p className="font-semibold text-lg">Iniciando sesión segura...</p>
+        </div>
+      </div>
+    );
   }
 
-  // AUTH STATE
-  auth.onAuthStateChanged(u=>{
-    if(u){
-      currentUserEmail = u.email;
-      currentUserRole = USER_ROLES[currentUserEmail] || null; // Determinar rol basado en el email
-      document.getElementById("login-view").classList.add("hidden"); document.getElementById("app-root").classList.remove("hidden");
-      updateHeaderRoleIndicator();
-      db.collection("overrides").onSnapshot(s=>{overrides={};s.forEach(d=>overrides[d.id]=d.data().owner);renderCalendar();});
-      db.collection("events").orderBy("createdAt").onSnapshot(s=>{eventsData={};s.forEach(d=>{const v=d.data();if(!eventsData[v.date])eventsData[v.date]=[];eventsData[v.date].push({id:d.id,...v})});renderCalendar();});
-      db.collection("requests").orderBy("createdAt","desc").limit(10).onSnapshot(snapshot => renderRequestsList(snapshot.docs));
-    } else {
-      currentUserEmail = null; currentUserRole = null;
-      document.getElementById("login-view").classList.remove("hidden"); document.getElementById("app-root").classList.add("hidden");
-    }
-  });
+  // Pantalla de Selección de Rol (Solo si no tiene)
+  if (!role) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-indigo-600 p-6">
+        <div className="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl text-center">
+          <h1 className="text-2xl font-bold mb-2">Bienvenido</h1>
+          <p className="text-slate-500 mb-8">Selecciona quién está accediendo para personalizar tu vista</p>
+          <div className="grid grid-cols-2 gap-4">
+            <button 
+              onClick={() => setRole('padre')}
+              className="flex flex-col items-center p-6 rounded-2xl border-2 border-blue-100 hover:border-blue-500 hover:bg-blue-50 transition-all group"
+            >
+              <Shield size={40} className="text-blue-500 mb-2 group-hover:scale-110 transition-transform" />
+              <span className="font-bold text-blue-700">Papá</span>
+            </button>
+            <button 
+              onClick={() => setRole('madre')}
+              className="flex flex-col items-center p-6 rounded-2xl border-2 border-pink-100 hover:border-pink-500 hover:bg-pink-50 transition-all group"
+            >
+              <Heart size={40} className="text-pink-500 mb-2 group-hover:scale-110 transition-transform" />
+              <span className="font-bold text-pink-700">Mamá</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
-  // SWIPE & BASIC EVENTS
-  const el=document.getElementById("calendar-wrapper-swipe"); let sx=0,sy=0; el.addEventListener('touchstart',e=>{sx=e.changedTouches[0].screenX;sy=e.changedTouches[0].screenY},{passive:true}); el.addEventListener('touchend',e=>{const dx=sx-e.changedTouches[0].screenX,dy=sy-e.changedTouches[0].screenY;if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>50){dx>0?currentMonth++:currentMonth--;chkM();renderCalendar();}},{passive:true}); function chkM(){if(currentMonth>11){currentMonth=0;currentYear++}if(currentMonth<0){currentMonth=11;currentYear--}}
-  document.getElementById("login-form").addEventListener("submit",e=>{e.preventDefault();auth.signInWithEmailAndPassword(document.getElementById("login-email").value,document.getElementById("login-password").value).catch(err=>document.getElementById("login-error").textContent="Credenciales incorrectas");}); document.getElementById("logout-btn").onclick=()=>auth.signOut(); document.getElementById("prev-period").onclick=()=>{currentMonth--;chkM();renderCalendar();}; document.getElementById("next-period").onclick=()=>{currentMonth++;chkM();renderCalendar();}; const ys=document.getElementById("year-select");[2025,2026,2027].forEach(y=>{const o=document.createElement("option");o.value=y;o.textContent=y;if(y===currentYear)o.selected=true;ys.appendChild(o)});ys.onchange=e=>{currentYear=parseInt(e.target.value);renderCalendar();}; renderCalendar();
-</script>
-</body>
-</html>
+  return (
+    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans pb-20 md:pb-8">
+      {/* Header */}
+      <header className="bg-white border-b sticky top-0 z-40 px-4 py-4 md:px-8 flex items-center justify-between shadow-sm">
+        <div className="flex items-center gap-2">
+          <div className="bg-indigo-600 p-2 rounded-xl text-white">
+            <CalendarIcon size={20} />
+          </div>
+          <h1 className="font-extrabold text-lg hidden sm:block">Custodia Pro</h1>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full border shadow-sm ${USER_ROLES[role].gradient} ${USER_ROLES[role].border}`}>
+            {React.createElement(USER_ROLES[role].icon, { size: 16, className: USER_ROLES[role].accent })}
+            <span className={`font-bold text-sm ${USER_ROLES[role].accent}`}>{USER_ROLES[role].label}</span>
+          </div>
+          <button 
+            onClick={() => setRole(null)} 
+            className="p-2 text-slate-400 hover:text-red-500 transition-colors"
+            title="Cerrar Sesión"
+          >
+            <LogOut size={20} />
+          </button>
+        </div>
+      </header>
+
+      {/* Main Grid */}
+      <main className="max-w-7xl mx-auto p-4 md:p-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        {/* Calendario */}
+        <section className="lg:col-span-8 bg-white rounded-[32px] shadow-xl shadow-slate-200/50 overflow-hidden border border-slate-100">
+          <div className="p-6 md:p-8">
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-2xl md:text-3xl font-black capitalize">
+                {viewDate.toLocaleString('es-ES', { month: 'long', year: 'numeric' })}
+              </h2>
+              <div className="flex gap-2">
+                <button 
+                  onClick={() => setViewDate(new Date(viewDate.setMonth(viewDate.getMonth() - 1)))}
+                  className="p-3 rounded-2xl bg-slate-100 hover:bg-slate-200 transition-colors"
+                >
+                  <ChevronLeft size={20} />
+                </button>
+                <button 
+                  onClick={() => setViewDate(new Date(viewDate.setMonth(viewDate.getMonth() + 1)))}
+                  className="p-3 rounded-2xl bg-slate-100 hover:bg-slate-200 transition-colors"
+                >
+                  <ChevronRight size={20} />
+                </button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-7 gap-2 md:gap-4">
+              {['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'].map(d => (
+                <div key={d} className="text-center text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">
+                  {d}
+                </div>
+              ))}
+              {calendarDays.map((d, i) => {
+                if (!d) return <div key={`empty-${i}`} className="aspect-square md:aspect-[4/5]" />;
+                const isToday = d.key === formatDateKey(new Date());
+                const ownerStyles = USER_ROLES[d.owner];
+                return (
+                  <button
+                    key={d.key}
+                    onClick={() => { setSelectedDay(d); setIsModalOpen(true); }}
+                    className={`
+                      relative group aspect-square md:aspect-[4/5] rounded-xl md:rounded-3xl p-2 md:p-4 text-left transition-all overflow-hidden border-2
+                      flex flex-col justify-between
+                      ${isToday ? 'ring-4 ring-indigo-200 scale-105 z-10' : ''}
+                      ${ownerStyles.gradient} ${ownerStyles.border}
+                    `}
+                  >
+                    <div className="flex justify-between items-start relative z-10">
+                      <span className="font-black text-lg md:text-xl">{d.day}</span>
+                      {React.createElement(ownerStyles.icon, { 
+                        size: 16, 
+                        className: `${ownerStyles.accent} opacity-40 group-hover:opacity-100 transition-opacity` 
+                      })}
+                    </div>
+
+                    <div className="flex flex-wrap gap-1 mt-auto relative z-10">
+                      {d.events.slice(0, 3).map(e => (
+                        <div 
+                          key={e.id} 
+                          className={`w-2 h-2 md:w-6 md:h-6 rounded-full flex items-center justify-center text-white ${EVENT_TYPES[e.type]?.color || 'bg-slate-400'} shadow-sm`}
+                        >
+                          <span className="hidden md:block">
+                            {React.createElement(EVENT_TYPES[e.type]?.icon || Star, { size: 12 })}
+                          </span>
+                        </div>
+                      ))}
+                      {d.events.length > 3 && (
+                        <div className="w-2 h-2 md:w-6 md:h-6 rounded-full bg-slate-200 flex items-center justify-center text-[8px] font-bold text-slate-500">
+                          +{d.events.length - 3}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Ilustración de fondo sutil */}
+                    <div className="absolute -bottom-2 -right-2 opacity-10 pointer-events-none group-hover:scale-110 transition-transform">
+                       {React.createElement(ownerStyles.icon, { size: 80 })}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        {/* Sidebar */}
+        <aside className="lg:col-span-4 flex flex-col gap-6">
+          
+          {/* AI Assistant Panel */}
+          <div className="bg-gradient-to-br from-indigo-600 to-violet-700 rounded-[32px] p-6 text-white shadow-xl shadow-indigo-200">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Sparkles size={20} className="text-indigo-200" />
+                <h3 className="font-bold text-lg">Asistente IA</h3>
+              </div>
+              <button 
+                onClick={analyzeWithAI}
+                disabled={isAiLoading}
+                className="bg-white/20 hover:bg-white/30 p-2 rounded-xl transition-colors disabled:opacity-50"
+              >
+                {isAiLoading ? 'Analizando...' : 'Generar'}
+              </button>
+            </div>
+            {aiAnalysis ? (
+              <div className="text-sm bg-white/10 rounded-2xl p-4 leading-relaxed whitespace-pre-line animate-in fade-in slide-in-from-top-4">
+                {aiAnalysis}
+              </div>
+            ) : (
+              <p className="text-sm text-indigo-100">Haz clic en generar para analizar los eventos de este mes.</p>
+            )}
+          </div>
+
+          {/* Formulario de Cambio */}
+          <div className="bg-white rounded-[32px] p-6 shadow-xl shadow-slate-200/50 border border-slate-100">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center">
+                <Plus size={18} />
+              </div>
+              <h3 className="font-bold">Solicitar Cambio</h3>
+            </div>
+            <form onSubmit={submitSwapRequest} className="space-y-3">
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="text-[10px] font-bold text-slate-400 uppercase ml-2">Desde</label>
+                  <input name="start" type="date" className="w-full p-3 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:ring-2 focus:ring-indigo-500 transition-all text-sm outline-none" required />
+                </div>
+                <div>
+                  <label className="text-[10px] font-bold text-slate-400 uppercase ml-2">Hasta</label>
+                  <input name="end" type="date" className="w-full p-3 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:ring-2 focus:ring-indigo-500 transition-all text-sm outline-none" required />
+                </div>
+              </div>
+              <input name="reason" placeholder="Motivo (ej: Viaje trabajo)" className="w-full p-3 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:ring-2 focus:ring-indigo-500 transition-all text-sm outline-none" />
+              <button type="submit" className="w-full py-3 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-800 transition-colors shadow-lg shadow-slate-200">
+                Enviar Solicitud
+              </button>
+            </form>
+          </div>
+
+          {/* Lista de Solicitudes */}
+          <div className="bg-white rounded-[32px] p-6 shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden flex-1">
+            <h3 className="font-bold mb-4">Estado de Solicitudes</h3>
+            <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+              {requests.length === 0 && <p className="text-slate-400 text-center text-sm italic py-8">No hay solicitudes pendientes.</p>}
+              {requests.map(req => {
+                const isRequester = req.requesterRole === role;
+                const isPending = req.status === 'pendiente';
+                return (
+                  <div key={req.id} className={`p-4 rounded-2xl border transition-all ${isPending && !isRequester ? 'bg-indigo-50 border-indigo-200 ring-2 ring-indigo-100' : 'bg-slate-50 border-slate-100'}`}>
+                    <div className="flex justify-between items-start mb-2">
+                      <div className="font-black text-sm">
+                        {new Date(req.startDate).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' })} - {new Date(req.endDate).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' })}
+                      </div>
+                      <span className={`text-[10px] font-black uppercase px-2 py-1 rounded-full ${req.status === 'aprobada' ? 'bg-emerald-100 text-emerald-600' : req.status === 'rechazada' ? 'bg-red-100 text-red-600' : 'bg-amber-100 text-amber-600'}`}>
+                        {req.status}
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-500 italic mb-3">"{req.reason}"</p>
+                    
+                    {isPending && !isRequester && (
+                      <div className="flex gap-2">
+                        <button 
+                          onClick={() => handleRequestAction(req, 'aprobada')}
+                          className="flex-1 py-2 bg-emerald-500 text-white rounded-lg text-xs font-bold hover:bg-emerald-600 transition-colors"
+                        >
+                          Aprobar
+                        </button>
+                        <button 
+                          onClick={() => handleRequestAction(req, 'rechazada')}
+                          className="flex-1 py-2 bg-red-500 text-white rounded-lg text-xs font-bold hover:bg-red-600 transition-colors"
+                        >
+                          Rechazar
+                        </button>
+                      </div>
+                    )}
+                    {!isPending && (
+                      <div className="text-[10px] font-bold text-slate-400">
+                        {isRequester ? 'Tú solicitaste esto' : `Solicitado por ${USER_ROLES[req.requesterRole].label}`}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </aside>
+      </main>
+
+      {/* Modal de Día */}
+      {isModalOpen && selectedDay && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300">
+          <div className="bg-white w-full max-w-lg rounded-t-[32px] sm:rounded-[40px] shadow-2xl overflow-hidden animate-in slide-in-from-bottom-10 duration-300">
+            {/* Header del Modal */}
+            <div className={`p-8 ${USER_ROLES[selectedDay.owner].gradient} flex items-center justify-between border-b ${USER_ROLES[selectedDay.owner].border}`}>
+              <div className="flex items-center gap-4">
+                <div className="bg-white p-3 rounded-2xl shadow-sm">
+                   {React.createElement(USER_ROLES[selectedDay.owner].icon, { size: 32, className: USER_ROLES[selectedDay.owner].accent })}
+                </div>
+                <div>
+                  <p className="text-xs font-black uppercase text-slate-400 tracking-widest mb-1">Día de {USER_ROLES[selectedDay.owner].label}</p>
+                  <h3 className="text-2xl font-black">
+                    {selectedDay.date.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' })}
+                  </h3>
+                </div>
+              </div>
+              <button onClick={() => setIsModalOpen(false)} className="p-2 bg-white/50 rounded-full hover:bg-white transition-colors">
+                <X size={24} />
+              </button>
+            </div>
+
+            <div className="p-8 space-y-8">
+              {/* Formulario Evento */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-4">
+                   <input 
+                    id="new-event-title"
+                    placeholder="Nuevo evento..." 
+                    className="flex-1 text-lg font-bold outline-none border-b-2 border-slate-100 focus:border-indigo-500 py-2 transition-all" 
+                    onKeyDown={(e) => {
+                      if(e.key === 'Enter') {
+                        addEvent(selectedDay.key, e.target.value, document.getElementById('type-select').value);
+                        e.target.value = '';
+                      }
+                    }}
+                  />
+                  <select id="type-select" className="bg-slate-100 p-2 rounded-xl text-sm font-bold outline-none">
+                    {Object.entries(EVENT_TYPES).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
+                  </select>
+                </div>
+                <button 
+                  onClick={() => {
+                    const inp = document.getElementById('new-event-title');
+                    addEvent(selectedDay.key, inp.value, document.getElementById('type-select').value);
+                    inp.value = '';
+                  }}
+                  className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-black text-lg hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-100 flex items-center justify-center gap-2"
+                >
+                  <Plus size={20} /> Añadir Evento
+                </button>
+              </div>
+
+              {/* Lista Eventos */}
+              <div className="space-y-3">
+                <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest">Eventos Programados</h4>
+                <div className="max-h-60 overflow-y-auto pr-2 custom-scrollbar space-y-2">
+                  {selectedDay.events.length === 0 && <p className="text-center py-8 text-slate-400 text-sm italic">No hay eventos para este día.</p>}
+                  {selectedDay.events.map(e => (
+                    <div key={e.id} className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl hover:bg-slate-100 transition-colors group">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-white ${EVENT_TYPES[e.type]?.color || 'bg-slate-400 shadow-sm'}`}>
+                          {React.createElement(EVENT_TYPES[e.type]?.icon || Star, { size: 18 })}
+                        </div>
+                        <span className="font-bold">{e.title}</span>
+                      </div>
+                      <button 
+                        onClick={() => deleteEvent(e.id)}
+                        className="p-2 text-slate-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Notificaciones Flash */}
+      {notification && (
+        <div className={`fixed bottom-8 left-1/2 -translate-x-1/2 px-6 py-3 rounded-2xl text-white font-bold shadow-2xl z-[100] animate-in slide-in-from-bottom-10 flex items-center gap-3
+          ${notification.type === 'error' ? 'bg-red-500' : notification.type === 'success' ? 'bg-emerald-500' : 'bg-slate-800'}`}>
+          <Info size={18} />
+          {notification.text}
+        </div>
+      )}
+
+      <style>{`
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+        @keyframes subtle-pulse { 0% { opacity: 0.8; } 50% { opacity: 1; } 100% { opacity: 0.8; } }
+      `}</style>
+    </div>
+  );
+}

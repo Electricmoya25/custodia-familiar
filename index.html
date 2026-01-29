@@ -23,6 +23,9 @@
             --radius-card: 24px;
         }
 
+        /* Utility crítica para evitar parpadeos antes de que cargue Tailwind */
+        .hidden { display: none !important; }
+
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: var(--bg-app);
@@ -240,7 +243,7 @@
         appId = typeof __app_id !== 'undefined' ? __app_id : 'custodia-alberto';
     } catch (e) {
         console.error("Error cargando configuración, usando defaults seguros para evitar crash");
-        firebaseConfig = {}; // Evitar crash si no hay config
+        firebaseConfig = {}; 
         appId = 'custodia-alberto';
     }
 
@@ -523,21 +526,31 @@
     };
 
     // --- AUTH & INIT ---
+    let unsubscribes = [];
+
+    function cleanupListeners() {
+        unsubscribes.forEach(u => u());
+        unsubscribes = [];
+    }
+
+    function showLoginScreen(message = "Inicia sesión para continuar") {
+        document.getElementById('auth-status-text').textContent = message;
+        document.getElementById('login-container').classList.remove('hidden');
+        document.getElementById('auth-loader').classList.add('hidden');
+        document.getElementById('auth-screen').classList.remove('hidden');
+        document.getElementById('app-content').classList.add('hidden');
+    }
+
     async function initAuth() {
         try {
-            // REGLA 3: Siempre intentar el token inicial primero
             if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                 await signInWithCustomToken(auth, __initial_auth_token);
             } else {
-                // Fallback anónimo si no hay token, para que la app no se bloquee
                 await signInAnonymously(auth);
             }
         } catch (error) {
-            console.error("Auth error:", error);
-            // En caso de error fatal, mostrar login manual
-            document.getElementById('auth-status-text').textContent = "Inicia sesión para continuar";
-            document.getElementById('login-container').classList.remove('hidden');
-            document.getElementById('auth-loader').classList.add('hidden');
+            console.error("Auto-Auth error:", error);
+            showLoginScreen("Sesión no iniciada automáticamente. Entra manualmente.");
         }
     }
 
@@ -578,6 +591,9 @@
                 state.user = user;
                 state.userRole = USER_ROLES[user.email] || 'visitante';
                 
+                // Limpiar listeners anteriores para evitar fugas/bucles
+                cleanupListeners();
+                
                 try {
                     setupListeners();
                 } catch(err) { console.error("Error setting up listeners", err); }
@@ -592,22 +608,21 @@
                 
                 render();
             } else {
-                document.getElementById('login-container').classList.remove('hidden');
-                document.getElementById('auth-loader').classList.add('hidden');
-                document.getElementById('auth-screen').classList.remove('hidden');
-                document.getElementById('app-content').classList.add('hidden');
+                state.user = null;
+                cleanupListeners();
+                // Si no hay usuario y no estamos en medio de un proceso de carga inicial...
+                // Pero aquí dejamos que initAuth maneje el error inicial. 
+                // Si el usuario hace logout manual, esto también es correcto.
             }
         });
 
-        // FALLBACK: Si tras 3 segundos seguimos viendo el loader, forzar la vista de login
+        // FALLBACK DE SEGURIDAD
         setTimeout(() => {
             const loader = document.getElementById('auth-loader');
             const login = document.getElementById('login-container');
             if (!loader.classList.contains('hidden') && login.classList.contains('hidden') && !state.user) {
-                console.warn("Auth timed out, showing login manually.");
-                loader.classList.add('hidden');
-                login.classList.remove('hidden');
-                document.getElementById('auth-status-text').textContent = "Sesión no iniciada automáticamente.";
+                console.warn("Auth timed out (fallback trigged).");
+                showLoginScreen("Tiempo de espera agotado.");
             }
         }, 3000);
 
@@ -618,16 +633,17 @@
     function setupListeners() {
         if (!state.user) return;
 
-        // REGLA 1: Paths estrictos
+        // REGLA 1: Paths estrictos + Gestión de memoria
         const qOverrides = query(collection(db, 'artifacts', appId, 'public', 'data', 'overrides'));
-        onSnapshot(qOverrides, (s) => {
+        const u1 = onSnapshot(qOverrides, (s) => {
             state.overrides = {};
             s.forEach(d => state.overrides[d.id] = d.data().owner);
             render();
         }, (err) => console.error("Error overrides", err));
+        unsubscribes.push(u1);
 
         const qEvents = query(collection(db, 'artifacts', appId, 'public', 'data', 'events'));
-        onSnapshot(qEvents, (s) => {
+        const u2 = onSnapshot(qEvents, (s) => {
             state.events = {};
             s.forEach(d => {
                 const data = { id: d.id, ...d.data() };
@@ -637,12 +653,14 @@
             render();
             if (state.selectedDateKey) renderModalEvents();
         }, (err) => console.error("Error eventos", err));
+        unsubscribes.push(u2);
 
         const qReqs = query(collection(db, 'artifacts', appId, 'public', 'data', 'requests'), limit(20));
-        onSnapshot(qReqs, (s) => {
+        const u3 = onSnapshot(qReqs, (s) => {
             state.requests = s.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b) => b.createdAt - a.createdAt);
             renderRequests();
         }, (err) => console.error("Error solicitudes", err));
+        unsubscribes.push(u3);
     }
 
     init();

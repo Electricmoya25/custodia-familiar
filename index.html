@@ -837,9 +837,159 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        
+        /* Security Notice Styles */
+        .security-notice {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 20px;
+            border-radius: var(--radius);
+            margin: 20px 0;
+            text-align: left;
+            box-shadow: 0 4px 15px rgba(238, 90, 36, 0.3);
+        }
+        
+        .security-notice h3 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            font-size: 1.4rem;
+        }
+        
+        .security-notice ul {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+        
+        .security-notice li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+        
+        .config-container {
+            background: white;
+            border-radius: var(--radius);
+            padding: 25px;
+            margin: 25px 0;
+            box-shadow: var(--shadow);
+        }
+        
+        .config-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--secondary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .config-steps {
+            background: var(--light);
+            border-left: 4px solid var(--primary);
+            padding: 15px;
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+            margin: 15px 0;
+        }
+        
+        .step {
+            margin-bottom: 12px;
+            padding-left: 20px;
+            position: relative;
+        }
+        
+        .step:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 20px;
+            height: 20px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .code-block {
+            background: var(--dark);
+            color: #4cc9f0;
+            padding: 15px;
+            border-radius: var(--radius-sm);
+            margin: 15px 0;
+            font-family: monospace;
+            overflow-x: auto;
+            font-size: 0.9rem;
+        }
+        
+        .warning {
+            background: rgba(247, 37, 133, 0.1);
+            border-left: 4px solid var(--warning);
+            padding: 15px;
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+            margin: 15px 0;
+            color: var(--warning);
+            font-weight: 500;
+        }
     </style>
 </head>
 <body>
+    <!-- Security Notice - Shown when Firebase is not configured -->
+    <div id="security-notice" class="auth-container" style="display: none;">
+        <div class="logo">
+            <i class="fas fa-shield-alt"></i>
+            <div>Configuración de Seguridad</div>
+        </div>
+        <div class="app-name">⚠️ Configuración de Firebase Requerida</div>
+        <p class="app-desc">Para proteger tu aplicación, debes configurar Firebase correctamente antes de usarla.</p>
+        
+        <div class="config-container">
+            <h2 class="config-title"><i class="fas fa-cog"></i> Pasos para Configurar Firebase</h2>
+            <div class="config-steps">
+                <div class="step">Crear un proyecto en <a href="https://console.firebase.google.com/" target="_blank" style="color: var(--primary); text-decoration: underline;">Firebase Console</a></div>
+                <div class="step">Registrar una aplicación web en tu proyecto de Firebase</div>
+                <div class="step">Copiar tu configuración de Firebase (firebaseConfig)</div>
+                <div class="step">Reemplazar la configuración de ejemplo en el archivo index.html</div>
+            </div>
+            
+            <h3 style="margin: 20px 0 10px; color: var(--secondary);"><i class="fas fa-file-code"></i> Ejemplo de Configuración:</h3>
+            <div class="code-block">
+// Reemplaza esto en la sección de configuración de Firebase<br>
+const firebaseConfig = {<br>
+&nbsp;&nbsp;apiKey: "AIzaSyAwgk4_l0zvaCUCgm1CjqqqXjJHr5KPBjc",<br>
+&nbsp;&nbsp;authDomain: "custodia-familiar.firebaseapp.com",<br>
+&nbsp;&nbsp;projectId: "custodia-familiar",<br>
+&nbsp;&nbsp;storageBucket:"custodia-familiar.firebasestorage.app",<br>
+&nbsp;&nbsp;messagingSenderId: "1038952432258",<br>
+&nbsp;&nbsp;appId: "1:1038952432258:web:7608d6a48d8ad8308a6a9b"<br>
+};
+            </div>
+            
+            <div class="warning">
+                <i class="fas fa-exclamation-triangle"></i> NUNCA commitees tus claves reales a GitHub. Usa variables de entorno o archivos .env en producción.
+            </div>
+            
+            <button id="continue-btn" class="btn btn-primary" style="margin-top: 20px;">
+                <i class="fas fa-check-circle"></i> He Configurado Firebase - Continuar
+            </button>
+        </div>
+        
+        <div class="security-notice">
+            <h3><i class="fas fa-lock"></i> ¿Por qué es esto importante?</h3>
+            <ul>
+                <li>Las claves expuestas pueden ser usadas para acceder a tu base de datos</li>
+                <li>Podrían generar cargos no autorizados en tu cuenta de Google Cloud</li>
+                <li>GitHub bloquea repositorios con claves expuestas automáticamente</li>
+                <li>Protege la privacidad de los usuarios de tu aplicación</li>
+            </ul>
+        </div>
+    </div>
+    
     <!-- Authentication Screen -->
     <div id="auth-screen" class="auth-container">
         <div class="logo">
@@ -1032,22 +1182,55 @@
     </div>
     
     <script>
-        // Firebase configuration - REPLACE WITH YOUR ACTUAL CONFIG
+        // =====================================================
+        // FIREBASE CONFIGURATION - SECURE IMPLEMENTATION
+        // =====================================================
+        // ⚠️ IMPORTANT: REPLACE WITH YOUR ACTUAL FIREBASE CONFIG
+        // Get your config from Firebase Console > Project Settings
+        // NEVER commit real keys to GitHub - use environment variables in production
+        // =====================================================
+        
+        // Placeholder config - MUST BE REPLACED WITH YOUR ACTUAL FIREBASE CONFIG
         const firebaseConfig = {
-            apiKey: "AIzaSyDZ0Qc6RjZ0X9X9X9X9X9X9X9X9X9X9X9X",
-            authDomain: "custodia-familiar-alberto.firebaseapp.com",
-            projectId: "custodia-familiar-alberto",
-            storageBucket: "custodia-familiar-alberto.appspot.com",
-            messagingSenderId: "1234567890",
-            appId: "1:1234567890:web:abcdef1234567890abcdef12"
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
         };
         
-        // Initialize Firebase
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
+        // Security check: Verify if Firebase has been properly configured
+        const isFirebaseConfigured = () => {
+            return (
+                firebaseConfig.apiKey !== "YOUR_API_KEY" &&
+                firebaseConfig.projectId !== "YOUR_PROJECT_ID" &&
+                firebaseConfig.apiKey.length > 10 &&
+                firebaseConfig.projectId.length > 5
+            );
+        };
+        
+        // Initialize Firebase ONLY if properly configured
+        let firebaseApp = null;
+        if (isFirebaseConfigured()) {
+            try {
+                if (!firebase.apps.length) {
+                    firebaseApp = firebase.initializeApp(firebaseConfig);
+                } else {
+                    firebaseApp = firebase.app();
+                }
+                console.log("✓ Firebase inicializado correctamente");
+            } catch (error) {
+                console.error("Error inicializando Firebase:", error);
+                showSecurityNotice();
+            }
+        } else {
+            // Show security notice if not configured
+            showSecurityNotice();
         }
         
         // DOM Elements
+        const securityNotice = document.getElementById('security-notice');
         const authScreen = document.getElementById('auth-screen');
         const appContainer = document.getElementById('app-container');
         const loginBtn = document.getElementById('login-btn');
@@ -1074,6 +1257,7 @@
         const confirmationMessage = document.getElementById('confirmation-message');
         const confirmYesBtn = document.getElementById('confirm-yes');
         const confirmNoBtn = document.getElementById('confirm-no');
+        const continueBtn = document.getElementById('continue-btn');
         
         // App State
         let currentUser = null;
@@ -1082,9 +1266,49 @@
         let currentRequestId = null;
         let currentAction = null; // 'accept' or 'reject'
         
+        // Security Notice Functions
+        function showSecurityNotice() {
+            securityNotice.style.display = 'flex';
+            authScreen.style.display = 'none';
+            appContainer.style.display = 'none';
+        }
+        
+        function hideSecurityNotice() {
+            securityNotice.style.display = 'none';
+            authScreen.style.display = 'flex';
+        }
+        
         // Initialize the app
         document.addEventListener('DOMContentLoaded', () => {
-            // Check authentication state
+            // Set up continue button
+            if (continueBtn) {
+                continueBtn.addEventListener('click', () => {
+                    if (isFirebaseConfigured()) {
+                        hideSecurityNotice();
+                        // Reinitialize Firebase
+                        if (!firebase.apps.length) {
+                            firebase.initializeApp(firebaseConfig);
+                        }
+                        setupAuthStateListener();
+                    } else {
+                        alert("⚠️ Aún no has configurado Firebase correctamente.\n\nReemplaza los valores de ejemplo en la sección de configuración de Firebase con tus claves reales.");
+                    }
+                });
+            }
+            
+            // Set up auth state listener only if Firebase is configured
+            if (isFirebaseConfigured()) {
+                setupAuthStateListener();
+            }
+            
+            // Set up event listeners
+            setupEventListeners();
+            
+            // Initialize calendar
+            renderCalendar();
+        });
+        
+        function setupAuthStateListener() {
             firebase.auth().onAuthStateChanged(user => {
                 if (user) {
                     currentUser = user;
@@ -1097,13 +1321,7 @@
                     appContainer.style.display = 'none';
                 }
             });
-            
-            // Set up event listeners
-            setupEventListeners();
-            
-            // Initialize calendar
-            renderCalendar();
-        });
+        }
         
         // Set up event listeners
         function setupEventListeners() {
@@ -1148,6 +1366,11 @@
         
         // Authentication Functions
         function handleLogin() {
+            if (!isFirebaseConfigured()) {
+                showSecurityNotice();
+                return;
+            }
+            
             const email = userEmail.value.trim();
             const password = userPassword.value;
             
@@ -1164,6 +1387,11 @@
         }
         
         function handleGoogleLogin() {
+            if (!isFirebaseConfigured()) {
+                showSecurityNotice();
+                return;
+            }
+            
             const provider = new firebase.auth.GoogleAuthProvider();
             firebase.auth().signInWithPopup(provider)
                 .catch(error => {
@@ -1181,6 +1409,11 @@
         }
         
         function handleRegister() {
+            if (!isFirebaseConfigured()) {
+                showSecurityNotice();
+                return;
+            }
+            
             const email = userEmail.value.trim();
             const password = userPassword.value;
             
@@ -1296,6 +1529,11 @@
         
         // Request Modal Functions
         function openRequestModal(date) {
+            if (!isFirebaseConfigured()) {
+                showSecurityNotice();
+                return;
+            }
+            
             selectedDate = date;
             
             // Format date for display
@@ -1312,6 +1550,11 @@
         }
         
         function handleSubmitRequest() {
+            if (!isFirebaseConfigured()) {
+                showSecurityNotice();
+                return;
+            }
+            
             // Get selected reasons
             const reasons = [];
             document.querySelectorAll('.reason-checkbox:checked').forEach(checkbox => {
@@ -1452,6 +1695,11 @@
         }
         
         function handleRequestAction(e) {
+            if (!isFirebaseConfigured()) {
+                showSecurityNotice();
+                return;
+            }
+            
             const button = e.currentTarget;
             currentRequestId = button.dataset.requestId;
             currentAction = button.dataset.action;
@@ -1468,6 +1716,11 @@
         }
         
         function handleConfirmAction() {
+            if (!isFirebaseConfigured()) {
+                showSecurityNotice();
+                return;
+            }
+            
             if (!currentRequestId || !currentAction) return;
             
             // In a real app, this would update Firestore

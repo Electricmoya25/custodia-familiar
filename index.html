@@ -1,609 +1,1568 @@
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Custodia Familiar Alberto</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
 
-export default function App() {
-  const [currentUser, setCurrentUser] = useState(null);
-  const [monthDays, setMonthDays] = useState([]);
-  const [currentMonthName, setCurrentMonthName] = useState('');
-  const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
-  const [requests, setRequests] = useState([]);
-  const [showModal, setShowModal] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(null);
-  const [selectedReason, setSelectedReason] = useState('');
-  const [requestStatus, setRequestStatus] = useState('idle');
+        :root {
+            --gradient-start: #6366f1;
+            --gradient-end: #f43f5e;
+            --mother-color: #f43f5e;
+            --father-color: #0ea5e9;
+            --mother-light: #fef2f2;
+            --father-light: #f0f9ff;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --neutral-50: #f9fafb;
+            --neutral-100: #f3f4f6;
+            --neutral-200: #e5e7eb;
+            --neutral-700: #374151;
+            --neutral-800: #1f2937;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
 
-  // Month names in Spanish
-  const monthNames = [
-    'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
-  ];
-  
-  // Week day names in Spanish (starting Monday)
-  const weekDays = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+        body {
+            background: linear-gradient(135deg, #f0f9ff 0%, #fef2f2 100%);
+            color: var(--neutral-800);
+            min-height: 100vh;
+            padding-bottom: 100px;
+            overflow-x: hidden;
+        }
 
-  // Generate full month calendar
-  useEffect(() => {
-    const today = new Date();
-    const currentMonth = today.getMonth();
-    const year = today.getFullYear();
-    
-    setCurrentYear(year);
-    setCurrentMonthName(monthNames[currentMonth]);
-    
-    // First day of the month
-    const firstDayOfMonth = new Date(year, currentMonth, 1);
-    // Day of week (0=Sunday, 1=Monday, ... 6=Saturday)
-    let firstDayOfWeek = firstDayOfMonth.getDay();
-    
-    // Adjust to start on Monday (if Sunday, set to 6 days before)
-    const diff = (firstDayOfWeek === 0) ? 6 : firstDayOfWeek - 1;
-    const startDate = new Date(firstDayOfMonth);
-    startDate.setDate(firstDayOfMonth.getDate() - diff);
-    
-    // Generate 42 days (6 weeks)
-    const days = [];
-    for (let i = 0; i < 42; i++) {
-      const date = new Date(startDate);
-      date.setDate(startDate.getDate() + i);
-      const dayOfMonth = date.getDate();
-      const isCurrentMonth = date.getMonth() === currentMonth;
-      
-      // Assign custody days (alternating pattern for demo)
-      let assignedTo = null;
-      if (isCurrentMonth) {
-        // Even days -> Madre, Odd days -> Padre
-        assignedTo = (dayOfMonth % 2 === 0) ? 'madre' : 'padre';
-      }
-      
-      days.push({
-        date: date.toISOString().split('T')[0],
-        day: dayOfMonth,
-        dayName: weekDays[date.getDay() === 0 ? 6 : date.getDay() - 1], // Adjust index for Monday start
-        assignedTo,
-        isCurrentMonth,
-        isToday: date.toDateString() === today.toDateString(),
-        dayOfWeek: date.getDay()
-      });
-    }
-    
-    setMonthDays(days);
-  }, []);
+        /* Login Screen Styles */
+        .login-screen {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            text-align: center;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 30%, #ec4899 70%, #f43f5e 100%);
+            position: relative;
+            overflow: hidden;
+        }
 
-  // Handle user login
-  const handleLogin = (userType) => {
-    setCurrentUser(userType);
-  };
+        .login-screen::before {
+            content: "";
+            position: absolute;
+            width: 300%;
+            height: 300%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            top: -100%;
+            left: -100%;
+            animation: rotate 25s linear infinite;
+        }
 
-  // Handle logout
-  const handleLogout = () => {
-    setCurrentUser(null);
-  };
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
 
-  // Open request modal for a specific date
-  const openRequestModal = (date) => {
-    const day = monthDays.find(d => d.date === date);
-    // Only allow requesting days assigned to the OTHER parent and in current month
-    if (day?.isCurrentMonth && day.assignedTo !== currentUser) {
-      setSelectedDate(date);
-      setShowModal(true);
-    }
-  };
+        .login-container {
+            background: white;
+            border-radius: 28px;
+            box-shadow: var(--shadow-lg);
+            width: 100%;
+            max-width: 480px;
+            overflow: hidden;
+            z-index: 10;
+            animation: slideUp 0.6s ease-out;
+        }
 
-  // Send request
-  const sendRequest = () => {
-    if (!selectedReason || !selectedDate) return;
-    
-    setRequestStatus('sending');
-    
-    // Simulate API delay
-    setTimeout(() => {
-      const newRequest = {
-        id: Date.now(),
-        date: selectedDate,
-        reason: selectedReason,
-        from: currentUser,
-        to: currentUser === 'madre' ? 'padre' : 'madre',
-        status: 'pending',
-        timestamp: new Date().toISOString()
-      };
-      
-      setRequests(prev => [...prev, newRequest]);
-      setShowModal(false);
-      setSelectedReason('');
-      setRequestStatus('success');
-      
-      // Reset success message after 3 seconds
-      setTimeout(() => setRequestStatus('idle'), 3000);
-    }, 800);
-  };
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-  // Handle request approval/rejection
-  const handleRequestAction = (id, action) => {
-    setRequests(prev => 
-      prev.map(req => 
-        req.id === id ? { ...req, status: action } : req
-      )
-    );
-  };
+        .login-header {
+            background: linear-gradient(90deg, var(--mother-color), var(--father-color));
+            padding: 32px 24px;
+            color: white;
+        }
 
-  // Get custody label with clear ownership indication
-  const getCustodyLabel = (assignedTo) => {
-    if (assignedTo === 'madre') return 'Días de la Madre 👩';
-    if (assignedTo === 'padre') return 'Días del Padre 👨';
-    return 'Sin asignar';
-  };
+        .login-header h1 {
+            font-size: 28px;
+            font-weight: 800;
+            margin-top: 16px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
 
-  // Get user-friendly reason text
-  const getReasonText = (reason) => {
-    const reasons = {
-      'medico': 'Cita Médica 🩺',
-      'dentista': 'Dentista 🦷',
-      'colegio': 'Colegio 📚',
-      'deporte': 'Deporte ⚽',
-      'fiesta': 'Fiesta 🎉',
-      'parque': 'Parque 🌳',
-      'otro': 'Otro ❓',
-      'viaje': 'Viaje ✈️'
-    };
-    return reasons[reason] || reason;
-  };
+        .login-header p {
+            font-size: 16px;
+            opacity: 0.9;
+            margin-top: 8px;
+        }
 
-  // Login Screen
-  if (!currentUser) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-100 flex flex-col items-center justify-center p-4 sm:p-6">
-        <motion.div 
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.5 }}
-          className="w-full max-w-md bg-white rounded-3xl shadow-xl overflow-hidden"
-        >
-          <div className="bg-gradient-to-r from-rose-500 to-amber-500 p-6 text-center">
-            <div className="text-6xl mb-4">👨‍👩‍👧‍👦</div>
-            <h1 className="text-3xl font-bold text-white">Custodia Familiar Alberto</h1>
-            <p className="text-amber-100 mt-2">Coordinación de custodia con claridad y respeto</p>
-          </div>
-          
-          <div className="p-8 space-y-6">
-            <p className="text-center text-gray-600 text-lg">
-              Selecciona tu rol para comenzar la coordinación
-            </p>
+        .login-body {
+            padding: 32px 24px;
+        }
+
+        .login-body p {
+            font-size: 18px;
+            margin-bottom: 32px;
+            color: var(--neutral-700);
+            line-height: 1.5;
+        }
+
+        .role-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .role-btn {
+            background: white;
+            border: 3px solid var(--mother-color);
+            border-radius: 24px;
+            padding: 24px 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow-md);
+            font-weight: 700;
+            font-size: 18px;
+            color: var(--mother-color);
+        }
+
+        .role-btn.father {
+            border-color: var(--father-color);
+            color: var(--father-color);
+        }
+
+        .role-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15);
+        }
+
+        .role-btn:active {
+            transform: translateY(1px);
+        }
+
+        .role-btn div {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+
+        .role-btn.father div {
+            font-size: 52px;
+        }
+
+        .role-description {
+            font-size: 14px;
+            margin-top: 8px;
+            opacity: 0.85;
+            line-height: 1.4;
+        }
+
+        .important-notice {
+            background: rgba(255, 250, 230, 0.9);
+            border-left: 4px solid var(--warning-color);
+            padding: 16px;
+            border-radius: 0 12px 12px 0;
+            margin-top: 16px;
+            font-size: 14px;
+            text-align: left;
+            line-height: 1.5;
+        }
+
+        .important-notice strong {
+            color: var(--warning-color);
+        }
+
+        /* Main App Styles */
+        .app-container {
+            display: none;
+            max-width: 480px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+            position: relative;
+            box-shadow: 0 0 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .app-header {
+            background: white;
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .app-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 800;
+            font-size: 20px;
+            background: linear-gradient(90deg, var(--mother-color), var(--father-color));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .app-title-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--mother-color), var(--father-color));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .logout-btn {
+            background: linear-gradient(90deg, #bfdbfe, #dbeafe);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            color: #1e40af;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .logout-btn:hover {
+            background: linear-gradient(90deg, #93c5fd, #bfdbfe);
+            transform: scale(1.03);
+        }
+
+        .user-banner {
+            padding: 16px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 18px;
+            margin: 16px;
+            border-radius: 20px;
+            background: linear-gradient(90deg, rgba(244, 63, 94, 0.15), rgba(254, 242, 242, 0.9));
+            color: var(--mother-color);
+            box-shadow: var(--shadow-sm);
+            animation: pulse 2s infinite;
+        }
+
+        .user-banner.father {
+            background: linear-gradient(90deg, rgba(14, 165, 233, 0.15), rgba(240, 249, 255, 0.9));
+            color: var(--father-color);
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.3); }
+            70% { box-shadow: 0 0 0 8px rgba(244, 63, 94, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0); }
+        }
+
+        .user-banner.father {
+            animation-name: pulse-father;
+        }
+
+        @keyframes pulse-father {
+            0% { box-shadow: 0 0 0 0 rgba(14, 165, 233, 0.3); }
+            70% { box-shadow: 0 0 0 8px rgba(14, 165, 233, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(14, 165, 233, 0); }
+        }
+
+        .calendar-section {
+            background: white;
+            border-radius: 24px;
+            box-shadow: var(--shadow-md);
+            margin: 16px;
+            overflow: hidden;
+        }
+
+        .calendar-header {
+            background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
+            padding: 20px 16px;
+            text-align: center;
+            color: white;
+        }
+
+        .calendar-header h2 {
+            font-size: 24px;
+            font-weight: 800;
+        }
+
+        .calendar-header p {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-top: 6px;
+        }
+
+        .week-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            text-align: center;
+            font-weight: 700;
+            padding: 12px 0;
+            background: var(--neutral-50);
+            border-bottom: 1px solid var(--neutral-200);
+            font-size: 14px;
+            color: var(--neutral-700);
+        }
+
+        .week-days div {
+            padding: 8px 0;
+        }
+
+        .week-days div.weekend {
+            color: var(--warning-color);
+            background: rgba(245, 158, 11, 0.08);
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            text-align: center;
+            padding: 8px;
+            background: white;
+        }
+
+        .calendar-day {
+            min-height: 80px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 4px;
+            position: relative;
+            cursor: pointer;
+            transition: var(--transition);
+            border-radius: 12px;
+            margin: 2px;
+            font-size: 16px;
+            border: 1px solid transparent;
+        }
+
+        .calendar-day:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .calendar-day.other-month {
+            background: var(--neutral-50);
+            color: #9ca3af;
+            cursor: default;
+        }
+
+        .calendar-day.today {
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.5);
+            position: relative;
+            z-index: 2;
+        }
+
+        .calendar-day.today::after {
+            content: "";
+            position: absolute;
+            width: 90%;
+            height: 90%;
+            background: rgba(245, 158, 11, 0.15);
+            border-radius: 50%;
+            z-index: -1;
+        }
+
+        .calendar-day.mother {
+            background: var(--mother-light);
+            border: 1px solid rgba(244, 63, 94, 0.2);
+        }
+
+        .calendar-day.father {
+            background: var(--father-light);
+            border: 1px solid rgba(14, 165, 233, 0.2);
+        }
+
+        .calendar-day.mother.requestable {
+            background: rgba(254, 242, 242, 0.7);
+            border: 2px dashed var(--mother-color);
+            position: relative;
+        }
+
+        .calendar-day.father.requestable {
+            background: rgba(240, 249, 255, 0.7);
+            border: 2px dashed var(--father-color);
+            position: relative;
+        }
+
+        .calendar-day .day-number {
+            font-weight: 700;
+            margin-bottom: 4px;
+            font-size: 18px;
+        }
+
+        .calendar-day.today .day-number {
+            background: var(--warning-color);
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .calendar-day .parent-icon {
+            font-size: 24px;
+            margin: 4px 0;
+        }
+
+        .calendar-day .request-prompt {
+            font-size: 11px;
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--warning-color);
+            padding: 2px 6px;
+            border-radius: 12px;
+            font-weight: 600;
+            margin-top: 4px;
+            display: none;
+        }
+
+        .calendar-day.requestable .request-prompt {
+            display: block;
+        }
+
+        .calendar-day .weekend-badge {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            background: var(--warning-color);
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            font-size: 10px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            display: none;
+        }
+
+        .calendar-day.weekend .weekend-badge {
+            display: flex;
+        }
+
+        .calendar-legend {
+            padding: 12px;
+            background: linear-gradient(90deg, rgba(254, 242, 242, 0.5), rgba(240, 249, 255, 0.5));
+            text-align: center;
+            font-size: 12px;
+            color: var(--neutral-700);
+            border-top: 1px solid var(--neutral-200);
+            line-height: 1.5;
+        }
+
+        .requests-section {
+            background: white;
+            border-radius: 24px;
+            box-shadow: var(--shadow-md);
+            margin: 16px;
+            overflow: hidden;
+        }
+
+        .requests-header {
+            background: linear-gradient(90deg, var(--success-color), #0d9488);
+            padding: 20px 16px;
+            text-align: center;
+            color: white;
+        }
+
+        .requests-header h2 {
+            font-size: 22px;
+            font-weight: 800;
+        }
+
+        .requests-body {
+            padding: 16px;
+        }
+
+        .no-requests {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6b7280;
+        }
+
+        .no-requests div {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .no-requests p {
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        .no-requests p.small {
+            font-size: 15px;
+            margin-top: 8px;
+            opacity: 0.8;
+        }
+
+        .request-card {
+            border-radius: 18px;
+            padding: 16px;
+            margin-bottom: 16px;
+            border: 1px solid var(--neutral-200);
+            box-shadow: var(--shadow-sm);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .request-card.pending-recipient {
+            border-color: var(--warning-color);
+            background: rgba(253, 230, 138, 0.1);
+        }
+
+        .request-card.pending-sender {
+            border-color: #93c5fd;
+            background: rgba(147, 197, 253, 0.1);
+        }
+
+        .request-card.accepted {
+            border-color: var(--success-color);
+            background: rgba(16, 185, 129, 0.08);
+        }
+
+        .request-card.rejected {
+            border-color: var(--error-color);
+            background: rgba(239, 68, 68, 0.08);
+        }
+
+        .request-date {
+            font-weight: 700;
+            font-size: 18px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .request-info {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+            font-size: 16px;
+        }
+
+        .request-info span {
+            margin-left: 8px;
+        }
+
+        .request-reason {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+            padding: 8px 0;
+            border-top: 1px dashed var(--neutral-200);
+            border-bottom: 1px dashed var(--neutral-200);
+            font-weight: 500;
+        }
+
+        .request-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--neutral-200);
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .request-status {
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 14px;
+            font-size: 14px;
+        }
+
+        .request-status.pending {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--warning-color);
+        }
+
+        .request-status.accepted {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success-color);
+        }
+
+        .request-status.rejected {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--error-color);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .action-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: none;
+            font-weight: bold;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .action-btn.accept {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success-color);
+        }
+
+        .action-btn.accept:hover {
+            background: rgba(16, 185, 129, 0.25);
+            transform: scale(1.1);
+        }
+
+        .action-btn.reject {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--error-color);
+        }
+
+        .action-btn.reject:hover {
+            background: rgba(239, 68, 68, 0.25);
+            transform: scale(1.1);
+        }
+
+        .notice-box {
+            background: linear-gradient(90deg, rgba(254, 243, 199, 0.8), rgba(254, 249, 195, 0.8));
+            border-left: 4px solid var(--warning-color);
+            padding: 16px;
+            border-radius: 0 16px 16px 0;
+            margin: 16px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .notice-box h3 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            color: #92400e;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .notice-box ul {
+            padding-left: 20px;
+            margin-top: 8px;
+            font-size: 15px;
+            line-height: 1.6;
+            color: #854d0e;
+        }
+
+        .notice-box li {
+            margin-bottom: 6px;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: var(--transition);
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 28px 28px 0 0;
+            width: 100%;
+            max-width: 480px;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: translateY(100%);
+            transition: var(--transition);
+            box-shadow: 0 -5px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-overlay.active .modal {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            padding: 20px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--neutral-200);
+        }
+
+        .modal-header h2 {
+            font-size: 22px;
+            font-weight: 800;
+            background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 28px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .close-modal:hover {
+            background: var(--neutral-100);
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .selected-date-box {
+            background: linear-gradient(90deg, rgba(254, 243, 199, 0.7), rgba(254, 249, 195, 0.7));
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 18px;
+            padding: 16px;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .selected-date-box p {
+            font-size: 15px;
+            color: #854d0e;
+            margin-top: 6px;
+        }
+
+        .selected-date-box strong {
+            display: block;
+            font-size: 19px;
+            margin-top: 4px;
+            color: #92400e;
+            font-weight: 700;
+        }
+
+        .reason-label {
+            display: block;
+            font-weight: 700;
+            font-size: 18px;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .reason-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .reason-btn {
+            border: 2px solid var(--neutral-200);
+            background: white;
+            border-radius: 16px;
+            padding: 14px 8px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .reason-btn:hover {
+            border-color: var(--warning-color);
+            background: rgba(254, 243, 199, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .reason-btn.active {
+            border-color: var(--warning-color);
+            background: rgba(254, 243, 199, 0.8);
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+            transform: scale(1.05);
+        }
+
+        .reason-btn span {
+            font-size: 22px;
+        }
+
+        .success-message {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+            padding: 14px;
+            border-radius: 14px;
+            text-align: center;
+            font-weight: 500;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .submit-btn {
+            background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 18px;
+            font-size: 19px;
+            font-weight: 700;
+            width: 100%;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.6);
+        }
+
+        .submit-btn:active {
+            transform: translateY(1px);
+        }
+
+        .submit-btn:disabled {
+            background: var(--neutral-200);
+            color: var(--neutral-500);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .modal-footer {
+            text-align: center;
+            font-size: 14px;
+            color: #6b7280;
+            padding: 0 24px 24px;
+            line-height: 1.5;
+        }
+
+        /* Floating Action Button */
+        .fab {
+            position: fixed;
+            bottom: 32px;
+            right: 24px;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--mother-color), var(--father-color));
+            color: white;
+            border: none;
+            font-size: 32px;
+            font-weight: bold;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 900;
+            transition: var(--transition);
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .fab:hover {
+            transform: scale(1.1) translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+        }
+
+        .fab:active {
+            transform: scale(0.95);
+        }
+
+        /* Responsive adjustments */
+        @media (min-width: 480px) {
+            body {
+                background: linear-gradient(135deg, #e0e7ff 0%, #fce7f3 100%);
+                padding-bottom: 40px;
+            }
             
-            <div className="grid grid-cols-2 gap-6">
-              <motion.button
-                whileTap={{ scale: 0.98 }}
-                onClick={() => handleLogin('madre')}
-                className="bg-gradient-to-br from-rose-100 to-amber-100 border-2 border-rose-300 rounded-2xl p-6 flex flex-col items-center justify-center hover:shadow-lg transition-all"
-              >
-                <div className="text-5xl mb-3">👩</div>
-                <span className="text-xl font-bold text-rose-700">Madre</span>
-                <p className="text-sm text-rose-600 mt-2 text-center">
-                  Solicita cambios en los días del Padre
-                </p>
-              </motion.button>
-              
-              <motion.button
-                whileTap={{ scale: 0.98 }}
-                onClick={() => handleLogin('padre')}
-                className="bg-gradient-to-br from-sky-100 to-cyan-100 border-2 border-sky-300 rounded-2xl p-6 flex flex-col items-center justify-center hover:shadow-lg transition-all"
-              >
-                <div className="text-5xl mb-3">👨</div>
-                <span className="text-xl font-bold text-sky-700">Padre</span>
-                <p className="text-sm text-sky-600 mt-2 text-center">
-                  Solicita cambios en los días de la Madre
-                </p>
-              </motion.button>
-            </div>
+            .login-screen {
+                background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 25%, #db2777 75%, #be123c 100%);
+            }
             
-            <div className="mt-4 p-4 bg-amber-50 rounded-xl border border-amber-100">
-              <p className="text-amber-800 text-center text-sm">
-                <span className="font-bold">Importante:</span> Solo puedes solicitar cambios para los días asignados al otro progenitor. 
-                Las solicitudes serán revisadas por el otro padre/madre.
-              </p>
+            .app-container {
+                margin-top: 24px;
+                border-radius: 32px;
+                overflow: hidden;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .animate-slide-up {
+            animation: slideUp 0.5s ease-out forwards;
+        }
+
+        /* Loading animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-container animate-fade-in">
+            <div class="login-header">
+                <div style="font-size: 64px; margin-bottom: 12px;">👨‍👩‍👧‍👦</div>
+                <h1>Custodia Familiar Alberto</h1>
+                <p>Coordinación de custodia con claridad y respeto</p>
             </div>
-          </div>
-        </motion.div>
-      </div>
-    );
-  }
-
-  // Main Application
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-100 pb-28">
-      {/* Header */}
-      <header className="bg-white shadow-sm sticky top-0 z-50">
-        <div className="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
-          <div className="flex items-center space-x-3">
-            <div className="bg-gradient-to-r from-rose-400 to-amber-400 w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-lg">
-              CF
-            </div>
-            <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-rose-500 to-amber-500">
-              Custodia Familiar Alberto
-            </h1>
-          </div>
-          <motion.button
-            whileTap={{ scale: 0.95 }}
-            onClick={handleLogout}
-            className="px-3 py-1 bg-gradient-to-r from-sky-100 to-cyan-200 text-sky-800 rounded-full font-medium text-sm flex items-center"
-          >
-            <span>Cerrar Sesión</span>
-            <span className="ml-1">🚪</span>
-          </motion.button>
-        </div>
-      </header>
-
-      <main className="max-w-4xl mx-auto px-3 sm:px-4 py-4">
-        {/* User Role Banner */}
-        <div className={`mb-5 rounded-2xl p-3 sm:p-4 text-center font-bold text-base sm:text-lg ${
-          currentUser === 'madre' 
-            ? 'bg-gradient-to-r from-rose-100 to-amber-100 text-rose-800' 
-            : 'bg-gradient-to-r from-sky-100 to-cyan-100 text-sky-800'
-        }`}>
-          {currentUser === 'madre' 
-            ? '👩 Eres la Madre - Solicita cambios solo en los días del Padre' 
-            : '👨 Eres el Padre - Solicita cambios solo en los días de la Madre'}
-        </div>
-
-        {/* Calendar Section */}
-        <section className="bg-white rounded-2xl shadow-md overflow-hidden mb-6">
-          <div className="p-3 sm:p-4 bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
-            <h2 className="text-xl sm:text-2xl font-bold text-center">
-              {currentMonthName} {currentYear}
-            </h2>
-            <p className="text-center text-indigo-100 mt-1 text-xs sm:text-sm">
-              Toque los días {currentUser === 'madre' ? 'del Padre 👨' : 'de la Madre 👩'} para solicitar cambios
-            </p>
-          </div>
-          
-          {/* Week days header */}
-          <div className="grid grid-cols-7 text-center font-bold bg-gray-50 border-b border-gray-200">
-            {weekDays.map((day, index) => (
-              <div 
-                key={index} 
-                className={`py-2 text-xs sm:text-sm ${
-                  ['Sáb', 'Dom'].includes(day) 
-                    ? 'text-amber-600 bg-amber-50' 
-                    : 'text-gray-700'
-                }`}
-              >
-                {day}
-              </div>
-            ))}
-          </div>
-          
-          {/* Calendar grid - 6 rows of 7 days */}
-          <div className="grid grid-cols-7 text-center">
-            {monthDays.map((day, index) => {
-              const isOtherParentDay = day.isCurrentMonth && day.assignedTo && day.assignedTo !== currentUser;
-              const isWeekend = day.dayOfWeek === 0 || day.dayOfWeek === 6; // Sunday or Saturday
-              
-              return (
-                <motion.div
-                  key={index}
-                  whileTap={isOtherParentDay ? { scale: 0.97 } : undefined}
-                  onClick={() => openRequestModal(day.date)}
-                  className={`border border-gray-100 min-h-[70px] sm:min-h-[80px] flex flex-col items-center justify-center cursor-pointer transition-all relative ${
-                    day.isToday ? 'ring-2 ring-amber-400 ring-offset-2' : ''
-                  } ${
-                    !day.isCurrentMonth 
-                      ? 'bg-gray-50 text-gray-400 cursor-default' 
-                      : isOtherParentDay
-                        ? day.assignedTo === 'madre'
-                          ? 'bg-sky-50 hover:bg-sky-100 border-dashed border-sky-300'
-                          : 'bg-rose-50 hover:bg-rose-100 border-dashed border-rose-300'
-                        : day.assignedTo === 'madre'
-                          ? 'bg-rose-100'
-                          : 'bg-sky-100'
-                  } ${
-                    isWeekend && day.isCurrentMonth ? 'bg-gradient-to-br from-amber-50 to-amber-100' : ''
-                  }`}
-                >
-                  {/* Day number */}
-                  <div className={`font-bold text-sm sm:text-base ${
-                    day.isToday 
-                      ? 'text-amber-600 bg-amber-200 w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center' 
-                      : day.isCurrentMonth 
-                        ? 'text-gray-800' 
-                        : ''
-                  }`}>
-                    {day.day}
-                  </div>
-                  
-                  {/* Parent indicator and request prompt */}
-                  {day.isCurrentMonth && (
-                    <div className="mt-1 flex flex-col items-center">
-                      <div className={`text-lg ${
-                        day.assignedTo === 'madre' ? 'text-rose-600' : 'text-sky-600'
-                      }`}>
-                        {day.assignedTo === 'madre' ? '👩' : '👨'}
-                      </div>
-                      {isOtherParentDay && (
-                        <div className="mt-1 text-[10px] sm:text-xs font-medium text-amber-700 px-1 py-0.5 bg-amber-100 rounded">
-                          Solicitar
-                        </div>
-                      )}
+            <div class="login-body">
+                <p>Selecciona tu rol para comenzar la coordinación</p>
+                
+                <div class="role-grid">
+                    <div class="role-btn" data-role="madre">
+                        <div>👩</div>
+                        <span>Madre</span>
+                        <div class="role-description">Solicita cambios en los días del Padre</div>
                     </div>
-                  )}
-                  
-                  {/* Weekend badge */}
-                  {isWeekend && day.isCurrentMonth && (
-                    <div className="absolute top-1 right-1 bg-amber-200 text-[8px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
-                      {day.dayOfWeek === 0 ? 'D' : 'S'}
+                    <div class="role-btn father" data-role="padre">
+                        <div>👨</div>
+                        <span>Padre</span>
+                        <div class="role-description">Solicita cambios en los días de la Madre</div>
                     </div>
-                  )}
-                </motion.div>
-              );
-            })}
-          </div>
-          
-          <div className="p-3 bg-gradient-to-r from-rose-50 to-sky-50 text-center text-[10px] sm:text-xs text-gray-600 border-t border-gray-100">
-            <p>
-              <span className="font-medium">Leyenda:</span> <span className="text-amber-600">■</span> Fin de semana | 
-              <span className="ml-2 inline-flex items-center"><span className="w-3 h-3 rounded-full bg-rose-200 mr-1"></span>Madre</span> | 
-              <span className="ml-2 inline-flex items-center"><span className="w-3 h-3 rounded-full bg-sky-200 mr-1"></span>Padre</span> | 
-              <span className="ml-2">Borde punteado = Días solicitables</span>
-            </p>
-          </div>
-        </section>
-
-        {/* Requests Status Section */}
-        <section className="bg-white rounded-2xl shadow-md overflow-hidden mb-6">
-          <div className="p-3 sm:p-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white">
-            <h2 className="text-xl font-bold text-center">Estado de Solicitudes</h2>
-          </div>
-          
-          <div className="p-3 sm:p-4">
-            {requests.length === 0 ? (
-              <div className="text-center py-6 sm:py-8 text-gray-500">
-                <div className="text-4xl mb-2">📭</div>
-                <p className="font-medium">No hay solicitudes pendientes</p>
-                <p className="text-xs sm:text-sm mt-1">Todas las solicitudes aparecerán aquí</p>
-              </div>
-            ) : (
-              <div className="space-y-3 sm:space-y-4">
-                {requests.map((request) => {
-                  const isRecipient = request.to === currentUser;
-                  const isSender = request.from === currentUser;
-                  
-                  return (
-                    <div 
-                      key={request.id} 
-                      className={`border rounded-xl p-3 sm:p-4 ${
-                        request.status === 'pending' 
-                          ? isRecipient 
-                            ? 'border-amber-300 bg-amber-50' 
-                            : 'border-blue-300 bg-blue-50'
-                          : request.status === 'accepted'
-                            ? 'border-emerald-300 bg-emerald-50'
-                            : 'border-rose-300 bg-rose-50'
-                      }`}
-                    >
-                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start">
-                        <div className="mb-3 sm:mb-0">
-                          <div className="font-bold text-base sm:text-lg">
-                            {new Date(request.date).toLocaleDateString('es-ES', {
-                              weekday: 'long',
-                              year: 'numeric',
-                              month: 'long',
-                              day: 'numeric'
-                            })}
-                          </div>
-                          <div className="mt-1 flex items-center">
-                            <span className="text-xl sm:text-2xl mr-2">
-                              {request.from === 'madre' ? '👩' : '👨'}
-                            </span>
-                            <span className="text-sm sm:text-base">
-                              {isSender 
-                                ? `Solicitaste cambio para este día` 
-                                : `Solicitud de ${request.from === 'madre' ? 'la Madre' : 'el Padre'}`}
-                            </span>
-                          </div>
-                          <div className="mt-2 flex items-center">
-                            <span className="text-lg sm:text-xl mr-2">{request.reason.startsWith('viaje') ? '✈️' : '📝'}</span>
-                            <span className="font-medium text-sm sm:text-base">{getReasonText(request.reason)}</span>
-                          </div>
-                        </div>
-                        
-                        {request.status === 'pending' && isRecipient && (
-                          <div className="flex space-x-2">
-                            <motion.button
-                              whileTap={{ scale: 0.95 }}
-                              onClick={() => handleRequestAction(request.id, 'accepted')}
-                              className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-emerald-100 border-2 border-emerald-300 flex items-center justify-center text-emerald-700 font-bold text-lg"
-                            >
-                              ✓
-                            </motion.button>
-                            <motion.button
-                              whileTap={{ scale: 0.95 }}
-                              onClick={() => handleRequestAction(request.id, 'rejected')}
-                              className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-rose-100 border-2 border-rose-300 flex items-center justify-center text-rose-700 font-bold text-lg"
-                            >
-                              ✕
-                            </motion.button>
-                          </div>
-                        )}
-                      </div>
-                      
-                      <div className="mt-3 pt-3 border-t border-gray-100 flex flex-col sm:flex-row sm:justify-between sm:items-center">
-                        <div className="text-[10px] sm:text-xs text-gray-500 mb-2 sm:mb-0">
-                          Solicitado: {new Date(request.timestamp).toLocaleTimeString('es-ES', {
-                            hour: '2-digit',
-                            minute: '2-digit'
-                          })}
-                        </div>
-                        <div className={`font-bold px-2 py-1 text-[10px] sm:text-xs rounded-full ${
-                          request.status === 'pending' 
-                            ? 'bg-amber-100 text-amber-800'
-                            : request.status === 'accepted'
-                              ? 'bg-emerald-100 text-emerald-800'
-                              : 'bg-rose-100 text-rose-800'
-                        }`}>
-                          {request.status === 'pending' && 'Pendiente'}
-                          {request.status === 'accepted' && 'Aceptado'}
-                          {request.status === 'rejected' && 'Rechazado'}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        </section>
-
-        {/* Important Notice */}
-        <div className="bg-gradient-to-r from-amber-50 to-amber-100 border-l-4 border-amber-400 p-3 sm:p-4 rounded-r-xl mb-6">
-          <div className="flex flex-col sm:flex-row items-start">
-            <div className="text-xl sm:text-2xl mr-2 mb-2 sm:mb-0 mt-1">ℹ️</div>
-            <div>
-              <h3 className="font-bold text-amber-800 text-base">Reglas de Solicitud</h3>
-              <ul className="mt-2 space-y-1 text-amber-700 text-[10px] sm:text-xs">
-                <li>• {currentUser === 'madre' 
-                  ? 'Como Madre, solo puedes solicitar cambios en los días asignados al Padre' 
-                  : 'Como Padre, solo puedes solicitar cambios en los días asignados a la Madre'}</li>
-                <li>• El otro progenitor debe aprobar o rechazar tu solicitud</li>
-                <li>• Las solicitudes aprobadas modificarán el calendario de custodia</li>
-                <li>• Mantén una comunicación respetuosa y clara en todas las solicitudes</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </main>
-
-      {/* Request Modal */}
-      <AnimatePresence>
-        {showModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-end justify-center z-50"
-            onClick={() => setShowModal(false)}
-          >
-            <motion.div
-              initial={{ y: '100%' }}
-              animate={{ y: 0 }}
-              exit={{ y: '100%' }}
-              className="bg-white rounded-t-3xl w-full max-h-[90vh] overflow-y-auto max-w-md mx-2"
-              onClick={e => e.stopPropagation()}
-            >
-              <div className="p-4 sm:p-6">
-                <div className="flex justify-between items-center mb-4 sm:mb-6">
-                  <h2 className="text-xl sm:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">
-                    Nueva Solicitud de Cambio
-                  </h2>
-                  <motion.button
-                    whileTap={{ scale: 0.9 }}
-                    onClick={() => setShowModal(false)}
-                    className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center font-bold"
-                  >
-                    ✕
-                  </motion.button>
                 </div>
                 
-                <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-gradient-to-r from-amber-50 to-rose-50 rounded-xl border border-amber-100">
-                  <p className="font-medium text-amber-800 text-sm sm:text-base">
-                    📅 Fecha seleccionada:{" "}
-                    <span className="font-bold">
-                      {new Date(selectedDate).toLocaleDateString('es-ES', {
-                        weekday: 'long',
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                      })}
-                    </span>
-                  </p>
-                  <p className="mt-2 text-[10px] sm:text-sm text-amber-700">
-                    Recuerda: Estás solicitando un cambio para un día que actualmente está asignado a {currentUser === 'madre' ? 'el Padre 👨' : 'la Madre 👩'}
-                  </p>
+                <div class="important-notice">
+                    <strong>Importante:</strong> Solo puedes solicitar cambios para los días asignados al otro progenitor. Las solicitudes serán revisadas por el otro padre/madre.
                 </div>
-                
-                <div className="mb-4 sm:mb-6">
-                  <label className="block text-base font-medium text-gray-700 mb-2 sm:mb-3">
-                    Motivo de la Solicitud
-                  </label>
-                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 sm:gap-3">
-                    {[
-                      { id: 'medico', label: 'Médico 🩺' },
-                      { id: 'dentista', label: 'Dentista 🦷' },
-                      { id: 'colegio', label: 'Colegio 📚' },
-                      { id: 'deporte', label: 'Deporte ⚽' },
-                      { id: 'fiesta', label: 'Fiesta 🎉' },
-                      { id: 'parque', label: 'Parque 🌳' },
-                      { id: 'viaje', label: 'Viaje ✈️' },
-                      { id: 'otro', label: 'Otro ❓' }
-                    ].map((reason) => (
-                      <motion.button
-                        key={reason.id}
-                        whileTap={{ scale: 0.97 }}
-                        onClick={() => setSelectedReason(reason.id)}
-                        className={`p-2 sm:p-3 rounded-xl border-2 font-medium text-[10px] sm:text-xs transition-all ${
-                          selectedReason === reason.id
-                            ? 'border-amber-400 bg-amber-50 text-amber-800 shadow-md'
-                            : 'border-gray-200 hover:border-amber-200 bg-white'
-                        }`}
-                      >
-                        {reason.label}
-                      </motion.button>
-                    ))}
-                  </div>
-                </div>
-                
-                {requestStatus === 'success' && (
-                  <div className="mb-3 sm:mb-4 p-2 sm:p-3 bg-emerald-50 text-emerald-700 rounded-lg text-center font-medium text-sm">
-                    ¡Solicitud enviada correctamente! El otro progenitor recibirá una notificación.
-                  </div>
-                )}
-                
-                {requestStatus === 'error' && (
-                  <div className="mb-3 sm:mb-4 p-2 sm:p-3 bg-rose-50 text-rose-700 rounded-lg text-center font-medium text-sm">
-                    Error al enviar la solicitud. Por favor intenta nuevamente.
-                  </div>
-                )}
-                
-                <motion.button
-                  whileTap={{ scale: 0.98 }}
-                  onClick={sendRequest}
-                  disabled={!selectedReason || requestStatus === 'sending'}
-                  className={`w-full py-3 sm:py-4 rounded-xl font-bold text-base sm:text-lg transition-all ${
-                    !selectedReason || requestStatus === 'sending'
-                      ? 'bg-gray-300 cursor-not-allowed'
-                      : 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white hover:from-indigo-600 hover:to-purple-700 shadow-lg'
-                  }`}
-                >
-                  {requestStatus === 'sending' ? 'Enviando...' : 'Enviar Solicitud 📤'}
-                </motion.button>
-                
-                <p className="mt-3 sm:mt-4 text-center text-[10px] sm:text-sm text-gray-500 px-2">
-                  La solicitud será revisada por {currentUser === 'madre' ? 'el Padre' : 'la Madre'} y recibirás una notificación con la respuesta
-                </p>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-      
-      {/* Floating Action Button for Mobile */}
-      <motion.button
-        whileTap={{ scale: 0.95 }}
-        onClick={() => {
-          // Find next available day from other parent
-          const nextAvailable = monthDays.find(day => 
-            day.isCurrentMonth && 
-            day.assignedTo && 
-            day.assignedTo !== currentUser &&
-            new Date(day.date) >= new Date()
-          );
-          if (nextAvailable) {
-            setSelectedDate(nextAvailable.date);
-            setShowModal(true);
-          }
-        }}
-        className="fixed bottom-6 right-6 w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-r from-rose-500 to-amber-500 text-white text-2xl font-bold shadow-xl flex items-center justify-center z-40"
-        aria-label="Nueva solicitud"
-      >
-        +
-      </motion.button>
+            </div>
+        </div>
     </div>
-  );
-}
+
+    <!-- Main App -->
+    <div class="app-container" id="appContainer">
+        <header class="app-header">
+            <div class="app-title">
+                <div class="app-title-icon">CF</div>
+                <span>Custodia Familiar Alberto</span>
+            </div>
+            <button class="logout-btn" id="logoutBtn">
+                <span>Cerrar Sesión</span>
+                <span>🚪</span>
+            </button>
+        </header>
+
+        <div class="user-banner" id="userBanner">
+            👩 Eres la Madre - Solicita cambios solo en los días del Padre
+        </div>
+
+        <section class="calendar-section animate-slide-up">
+            <div class="calendar-header">
+                <h2 id="monthYear">Julio 2026</h2>
+                <p>Toque los días del Padre 👨 para solicitar cambios</p>
+            </div>
+            
+            <div class="week-days">
+                <div>Lun</div>
+                <div>Mar</div>
+                <div>Mié</div>
+                <div>Jue</div>
+                <div>Vie</div>
+                <div class="weekend">Sáb</div>
+                <div class="weekend">Dom</div>
+            </div>
+            
+            <div class="calendar-grid" id="calendarGrid">
+                <!-- Calendar days will be generated by JavaScript -->
+            </div>
+            
+            <div class="calendar-legend">
+                <p><strong>Leyenda:</strong> <span style="color:#f59e0b">■</span> Fin de semana | 
+                <span style="color:#f43f5e;margin:0 4px">■</span> Madre | 
+                <span style="color:#0ea5e9;margin:0 4px">■</span> Padre | 
+                Borde punteado = Días que puedes solicitar</p>
+            </div>
+        </section>
+
+        <section class="requests-section animate-slide-up">
+            <div class="requests-header">
+                <h2>Estado de Solicitudes</h2>
+            </div>
+            <div class="requests-body" id="requestsBody">
+                <div class="no-requests">
+                    <div>📭</div>
+                    <p>No hay solicitudes pendientes</p>
+                    <p class="small">Todas las solicitudes aparecerán aquí</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="notice-box animate-slide-up">
+            <h3>
+                <span>ℹ️</span>
+                <span>Reglas de Solicitud</span>
+            </h3>
+            <ul id="rulesList">
+                <li>Como Madre, solo puedes solicitar cambios en los días asignados al Padre</li>
+                <li>El otro progenitor debe aprobar o rechazar tu solicitud</li>
+                <li>Las solicitudes aprobadas modificarán el calendario de custodia</li>
+                <li>Mantén una comunicación respetuosa y clara en todas las solicitudes</li>
+            </ul>
+        </div>
+
+        <button class="fab" id="fab">+</button>
+    </div>
+
+    <!-- Request Modal -->
+    <div class="modal-overlay" id="requestModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Nueva Solicitud de Cambio</h2>
+                <button class="close-modal" id="closeModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="selected-date-box" id="selectedDateBox">
+                    <div>📅 Fecha seleccionada:</div>
+                    <strong id="selectedDateDisplay">Sábado, 15 de Julio de 2026</strong>
+                    <p>Recuerda: Estás solicitando un cambio para un día que actualmente está asignado al Padre 👨</p>
+                </div>
+                
+                <label class="reason-label">Motivo de la Solicitud</label>
+                
+                <div class="reason-grid">
+                    <button class="reason-btn" data-reason="medico">
+                        <span>🩺</span>
+                        Médico
+                    </button>
+                    <button class="reason-btn" data-reason="dentista">
+                        <span>🦷</span>
+                        Dentista
+                    </button>
+                    <button class="reason-btn" data-reason="colegio">
+                        <span>📚</span>
+                        Colegio
+                    </button>
+                    <button class="reason-btn" data-reason="deporte">
+                        <span>⚽</span>
+                        Deporte
+                    </button>
+                    <button class="reason-btn" data-reason="fiesta">
+                        <span>🎉</span>
+                        Fiesta
+                    </button>
+                    <button class="reason-btn" data-reason="parque">
+                        <span>🌳</span>
+                        Parque
+                    </button>
+                    <button class="reason-btn" data-reason="viaje">
+                        <span>✈️</span>
+                        Viaje
+                    </button>
+                    <button class="reason-btn" data-reason="otro">
+                        <span>❓</span>
+                        Otro
+                    </button>
+                </div>
+                
+                <div class="success-message" id="successMessage">
+                    ¡Solicitud enviada correctamente! El otro progenitor recibirá una notificación.
+                </div>
+                
+                <button class="submit-btn" id="submitRequest" disabled>
+                    Enviar Solicitud 📤
+                </button>
+                
+                <div class="modal-footer">
+                    <p>La solicitud será revisada por el Padre y recibirás una notificación con la respuesta</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const loginScreen = document.getElementById('loginScreen');
+        const appContainer = document.getElementById('appContainer');
+        const userBanner = document.getElementById('userBanner');
+        const monthYearElement = document.getElementById('monthYear');
+        const calendarGrid = document.getElementById('calendarGrid');
+        const requestsBody = document.getElementById('requestsBody');
+        const rulesList = document.getElementById('rulesList');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const fab = document.getElementById('fab');
+        const requestModal = document.getElementById('requestModal');
+        const closeModal = document.getElementById('closeModal');
+        const selectedDateBox = document.getElementById('selectedDateBox');
+        const selectedDateDisplay = document.getElementById('selectedDateDisplay');
+        const reasonBtns = document.querySelectorAll('.reason-btn');
+        const submitRequestBtn = document.getElementById('submitRequest');
+        const successMessage = document.getElementById('successMessage');
+        const roleBtns = document.querySelectorAll('.role-btn');
+        
+        // State variables
+        let currentUser = null;
+        let currentMonth = new Date().getMonth();
+        let currentYear = new Date().getFullYear();
+        let selectedDate = null;
+        let selectedReason = null;
+        let requests = [];
+        
+        // Initialize the app
+        function initApp() {
+            // Set up event listeners
+            logoutBtn.addEventListener('click', logout);
+            fab.addEventListener('click', openNextAvailableRequest);
+            closeModal.addEventListener('click', closeRequestModal);
+            requestModal.addEventListener('click', (e) => {
+                if (e.target === requestModal) closeRequestModal();
+            });
+            submitRequestBtn.addEventListener('click', sendRequest);
+            
+            // Set up role selection
+            roleBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const role = btn.getAttribute('data-role');
+                    login(role);
+                });
+            });
+            
+            // Set up reason buttons
+            reasonBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    selectedReason = btn.getAttribute('data-reason');
+                    
+                    // Update active state
+                    reasonBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    
+                    // Enable submit button
+                    submitRequestBtn.disabled = false;
+                });
+            });
+            
+            // Generate calendar
+            generateCalendar();
+        }
+        
+        // Login function
+        function login(role) {
+            currentUser = role;
+            
+            // Update UI based on user role
+            if (currentUser === 'madre') {
+                userBanner.textContent = '👩 Eres la Madre - Solicita cambios solo en los días del Padre';
+                userBanner.className = 'user-banner';
+                monthYearElement.querySelector('p').textContent = 'Toque los días del Padre 👨 para solicitar cambios';
+                selectedDateBox.querySelector('p').textContent = 'Recuerda: Estás solicitando un cambio para un día que actualmente está asignado al Padre 👨';
+                document.querySelector('.modal-footer p').textContent = 'La solicitud será revisada por el Padre y recibirás una notificación con la respuesta';
+                
+                // Update rules
+                rulesList.children[0].textContent = 'Como Madre, solo puedes solicitar cambios en los días asignados al Padre';
+                rulesList.children[1].textContent = 'El Padre debe aprobar o rechazar tu solicitud';
+                rulesList.children[3].textContent = 'Mantén una comunicación respetuosa y clara en todas las solicitudes';
+            } else {
+                userBanner.textContent = '👨 Eres el Padre - Solicita cambios solo en los días de la Madre';
+                userBanner.className = 'user-banner father';
+                monthYearElement.querySelector('p').textContent = 'Toque los días de la Madre 👩 para solicitar cambios';
+                selectedDateBox.querySelector('p').textContent = 'Recuerda: Estás solicitando un cambio para un día que actualmente está asignado a la Madre 👩';
+                document.querySelector('.modal-footer p').textContent = 'La solicitud será revisada por la Madre y recibirás una notificación con la respuesta';
+                
+                // Update rules
+                rulesList.children[0].textContent = 'Como Padre, solo puedes solicitar cambios en los días asignados a la Madre';
+                rulesList.children[1].textContent = 'La Madre debe aprobar o rechazar tu solicitud';
+                rulesList.children[3].textContent = 'Mantén una comunicación respetuosa y clara en todas las solicitudes';
+            }
+            
+            // Switch screens
+            loginScreen.style.display = 'none';
+            appContainer.style.display = 'block';
+            
+            // Generate calendar
+            generateCalendar();
+        }
+        
+        // Logout function
+        function logout() {
+            currentUser = null;
+            selectedDate = null;
+            selectedReason = null;
+            requests = [];
+            
+            // Reset UI
+            loginScreen.style.display = 'flex';
+            appContainer.style.display = 'none';
+            
+            // Clear selections in modal
+            reasonBtns.forEach(btn => btn.classList.remove('active'));
+            submitRequestBtn.disabled = true;
+            successMessage.style.display = 'none';
+        }
+        
+        // Generate calendar for current month
+        function generateCalendar() {
+            // Update month/year display
+            const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+            monthYearElement.querySelector('h2').textContent = `${monthNames[currentMonth]} ${currentYear}`;
+            
+            // Clear calendar grid
+            calendarGrid.innerHTML = '';
+            
+            // Get first day of month and total days
+            const firstDay = new Date(currentYear, currentMonth, 1);
+            const lastDay = new Date(currentYear, currentMonth + 1, 0);
+            const totalDays = lastDay.getDate();
+            const startDayOfWeek = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1; // Monday = 0
+            
+            // Get days from previous month to fill the grid
+            const prevMonthLastDay = new Date(currentYear, currentMonth, 0).getDate();
+            
+            // Create calendar days
+            let dayCount = 1;
+            let nextMonthDayCount = 1;
+            
+            // Create 6 rows (max needed for a month)
+            for (let i = 0; i < 42; i++) {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day';
+                
+                // Determine which day to show
+                if (i < startDayOfWeek) {
+                    // Days from previous month
+                    const dayNum = prevMonthLastDay - (startDayOfWeek - i - 1);
+                    dayElement.textContent = dayNum;
+                    dayElement.classList.add('other-month');
+                } else if (i >= startDayOfWeek && dayCount <= totalDays) {
+                    // Days from current month
+                    const date = new Date(currentYear, currentMonth, dayCount);
+                    const dayOfWeek = date.getDay();
+                    const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+                    const isToday = isSameDate(date, new Date());
+                    
+                    // Assign custody (alternating days for demo)
+                    const assignedTo = dayCount % 2 === 0 ? 'madre' : 'padre';
+                    const isOtherParentDay = assignedTo !== currentUser;
+                    
+                    // Set day content
+                    dayElement.innerHTML = `
+                        <div class="day-number">${dayCount}</div>
+                        <div class="parent-icon">${assignedTo === 'madre' ? '👩' : '👨'}</div>
+                        ${isOtherParentDay ? '<div class="request-prompt">Solicitar</div>' : ''}
+                        ${isWeekend ? '<div class="weekend-badge">' + (dayOfWeek === 0 ? 'D' : 'S') + '</div>' : ''}
+                    `;
+                    
+                    // Add classes
+                    dayElement.classList.add(assignedTo);
+                    if (isWeekend) dayElement.classList.add('weekend');
+                    if (isToday) dayElement.classList.add('today');
+                    if (isOtherParentDay) dayElement.classList.add('requestable');
+                    
+                    // Add click event for requestable days
+                    if (isOtherParentDay) {
+                        dayElement.addEventListener('click', () => openRequestModal(date));
+                    }
+                    
+                    dayCount++;
+                } else {
+                    // Days from next month
+                    dayElement.textContent = nextMonthDayCount;
+                    dayElement.classList.add('other-month');
+                    nextMonthDayCount++;
+                }
+                
+                calendarGrid.appendChild(dayElement);
+            }
+        }
+        
+        // Open request modal for a specific date
+        function openRequestModal(date) {
+            selectedDate = date;
+            
+            // Format date for display
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const formattedDate = date.toLocaleDateString('es-ES', options);
+            selectedDateDisplay.textContent = formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
+            
+            // Show modal
+            requestModal.classList.add('active');
+            
+            // Reset form
+            reasonBtns.forEach(btn => btn.classList.remove('active'));
+            submitRequestBtn.disabled = true;
+            successMessage.style.display = 'none';
+        }
+        
+        // Open next available request day
+        function openNextAvailableRequest() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            // Find next available day from other parent
+            for (let day = 1; day <= 31; day++) {
+                const date = new Date(currentYear, currentMonth, day);
+                if (date.getMonth() !== currentMonth) break;
+                
+                // Skip if before today
+                if (date < today) continue;
+                
+                // Check if it's the other parent's day
+                const assignedTo = day % 2 === 0 ? 'madre' : 'padre';
+                if (assignedTo !== currentUser) {
+                    openRequestModal(date);
+                    return;
+                }
+            }
+            
+            // If no available days this month, show message
+            alert('No hay días disponibles para solicitar cambios este mes. Por favor selecciona un día manualmente en el calendario.');
+        }
+        
+        // Close request modal
+        function closeRequestModal() {
+            requestModal.classList.remove('active');
+        }
+        
+        // Send request
+        function sendRequest() {
+            if (!selectedDate || !selectedReason) return;
+            
+            // Show loading state
+            const originalText = submitRequestBtn.innerHTML;
+            submitRequestBtn.disabled = true;
+            submitRequestBtn.innerHTML = '<div class="loading"></div>Enviando...';
+            
+            // Simulate API delay
+            setTimeout(() => {
+                // Create request object
+                const request = {
+                    id: Date.now(),
+                    date: new Date(selectedDate),
+                    reason: selectedReason,
+                    from: currentUser,
+                    to: currentUser === 'madre' ? 'padre' : 'madre',
+                    status: 'pending',
+                    timestamp: new Date()
+                };
+                
+                // Add to requests array
+                requests.unshift(request);
+                
+                // Update UI
+                renderRequests();
+                showSuccessMessage();
+                
+                // Reset button
+                submitRequestBtn.innerHTML = originalText;
+                submitRequestBtn.disabled = true;
+                
+                // Clear selection after delay
+                setTimeout(() => {
+                    closeRequestModal();
+                }, 1500);
+            }, 800);
+        }
+        
+        // Show success message
+        function showSuccessMessage() {
+            successMessage.style.display = 'block';
+            setTimeout(() => {
+                successMessage.style.display = 'none';
+            }, 3000);
+        }
+        
+        // Render requests list
+        function renderRequests() {
+            if (requests.length === 0) {
+                requestsBody.innerHTML = `
+                    <div class="no-requests">
+                        <div>📭</div>
+                        <p>No hay solicitudes pendientes</p>
+                        <p class="small">Todas las solicitudes aparecerán aquí</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            requestsBody.innerHTML = '';
+            
+            requests.forEach(request => {
+                const isRecipient = request.to === currentUser;
+                const isSender = request.from === currentUser;
+                const isPending = request.status === 'pending';
+                const requestCardClass = isPending ? 
+                    (isRecipient ? 'pending-recipient' : 'pending-sender') : 
+                    request.status;
+                
+                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                const formattedDate = request.date.toLocaleDateString('es-ES', options);
+                const formattedTime = request.timestamp.toLocaleTimeString('es-ES', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+                
+                const reasonText = {
+                    'medico': 'Cita Médica 🩺',
+                    'dentista': 'Dentista 🦷',
+                    'colegio': 'Colegio 📚',
+                    'deporte': 'Deporte ⚽',
+                    'fiesta': 'Fiesta 🎉',
+                    'parque': 'Parque 🌳',
+                    'viaje': 'Viaje ✈️',
+                    'otro': 'Otro ❓'
+                }[request.reason] || request.reason;
+                
+                const fromText = request.from === 'madre' ? 'la Madre 👩' : 'el Padre 👨';
+                const requestInfo = isSender ? 
+                    'Solicitaste cambio para este día' : 
+                    `Solicitud de ${fromText}`;
+                
+                let actionsHTML = '';
+                if (isPending && isRecipient) {
+                    actionsHTML = `
+                        <div class="action-buttons">
+                            <button class="action-btn accept" data-id="${request.id}">✓</button>
+                            <button class="action-btn reject" data-id="${request.id}">✕</button>
+                        </div>
+                    `;
+                }
+                
+                const card = document.createElement('div');
+                card.className = `request-card ${requestCardClass}`;
+                card.innerHTML = `
+                    <span class="request-date">${formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1)}</span>
+                    <div class="request-info">
+                        <span>${request.from === 'madre' ? '👩' : '👨'}</span>
+                        <span>${requestInfo}</span>
+                    </div>
+                    <div class="request-reason">
+                        <span>${reasonText.startsWith('Viaje') ? '✈️' : '📝'}</span>
+                        <span>${reasonText}</span>
+                    </div>
+                    ${actionsHTML}
+                    <div class="request-footer">
+                        <div>Solicitado: ${formattedTime}</div>
+                        <div class="request-status ${request.status}">${getRequestStatusText(request.status)}</div>
+                    </div>
+                `;
+                
+                requestsBody.appendChild(card);
+            });
+            
+            // Add event listeners to action buttons
+            document.querySelectorAll('.action-btn.accept').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = parseInt(e.target.getAttribute('data-id'));
+                    updateRequestStatus(id, 'accepted');
+                });
+            });
+            
+            document.querySelectorAll('.action-btn.reject').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = parseInt(e.target.getAttribute('data-id'));
+                    updateRequestStatus(id, 'rejected');
+                });
+            });
+        }
+        
+        // Get status text
+        function getRequestStatusText(status) {
+            const statusText = {
+                'pending': 'Pendiente',
+                'accepted': 'Aceptado',
+                'rejected': 'Rechazado'
+            };
+            return statusText[status] || status;
+        }
+        
+        // Update request status
+        function updateRequestStatus(id, status) {
+            const requestIndex = requests.findIndex(r => r.id === id);
+            if (requestIndex !== -1) {
+                requests[requestIndex].status = status;
+                renderRequests();
+            }
+        }
+        
+        // Helper function to compare dates (ignoring time)
+        function isSameDate(date1, date2) {
+            return date1.getFullYear() === date2.getFullYear() &&
+                   date1.getMonth() === date2.getMonth() &&
+                   date1.getDate() === date2.getDate();
+        }
+        
+        // Initialize the app when page loads
+        window.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
+

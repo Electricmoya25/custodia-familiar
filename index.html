@@ -2,251 +2,267 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Agenda Familiar</title>
+  <title>Familia Connect</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' x='0.1em' font-size='80'%3E%F0%9F%93%85%3C/text%3E%3C/svg%3E">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' x='0.1em' font-size='80'%3E%F0%9F%91%A8%E2%80%8D%F0%9F%91%A9%E2%80%8D%F0%9F%91%A7%E2%80%8D%F0%9F%91%A6%3C/text%3E%3C/svg%3E">
   
   <script src="https://unpkg.com/lucide@latest"></script>
 
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
 
   <style>
     :root {
-      /* COLORES MATERIAL (Pixel 10 Palette) */
-      --primary: #0b57d0; 
-      --on-primary: #ffffff;
-      --bg-app: #f2f4f7; /* Gris muy suave */
-      --surface: #ffffff;
+      /* PALETA PREMIUM 2026 */
+      --primary: #6366f1; /* Indigo vibrante */
+      --bg-app: #f8f9fc; /* Blanco roto muy limpio */
+      --text-main: #111827;
+      --text-muted: #6b7280;
       
-      /* CUSTODIA (Colores base suaves) */
-      --bg-mother: #ffe7f0; /* Rosa pastel muy claro */
-      --text-mother: #5c1134;
-      
-      --bg-father: #e3eeff; /* Azul pastel muy claro */
-      --text-father: #0b2e5e;
+      /* CUSTODIA - DEGRADADOS MODERNOS */
+      /* Mamá: Rosa seda a melocotón suave */
+      --mom-gradient: linear-gradient(135deg, #fff0f6 0%, #ffe3e8 100%);
+      --mom-accent: #db2777;
+      --mom-shadow: rgba(219, 39, 119, 0.15);
 
-      --text-main: #1a1c1e;
-      --text-sec: #444746;
+      /* Papá: Azul cielo a azul hielo */
+      --dad-gradient: linear-gradient(135deg, #f0f7ff 0%, #dbeafe 100%);
+      --dad-accent: #2563eb;
+      --dad-shadow: rgba(37, 99, 235, 0.15);
+
+      /* SOMBRAS "BENTO" */
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+      --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+      --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
       
-      /* RADIOS Y SOMBRAS */
-      --radius-xl: 28px;
-      --radius-md: 16px;
-      --shadow-soft: 0 4px 20px rgba(0,0,0,0.03);
+      --radius-card: 24px;
+      --radius-pill: 99px;
     }
 
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     
     body {
       margin: 0;
-      font-family: 'Roboto', sans-serif;
+      font-family: 'Plus Jakarta Sans', sans-serif;
       background: var(--bg-app);
       color: var(--text-main);
-      height: 100vh;
-      overflow-x: hidden;
-      display: flex;
-      flex-direction: column;
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      padding-bottom: 40px;
     }
     
     .hidden { display: none !important; }
 
-    /* --- LOGIN (Clean Lock Screen) --- */
+    /* --- LOGIN (Minimalista) --- */
     .login-wrapper {
-      position: fixed; inset: 0;
+      position: fixed; inset: 0; z-index: 2000;
       background: #fff;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      padding: 30px; z-index: 2000;
+      display: flex; align-items: center; justify-content: center; padding: 24px;
     }
-    .login-content { width: 100%; max-width: 340px; text-align: center; }
-    .login-emoji { font-size: 4.5rem; margin-bottom: 20px; display: block; animation: float 3s ease-in-out infinite; }
-    @keyframes float { 0%,100% {transform:translateY(0);} 50% {transform:translateY(-10px);} }
+    .login-box { width: 100%; max-width: 380px; text-align: center; }
+    .login-brand { font-size: 3rem; margin-bottom: 1rem; }
+    .login-title { font-size: 1.75rem; font-weight: 800; margin-bottom: 0.5rem; }
     
-    .input-pill {
-      width: 100%; padding: 18px 24px; margin-bottom: 14px;
-      background: #f0f4f8; border: none; border-radius: 99px;
-      font-size: 1rem; color: var(--text-main); outline: none;
-      text-align: center; transition: all 0.2s;
+    .input-modern {
+      width: 100%; padding: 16px 20px; margin-bottom: 12px;
+      background: #f3f4f6; border: 2px solid transparent; border-radius: 16px;
+      font-size: 1rem; font-family: inherit; transition: all 0.2s;
     }
-    .input-pill:focus { background: #fff; box-shadow: 0 0 0 2px var(--primary); }
+    .input-modern:focus { background: #fff; border-color: var(--primary); outline: none; box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1); }
 
-    .btn-pill {
-      background: var(--text-main); color: #fff;
-      width: 100%; padding: 18px; border: none; border-radius: 99px;
-      font-size: 1rem; font-weight: 700; cursor: pointer;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-      transition: transform 0.1s;
+    .btn-modern {
+      width: 100%; padding: 16px; background: var(--text-main); color: #fff;
+      border: none; border-radius: 16px; font-weight: 700; font-size: 1rem;
+      cursor: pointer; transition: transform 0.1s;
     }
-    .btn-pill:active { transform: scale(0.97); }
+    .btn-modern:active { transform: scale(0.98); }
 
-    /* --- APP LAYOUT --- */
-    .app-layout {
-      max-width: 900px; margin: 0 auto; width: 100%;
-      padding: 16px; display: flex; flex-direction: column; gap: 20px;
-    }
-
-    /* --- TOPBAR --- */
-    .topbar {
+    /* --- APP HEADER --- */
+    .app-header {
       display: flex; align-items: center; justify-content: space-between;
-      padding: 16px 24px; background: rgba(255,255,255,0.8);
-      backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 100;
+      padding: 20px 24px; background: transparent;
     }
-    .app-title { font-size: 1.4rem; font-weight: 900; letter-spacing: -0.5px; }
-    .year-select { background: transparent; border: none; font-weight: 700; font-size: 1rem; color: var(--text-sec); }
-
-    /* --- TARJETAS --- */
-    .card {
-      background: var(--surface); border-radius: var(--radius-xl);
-      padding: 24px; box-shadow: var(--shadow-soft);
-      overflow: visible; /* Permitir que elementos (como sombras) sobresalgan si es necesario */
+    .brand-logo { font-size: 1.5rem; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+    .user-menu { display: flex; gap: 12px; }
+    .btn-icon-subtle {
+      background: #fff; border: 1px solid #e5e7eb; color: var(--text-main);
+      padding: 8px 12px; border-radius: var(--radius-pill); font-weight: 600; font-size: 0.9rem;
+      cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: var(--shadow-sm);
     }
 
-    /* --- CALENDARIO REFINADO --- */
-    .calendar-header {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 20px; padding: 0 10px;
+    /* --- LAYOUT PRINCIPAL --- */
+    .main-container {
+      max-width: 1100px; margin: 0 auto; width: 100%; padding: 0 24px;
+      display: grid; gap: 32px; grid-template-columns: 1fr;
     }
-    .month-label { font-size: 1.8rem; font-weight: 900; text-transform: capitalize; color: var(--text-main); }
-    .nav-btn {
-      width: 42px; height: 42px; border-radius: 50%; border: 1px solid #e0e0e0;
-      background: #fff; color: var(--text-main); display: flex; align-items: center; justify-content: center;
-      cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    @media(min-width: 900px) { .main-container { grid-template-columns: 3fr 1fr; } }
+
+    /* --- CALENDARIO BENTO GRID --- */
+    .calendar-section { background: #fff; border-radius: 32px; padding: 24px; box-shadow: var(--shadow-card); }
+    
+    .calendar-controls {
+      display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;
+    }
+    .month-heading { font-size: 1.8rem; font-weight: 800; text-transform: capitalize; }
+    .nav-circle-btn {
+      width: 44px; height: 44px; border-radius: 50%; background: #f3f4f6; border: none;
+      display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-main);
+      transition: all 0.2s;
+    }
+    .nav-circle-btn:hover { background: #e5e7eb; transform: scale(1.05); }
+
+    /* GRID SEMANAL */
+    .week-header {
+      display: grid; grid-template-columns: repeat(7, 1fr); gap: 12px; margin-bottom: 12px;
+    }
+    .week-day-label { text-align: center; font-weight: 700; font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+
+    /* GRID DE DÍAS (BENTO STYLE) */
+    .days-grid {
+      display: grid; grid-template-columns: repeat(7, 1fr);
+      gap: 12px; /* Espacio generoso entre tarjetas */
     }
 
-    .calendar-table { 
-      width: 100%; border-collapse: separate; 
-      border-spacing: 6px; /* Separación clara entre tarjetas */
-      table-layout: fixed; 
-    }
-    .calendar-table th { padding-bottom: 12px; color: #888; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
-
-    /* CELDAS (DIAS) */
-    .day-cell {
-      height: 95px; /* Altura generosa */
-      border-radius: 18px;
+    /* LA TARJETA DEL DÍA (EL NÚCLEO DEL DISEÑO) */
+    .day-card {
+      aspect-ratio: 4/5; /* Proporción vertical elegante */
+      border-radius: 20px;
+      padding: 10px;
       position: relative;
-      vertical-align: top;
       cursor: pointer;
-      background: #fff;
-      transition: transform 0.1s;
-      overflow: hidden; /* Corta la imagen si sobresale */
+      background: #fff; /* Fallback */
+      border: 1px solid rgba(0,0,0,0.03);
+      box-shadow: var(--shadow-sm);
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      overflow: hidden;
+      display: flex; flex-direction: column; justify-content: space-between;
     }
-    .day-cell:active { transform: scale(0.96); }
+    .day-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); }
+    .day-card.empty { background: transparent; border: none; box-shadow: none; pointer-events: none; }
 
-    /* FONDOS COLOREADOS SUAVES */
-    .is-mother { background-color: var(--bg-mother) !important; }
-    .is-father { background-color: var(--bg-father) !important; }
-
-    /* --- ICONO FONDO GIGANTE (SIN FONDO BLANCO, SOLO PNG) --- */
-    .bg-icon-large {
-      position: absolute;
-      bottom: -5px; right: -5px; /* Pegado a la esquina */
-      width: 90%; /* MUCHO MÁS GRANDE */
-      height: 90%;
-      object-fit: contain;
-      object-position: bottom right;
-      opacity: 0.5; /* Transparencia para no molestar al texto */
-      pointer-events: none;
-      z-index: 0;
-      filter: saturate(1.2); /* Colores un poco más vivos */
+    /* ESTADOS DE CUSTODIA (Los degradados) */
+    .is-mom { background: var(--mom-gradient); border-color: var(--mom-accent); }
+    .is-dad { background: var(--dad-gradient); border-color: var(--dad-accent); }
+    
+    /* DÍA ACTUAL (HOY) */
+    .is-today {
+      box-shadow: 0 0 0 3px var(--primary), var(--shadow-hover) !important;
+    }
+    .is-today .day-number {
+      background: var(--primary); color: #fff; box-shadow: 0 4px 10px rgba(99, 102, 241, 0.4);
     }
 
-    /* NÚMERO DEL DÍA */
-    .day-num {
-      position: absolute; top: 8px; left: 8px;
-      font-size: 1rem; font-weight: 700;
-      z-index: 10; width: 30px; height: 30px;
+    /* ELEMENTOS DENTRO DE LA TARJETA */
+    .card-top { display: flex; justify-content: space-between; align-items: flex-start; position: relative; z-index: 2; }
+    
+    .day-number {
+      font-weight: 800; font-size: 1.1rem; width: 32px; height: 32px;
       display: flex; align-items: center; justify-content: center;
-      border-radius: 50%;
-      color: var(--text-main);
-      background: rgba(255,255,255,0.6); /* Semi-transparente para leerse sobre la imagen */
-      backdrop-filter: blur(2px);
+      background: rgba(255,255,255,0.7); border-radius: 12px; backdrop-filter: blur(4px);
     }
+    
+    /* Pequeño icono de identificación en la esquina superior */
+    .custody-badge-icon {
+      color: rgba(0,0,0,0.2);
+    }
+    .is-mom .custody-badge-icon { color: var(--mom-accent); opacity: 0.7; }
+    .is-dad .custody-badge-icon { color: var(--dad-accent); opacity: 0.7; }
 
-    /* HOY */
-    .is-today .day-num {
-      background: var(--primary); color: #fff;
-      box-shadow: 0 4px 8px rgba(11, 87, 208, 0.3);
+    /* ILUSTRACIÓN DE FONDO (Marca de agua grande) */
+    .bg-illustration {
+      position: absolute; bottom: -10px; right: -10px;
+      width: 80%; height: 80%; object-fit: contain; object-position: bottom right;
+      opacity: 0.15; /* Sutil */
+      pointer-events: none; z-index: 0;
+      filter: grayscale(100%); transition: opacity 0.3s;
     }
-    .is-today { 
-      box-shadow: inset 0 0 0 3px var(--primary); /* Marco azul */
-      z-index: 20; 
-    }
+    .is-mom .bg-illustration { opacity: 0.25; filter: none; /* Color para mamá */ }
+    .is-dad .bg-illustration { opacity: 0.25; filter: none; /* Color para papá */ }
 
-    /* PUNTOS EVENTOS */
-    .event-dots {
-      position: absolute; bottom: 8px; left: 10px;
-      display: flex; gap: 4px; z-index: 10;
+    /* CONTENEDOR DE EVENTOS (CHIPS) */
+    .events-container {
+      display: flex; flex-wrap: wrap; gap: 4px;
+      position: relative; z-index: 2;
+      margin-top: auto; /* Empujar hacia abajo */
+      padding-top: 8px;
     }
-    .dot { width: 7px; height: 7px; border-radius: 50%; box-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+    
+    /* EL CHIP DE EVENTO (Visualización clara) */
+    .event-chip {
+      height: 24px; padding: 0 8px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 0.75rem; font-weight: 700;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .event-chip svg { width: 14px; height: 14px; }
+    .more-events-chip { background: rgba(0,0,0,0.5); color: #fff; padding: 0 6px; border-radius: 8px; font-size: 0.7rem; }
 
-    /* --- MODAL (Full Material) --- */
+    /* Colores Chips */
+    .chip-medico { background: #ef4444; } .chip-dentista { background: #0ea5e9; }
+    .chip-escuela { background: #f97316; } .chip-deporte { background: #8b5cf6; }
+    .chip-cumple { background: #eab308; } .chip-parque { background: #84cc16; }
+    .chip-general { background: #64748b; } .chip-vacaciones { background: #06b6d4; }
+
+
+    /* --- SIDEBAR Y PANELES --- */
+    .sidebar { display: flex; flex-direction: column; gap: 24px; }
+    .glass-panel {
+      background: #fff; border-radius: 24px; padding: 24px;
+      border: 1px solid #f3f4f6; box-shadow: var(--shadow-card);
+    }
+    .panel-title { font-size: 1.1rem; font-weight: 800; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+
+    /* --- MODAL MODERNO --- */
     .modal-overlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 3000;
-      display: flex; align-items: flex-end; justify-content: center;
-      opacity: 0; pointer-events: none; transition: opacity 0.3s;
-      backdrop-filter: blur(4px);
+      position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(8px);
+      z-index: 3000; display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: all 0.3s;
     }
     .modal-overlay.open { opacity: 1; pointer-events: auto; }
     
-    .modal-content {
-      background: #fff; width: 100%; max-width: 500px;
-      border-radius: 32px 32px 0 0; padding: 30px;
-      transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-      box-shadow: 0 -10px 40px rgba(0,0,0,0.1);
+    .modal-card {
+      background: #fff; width: 90%; max-width: 480px; border-radius: 32px; padding: 32px;
+      box-shadow: var(--shadow-hover); transform: scale(0.95); transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
-    .modal-overlay.open .modal-content { transform: translateY(0); }
-    
-    @media(min-width: 600px) {
-      .modal-content { border-radius: 32px; margin-bottom: 20px; transform: scale(0.9); }
-      .modal-overlay.open .modal-content { transform: scale(1); }
-      .modal-overlay { align-items: center; }
-    }
+    .modal-overlay.open .modal-card { transform: scale(1); }
 
-    /* ESTILO CUSTODIA EN MODAL (Sin fondo, solo icono grande) */
-    .custody-display {
+    /* Custodia Header en Modal */
+    .modal-custody-header {
       display: flex; align-items: center; gap: 20px;
-      margin-bottom: 24px; padding: 10px;
+      padding: 20px; border-radius: 24px; margin-bottom: 24px;
     }
-    .custody-icon-large {
-      width: 90px; height: 90px; /* MUY GRANDE */
-      object-fit: contain;
-      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1)); /* Sombra suave a la imagen, no caja */
+    .modal-custody-header.mom { background: var(--mom-gradient); }
+    .modal-custody-header.dad { background: var(--dad-gradient); }
+    
+    .modal-avatar-large {
+      width: 80px; height: 80px;border-radius: 50%; background: #fff; padding: 4px;
+      box-shadow: var(--shadow-card);
     }
+    .modal-avatar-large img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
 
-    /* INPUTS Y BOTONES MODAL */
-    .modal-input {
-      width: 100%; padding: 16px; background: #f2f4f7; border: none;
-      border-radius: 16px; font-size: 1.1rem; margin-bottom: 20px; outline:none;
-    }
-    .modal-input:focus { background: #fff; box-shadow: 0 0 0 2px var(--primary); }
-
-    .icon-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
-    .icon-btn {
-      aspect-ratio: 1; border-radius: 20px; background: #f8f9fa;
+    /* Grid de Iconos Selección */
+    .selection-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+    .select-item {
+      aspect-ratio: 1; background: #f8f9fc; border-radius: 20px; border: 2px solid transparent;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      cursor: pointer; transition: all 0.2s; border: 2px solid transparent;
+      cursor: pointer; transition: all 0.2s;
     }
-    .icon-btn.selected {
-      background: #e8f0fe; border-color: var(--primary); color: var(--primary);
+    .select-item:hover { background: #f0f2f5; }
+    .select-item.selected { background: #eef2ff; border-color: var(--primary); color: var(--primary); box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2); }
+
+    /* RESPONSIVE TWEAKS */
+    @media (max-width: 768px) {
+      .main-container { padding: 0 16px; gap: 20px; }
+      .calendar-section { padding: 16px; border-radius: 24px; }
+      .days-grid, .week-header { gap: 8px; }
+      .day-card { border-radius: 16px; padding: 8px; }
+      .day-number { width: 28px; height: 28px; font-size: 1rem; }
+      .bg-illustration { width: 90%; height: 90%; bottom: -5px; right: -5px; }
+      .event-chip { height: 20px; padding: 0 6px; }
+      .event-chip svg { width: 12px; height: 12px; }
+      .app-header { padding: 16px; }
+      .brand-logo span { display: none; } /* Solo icono en móvil */
     }
-    .icon-label { font-size: 0.7rem; font-weight: 700; margin-top: 5px; }
-
-    /* SIDEBAR (Para móvil, debajo) */
-    .sidebar-block { background: #fff; border-radius: 24px; padding: 20px; margin-bottom: 16px; }
-
-    /* RESPONSIVE MÓVIL */
-    @media (max-width: 400px) {
-      .day-cell { height: 85px; }
-      .day-num { width: 26px; height: 26px; font-size: 0.9rem; }
-      .calendar-table { border-spacing: 4px; }
-      .bg-icon-large { width: 95%; height: 95%; opacity: 0.4; } /* Aún más grande en pantallas pequeñas */
-    }
-
-    /* Colores Dots */
-    .evt-medico { background: #ef4444; } .evt-dentista { background: #0ea5e9; }
-    .evt-escuela { background: #f97316; } .evt-deporte { background: #8b5cf6; }
-    .evt-cumple { background: #eab308; } .evt-parque { background: #84cc16; }
-    .evt-general { background: #64748b; } .evt-vacaciones { background: #06b6d4; }
   </style>
 </head>
 <body>
@@ -254,92 +270,94 @@
 <div id="toast-container" style="position:fixed; bottom:30px; left:50%; transform:translateX(-50%); z-index:4000;"></div>
 
 <div id="login-view" class="login-wrapper">
-  <div class="login-content">
-    <span class="login-emoji">🔒</span>
-    <h1 style="margin:0 0 10px 0; font-size:1.8rem; font-weight:900;">Hola de nuevo</h1>
-    <p style="color:#666; margin:0 0 30px 0;">Introduce tus datos para acceder</p>
-    
+  <div class="login-box">
+    <div class="login-brand">👋</div>
+    <h1 class="login-title">Bienvenido a bordo</h1>
+    <p style="color:var(--text-muted); margin-bottom: 32px;">Tu calendario familiar, reinventado.</p>
     <form id="login-form">
-      <input type="email" id="login-email" class="input-pill" required placeholder="tu@email.com">
-      <input type="password" id="login-password" class="input-pill" required placeholder="Contraseña">
-      <button type="submit" class="btn-pill">Desbloquear</button>
-      <div id="login-error" style="color:#ef4444; margin-top:20px; font-weight:500;"></div>
+      <input type="email" id="login-email" class="input-modern" required placeholder="Correo electrónico">
+      <input type="password" id="login-password" class="input-modern" required placeholder="Contraseña">
+      <button type="submit" class="btn-modern" style="margin-top:16px;">Entrar</button>
+      <div id="login-error" style="color:#ef4444; margin-top:20px; font-weight:600; font-size:0.9rem;"></div>
     </form>
   </div>
 </div>
 
 <div id="app-root" class="hidden">
-  <header class="topbar">
-    <div style="display:flex; align-items:center; gap:12px;">
-      <span style="font-size:1.8rem;">📅</span>
-      <span class="app-title">Custodia</span>
+  <header class="app-header">
+    <div class="brand-logo">
+      <i data-lucide="calendar-heart" style="color:var(--primary); width:28px; height:28px;"></i>
+      <span>Custodia</span>
     </div>
-    <div style="display:flex; align-items:center; gap:15px;">
-      <select id="year-select" class="year-select"></select>
-      <button id="logout-btn" style="border:none; background:#fee2e2; color:#b91c1c; padding:8px 16px; border-radius:99px; font-weight:700; cursor:pointer;">Salir</button>
+    <div class="user-menu">
+      <select id="year-select" class="btn-icon-subtle" style="border:none; box-shadow:var(--shadow-sm); padding: 8px 16px;"></select>
+      <button id="logout-btn" class="btn-icon-subtle" style="color:#ef4444; background:#fef2f2;">
+        <i data-lucide="log-out" style="width:16px;"></i>
+      </button>
     </div>
   </header>
 
-  <div class="app-layout">
-    <section class="card" id="calendar-wrapper-swipe">
-      <div class="calendar-header">
-        <button id="prev-period" class="nav-btn"><i data-lucide="chevron-left"></i></button>
-        <div id="calendar-title" class="month-label"></div>
-        <button id="next-period" class="nav-btn"><i data-lucide="chevron-right"></i></button>
+  <main class="main-container">
+    <section class="calendar-section" id="calendar-wrapper-swipe">
+      <div class="calendar-controls">
+        <button id="prev-period" class="nav-circle-btn"><i data-lucide="chevron-left"></i></button>
+        <div id="calendar-title" class="month-heading"></div>
+        <button id="next-period" class="nav-circle-btn"><i data-lucide="chevron-right"></i></button>
       </div>
-      <div id="calendar-grid"></div>
+      
+      <div class="week-header">
+        <div class="week-day-label">Lun</div><div class="week-day-label">Mar</div><div class="week-day-label">Mié</div>
+        <div class="week-day-label">Jue</div><div class="week-day-label">Vie</div><div class="week-day-label">Sáb</div>
+        <div class="week-day-label">Dom</div>
+      </div>
+      
+      <div id="calendar-grid" class="days-grid">
+        </div>
     </section>
 
-    <div class="sidebar-block">
-      <h3 style="margin:0 0 15px 0; font-size:1.1rem;">Solicitar Cambio</h3>
-      <form id="request-form">
-        <div style="display:flex; gap:10px; margin-bottom:10px;">
-          <input type="date" id="start-date" class="input-pill" style="padding:12px; margin:0; border-radius:12px;" required>
-          <input type="date" id="end-date" class="input-pill" style="padding:12px; margin:0; border-radius:12px;" required>
-        </div>
-        <input type="text" id="reason" class="input-pill" placeholder="¿Por qué motivo?" style="padding:12px; margin:0 0 10px 0; border-radius:12px;">
-        <button type="submit" class="btn-pill" style="padding:12px; border-radius:12px; font-size:0.9rem;">Enviar Solicitud</button>
-      </form>
-    </div>
-
-    <div class="sidebar-block">
-      <h3 style="margin:0 0 10px 0; font-size:1.1rem;">Notificaciones</h3>
-      <div id="pending-requests" style="color:#666; font-style:italic;">Todo está tranquilo por aquí.</div>
-    </div>
-  </div>
+    <aside class="sidebar">
+      <div class="glass-panel">
+        <div class="panel-title"><i data-lucide="git-pull-request" style="color:var(--primary)"></i> Solicitar Cambio</div>
+        <form id="request-form">
+          <div style="display:flex; gap:12px; margin-bottom:12px;">
+            <input type="date" id="start-date" class="input-modern" style="margin:0; padding:12px;" required>
+            <input type="date" id="end-date" class="input-modern" style="margin:0; padding:12px;" required>
+          </div>
+          <input type="text" id="reason" class="input-modern" placeholder="Motivo (opcional)">
+          <button type="submit" class="btn-modern" style="padding:12px; font-size:0.9rem;">Enviar Solicitud</button>
+        </form>
+      </div>
+    </aside>
+  </main>
 </div>
 
 <div class="modal-overlay" id="day-modal">
-  <div class="modal-content">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-      <h2 id="modal-date-title" style="margin:0; font-size:1.6rem; font-weight:800;">Fecha</h2>
-      <button onclick="closeModal()" style="border:none; background:#f0f2f5; width:36px; height:36px; border-radius:50%; font-size:1.2rem; cursor:pointer;">&times;</button>
+  <div class="modal-card">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+      <h2 id="modal-date-title" style="margin:0; font-size:1.5rem; font-weight:800;">Fecha</h2>
+      <button onclick="closeModal()" style="border:none; background:#f3f4f6; width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer;">
+        <i data-lucide="x" style="color:var(--text-main);"></i>
+      </button>
     </div>
 
-    <div class="custody-display">
-      <div id="modal-custody-img-container"></div>
-      <div>
-        <div style="font-size:0.8rem; text-transform:uppercase; font-weight:700; color:#888; letter-spacing:1px;">Le toca a</div>
-        <div id="modal-custody-text" style="font-size:1.6rem; font-weight:900;"></div>
-      </div>
-    </div>
+    <div id="modal-custody-header-container"></div>
 
-    <input type="text" id="event-title" class="modal-input" placeholder="Añadir nota o evento...">
+    <input type="text" id="event-title" class="input-modern" placeholder="Añadir nota o evento..." style="font-size:1.1rem; padding:16px;">
     
-    <div class="icon-grid">
-      <div class="icon-btn selected" onclick="selectIcon('medico', this)"><i data-lucide="stethoscope" style="color:#ef4444"></i><span class="icon-label">Médico</span></div>
-      <div class="icon-btn" onclick="selectIcon('dentista', this)"><i data-lucide="smile" style="color:#0ea5e9"></i><span class="icon-label">Dentista</span></div>
-      <div class="icon-btn" onclick="selectIcon('escuela', this)"><i data-lucide="backpack" style="color:#f97316"></i><span class="icon-label">Colegio</span></div>
-      <div class="icon-btn" onclick="selectIcon('deporte', this)"><i data-lucide="trophy" style="color:#8b5cf6"></i><span class="icon-label">Deporte</span></div>
-      <div class="icon-btn" onclick="selectIcon('cumple', this)"><i data-lucide="cake" style="color:#eab308"></i><span class="icon-label">Fiesta</span></div>
-      <div class="icon-btn" onclick="selectIcon('parque', this)"><i data-lucide="tree-deciduous" style="color:#84cc16"></i><span class="icon-label">Parque</span></div>
-      <div class="icon-btn" onclick="selectIcon('general', this)"><i data-lucide="star" style="color:#64748b"></i><span class="icon-label">Otro</span></div>
-      <div class="icon-btn" onclick="selectIcon('vacaciones', this)"><i data-lucide="palmtree" style="color:#06b6d4"></i><span class="icon-label">Viaje</span></div>
+    <div class="selection-grid">
+      <div class="select-item selected" onclick="selectIcon('medico', this)"><i data-lucide="stethoscope" style="color:#ef4444"></i><span style="font-size:0.7rem; font-weight:700; margin-top:8px;">Médico</span></div>
+      <div class="select-item" onclick="selectIcon('dentista', this)"><i data-lucide="smile" style="color:#0ea5e9"></i><span style="font-size:0.7rem; font-weight:700; margin-top:8px;">Dentista</span></div>
+      <div class="select-item" onclick="selectIcon('escuela', this)"><i data-lucide="backpack" style="color:#f97316"></i><span style="font-size:0.7rem; font-weight:700; margin-top:8px;">Colegio</span></div>
+      <div class="select-item" onclick="selectIcon('deporte', this)"><i data-lucide="trophy" style="color:#8b5cf6"></i><span style="font-size:0.7rem; font-weight:700; margin-top:8px;">Deporte</span></div>
+      <div class="select-item" onclick="selectIcon('cumple', this)"><i data-lucide="cake" style="color:#eab308"></i><span style="font-size:0.7rem; font-weight:700; margin-top:8px;">Fiesta</span></div>
+      <div class="select-item" onclick="selectIcon('parque', this)"><i data-lucide="tree-deciduous" style="color:#84cc16"></i><span style="font-size:0.7rem; font-weight:700; margin-top:8px;">Parque</span></div>
+      <div class="select-item" onclick="selectIcon('general', this)"><i data-lucide="star" style="color:#64748b"></i><span style="font-size:0.7rem; font-weight:700; margin-top:8px;">Otro</span></div>
+      <div class="select-item" onclick="selectIcon('vacaciones', this)"><i data-lucide="palmtree" style="color:#06b6d4"></i><span style="font-size:0.7rem; font-weight:700; margin-top:8px;">Viaje</span></div>
     </div>
 
-    <button onclick="saveEvent()" class="btn-pill" style="margin-bottom:20px;">Guardar Nota</button>
+    <button onclick="saveEvent()" class="btn-modern" style="margin-bottom:24px; background:var(--primary);">Guardar Evento</button>
     
-    <div id="modal-event-list" style="max-height:150px; overflow-y:auto;"></div>
+    <div id="modal-event-list" style="display:flex; flex-direction:column; gap:10px; max-height:200px; overflow-y:auto;"></div>
   </div>
 </div>
 
@@ -348,41 +366,23 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 
 <script>
-  // CONFIGURACIÓN FIREBASE (Misma)
-  const firebaseConfig = {
-    apiKey: "AIzaSyAwgk4_l0zvaCUCgm1CjqqqXjJHr5KPBjc",
-    authDomain: "custodia-familiar.firebaseapp.com",
-    projectId: "custodia-familiar",
-    storageBucket: "custodia-familiar.firebasestorage.app",
-    messagingSenderId: "1038952432258",
-    appId: "1:1038952432258:web:7608d6a48d8ad8308a6a9b"
-  };
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
-  const auth = firebase.auth();
+  // --- CONFIGURACIÓN ---
+  const firebaseConfig = { apiKey: "AIzaSyAwgk4_l0zvaCUCgm1CjqqqXjJHr5KPBjc", authDomain: "custodia-familiar.firebaseapp.com", projectId: "custodia-familiar", storageBucket: "custodia-familiar.firebasestorage.app", messagingSenderId: "1038952432258", appId: "1:1038952432258:web:7608d6a48d8ad8308a6a9b" };
+  firebase.initializeApp(firebaseConfig); const db = firebase.firestore(); const auth = firebase.auth();
 
-  // IMÁGENES (PNG Transparentes)
-  const IMG_MOM = "assets/madre.png";
-  const IMG_DAD = "assets/padre.png";
+  // ASSETS
+  const IMG_MOM = "assets/madre.png"; const IMG_DAD = "assets/padre.png";
 
-  let todayInit = new Date();
-  let currentYear = todayInit.getFullYear();
-  let currentMonth = todayInit.getMonth();
-  if (currentYear < 2025) currentYear = 2025;
-  let overrides={}, eventsData={}; 
-  let selectedDateKey=null, selectedIconType='medico';
-
+  // ESTADO
+  let todayInit = new Date(); let currentYear = todayInit.getFullYear(); let currentMonth = todayInit.getMonth(); if (currentYear < 2025) currentYear = 2025;
+  let overrides={}, eventsData={}; let selectedDateKey=null, selectedIconType='medico';
   const monthNames = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
-  const weekDays = ["L","M","X","J","V","S","D"];
   const BASE_MONDAY = new Date(2026, 0, 5, 12, 0, 0); 
 
-  function getBaseOwner(y,m,d) {
-    const date = new Date(y, m, d, 12, 0, 0);
-    if(date.getFullYear()<2025 || date.getFullYear()>2027) return null;
-    const diff = Math.round((date - BASE_MONDAY)/(1000*60*60*24));
-    return (Math.floor(diff/7)%2 === 0) ? "padre" : "madre";
-  }
+  function getBaseOwner(y,m,d) { const date = new Date(y, m, d, 12, 0, 0); if(date.getFullYear()<2025 || date.getFullYear()>2027) return null; const diff = Math.round((date - BASE_MONDAY)/(1000*60*60*24)); return (Math.floor(diff/7)%2 === 0) ? "padre" : "madre"; }
+  function getIconName(t) { const m={'medico':'stethoscope','dentista':'smile','escuela':'backpack','deporte':'trophy','cumple':'cake','parque':'tree-deciduous','general':'star','vacaciones':'palmtree'}; return m[t]||'circle'; }
 
+  // --- RENDER CALENDARIO PREMIUM ---
   function renderCalendar() {
     const grid = document.getElementById("calendar-grid");
     document.getElementById("calendar-title").textContent = `${monthNames[currentMonth]} ${currentYear}`;
@@ -392,153 +392,101 @@
     const firstDay = new Date(currentYear, currentMonth, 1).getDay();
     const startOffset = (firstDay === 0) ? 6 : firstDay - 1;
 
-    const table = document.createElement("table");
-    table.className = "calendar-table";
-    
-    // Header Días
-    const trH = document.createElement("tr");
-    weekDays.forEach(d => { const th = document.createElement("th"); th.textContent=d; trH.appendChild(th); });
-    table.appendChild(trH);
+    // Celdas vacías iniciales
+    for(let i=0; i<startOffset; i++) grid.appendChild(createDayCard(null));
 
-    let dayCount = 1;
-    for(let r=0; r<6; r++){
-      const tr = document.createElement("tr");
-      for(let c=0; c<7; c++){
-        const td = document.createElement("td");
-        if((r===0 && c<startOffset) || dayCount > daysInMonth) {
-          td.style.background="transparent"; td.style.cursor="default";
-        } else {
-          const y=currentYear, m=currentMonth, d=dayCount;
-          const dKey = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-          const owner = overrides[dKey] || getBaseOwner(y,m,d);
-          const isToday = (dKey === `${todayInit.getFullYear()}-${String(todayInit.getMonth()+1).padStart(2,'0')}-${String(todayInit.getDate()).padStart(2,'0')}`);
-          
-          td.className = "day-cell";
-          if(owner === "madre") td.classList.add("is-mother");
-          if(owner === "padre") td.classList.add("is-father");
-          if(isToday) td.classList.add("is-today");
-          
-          td.onclick = () => openDayModal(dKey, owner);
-
-          // 1. Número Día
-          const num = document.createElement("div"); 
-          num.className="day-num"; num.textContent=d;
-          td.appendChild(num);
-
-          // 2. ICONO GIGANTE DE FONDO (Marca de Agua)
-          // Usamos directamente la imagen sin contenedores extraños
-          const img = document.createElement("img");
-          img.className = "bg-icon-large";
-          img.src = (owner==="madre") ? IMG_MOM : IMG_DAD;
-          td.appendChild(img);
-
-          // 3. Puntos Eventos
-          const evts = eventsData[dKey] || [];
-          if(evts.length > 0) {
-            const dots = document.createElement("div"); dots.className="event-dots";
-            evts.slice(0,3).forEach(e => {
-              const dot = document.createElement("div"); dot.className=`dot evt-${e.type}`;
-              dots.appendChild(dot);
-            });
-            td.appendChild(dots);
-          }
-          dayCount++;
-        }
-        tr.appendChild(td);
-      }
-      table.appendChild(tr);
-      if(dayCount > daysInMonth) break;
+    // Días del mes
+    for(let day=1; day<=daysInMonth; day++) {
+      grid.appendChild(createDayCard(day));
     }
-    grid.appendChild(table);
     lucide.createIcons();
   }
 
-  // --- MODAL LÓGICA ---
+  function createDayCard(day) {
+    const card = document.createElement("div");
+    card.className = "day-card";
+    if(day === null) { card.classList.add("empty"); return card; }
+
+    const y=currentYear, m=currentMonth, d=day;
+    const dKey = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const owner = overrides[dKey] || getBaseOwner(y,m,d);
+    const isToday = (dKey === `${todayInit.getFullYear()}-${String(todayInit.getMonth()+1).padStart(2,'0')}-${String(todayInit.getDate()).padStart(2,'0')}`);
+    
+    if(owner === "madre") card.classList.add("is-mom");
+    if(owner === "padre") card.classList.add("is-dad");
+    if(isToday) card.classList.add("is-today");
+    
+    card.onclick = () => openDayModal(dKey, owner);
+
+    // 1. Parte Superior (Número e Icono Pequeño)
+    const topDiv = document.createElement("div"); topDiv.className = "card-top";
+    topDiv.innerHTML = `
+      <div class="day-number">${d}</div>
+      <i data-lucide="${owner==='madre'?'heart':'shield'}" class="custody-badge-icon" style="width:20px;"></i>
+    `;
+    card.appendChild(topDiv);
+
+    // 2. Ilustración de Fondo (Marca de agua grande)
+    const bgImg = document.createElement("img"); bgImg.className = "bg-illustration";
+    bgImg.src = (owner==="madre") ? IMG_MOM : IMG_DAD;
+    card.appendChild(bgImg);
+
+    // 3. Contenedor de Eventos (CHIPS VISIBLES)
+    const evts = eventsData[dKey] || [];
+    if(evts.length > 0) {
+      const evContainer = document.createElement("div"); evContainer.className = "events-container";
+      // Mostrar máximo 3 chips completos
+      evts.slice(0, 3).forEach(e => {
+        const chip = document.createElement("div"); chip.className = `event-chip chip-${e.type}`;
+        chip.innerHTML = `<i data-lucide="${getIconName(e.type)}"></i>`;
+        evContainer.appendChild(chip);
+      });
+      // Indicador si hay más
+      if(evts.length > 3) {
+        const more = document.createElement("div"); more.className="more-events-chip";
+        more.textContent = `+${evts.length - 3}`;
+        evContainer.appendChild(more);
+      }
+      card.appendChild(evContainer);
+    }
+
+    return card;
+  }
+
+  // --- MODAL ---
   function openDayModal(dateKey, owner) {
-    selectedDateKey = dateKey;
-    document.getElementById("day-modal").classList.add("open");
+    selectedDateKey = dateKey; document.getElementById("day-modal").classList.add("open");
+    const dObj = new Date(dateKey); document.getElementById("modal-date-title").textContent = dObj.toLocaleDateString('es-ES', {weekday:'long', day:'numeric', month:'long'});
     
-    const dObj = new Date(dateKey);
-    const dateStr = dObj.toLocaleDateString('es-ES', {weekday:'long', day:'numeric', month:'long'});
-    document.getElementById("modal-date-title").textContent = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
-    
-    // ICONO EN MODAL: Grande y sin fondo
-    const container = document.getElementById("modal-custody-img-container");
-    // Limpiamos y creamos imagen fresca
-    container.innerHTML = "";
-    const img = document.createElement("img");
-    img.className = "custody-icon-large"; // Clase para tamaño grande
-    img.src = (owner === "madre") ? IMG_MOM : IMG_DAD;
-    container.appendChild(img);
-    
-    const txt = document.getElementById("modal-custody-text");
-    txt.textContent = (owner === "madre") ? "Mamá" : "Papá";
-    txt.style.color = (owner === "madre") ? "var(--text-mother)" : "var(--text-father)";
-    
+    const headerContainer = document.getElementById("modal-custody-header-container");
+    headerContainer.innerHTML = `
+      <div class="modal-custody-header ${owner==='madre'?'mom':'dad'}">
+        <div class="modal-avatar-large"><img src="${owner==='madre'?IMG_MOM:IMG_DAD}"></div>
+        <div>
+          <div style="font-size:0.9rem; font-weight:700; opacity:0.7; text-transform:uppercase; letter-spacing:1px;">Día de</div>
+          <div style="font-size:1.8rem; font-weight:900; color:var(--text-main);">${owner==='madre'?'Mamá':'Papá'}</div>
+        </div>
+      </div>`;
     renderEventsList();
   }
-
   function closeModal() { document.getElementById("day-modal").classList.remove("open"); }
-  function selectIcon(t,el) { selectedIconType=t; document.querySelectorAll('.icon-btn').forEach(b=>b.classList.remove('selected')); el.classList.add('selected'); }
-  function getIconName(t) { const m={'medico':'stethoscope','dentista':'smile','escuela':'backpack','deporte':'trophy','cumple':'cake','parque':'tree-deciduous','general':'star','vacaciones':'palmtree'}; return m[t]||'circle'; }
-
+  function selectIcon(t,el) { selectedIconType=t; document.querySelectorAll('.select-item').forEach(b=>b.classList.remove('selected')); el.classList.add('selected'); }
   function renderEventsList() {
-    const l = document.getElementById("modal-event-list"); l.innerHTML="";
-    const evts = eventsData[selectedDateKey] || [];
-    if(evts.length===0) l.innerHTML="<div style='color:#999; text-align:center; margin-top:10px;'>Sin notas</div>";
+    const l = document.getElementById("modal-event-list"); l.innerHTML=""; const evts = eventsData[selectedDateKey] || [];
+    if(evts.length===0) l.innerHTML="<div style='color:var(--text-muted); text-align:center; padding:20px;'>No hay eventos para este día.</div>";
     evts.forEach(e => {
-      const d = document.createElement("div");
-      d.style.cssText = "display:flex; justify-content:space-between; align-items:center; padding:12px; background:#f8f9fa; border-radius:12px; margin-bottom:8px;";
-      d.innerHTML = `<div style="display:flex; gap:10px; align-items:center;"><i data-lucide="${getIconName(e.type)}" style="width:18px; color:#555;"></i><strong>${e.title}</strong></div><button onclick="delEv('${e.id}')" style="border:none; color:#ef4444; background:none; cursor:pointer;"><i data-lucide="trash-2" style="width:18px;"></i></button>`;
+      const d = document.createElement("div"); d.style.cssText = "display:flex; justify-content:space-between; align-items:center; padding:16px; background:#f8f9fc; border-radius:16px; border:1px solid #e5e7eb;";
+      d.innerHTML = `<div style="display:flex; gap:12px; align-items:center;"><div class="event-chip chip-${e.type}" style="width:32px; height:32px;"><i data-lucide="${getIconName(e.type)}" style="width:16px;"></i></div><strong style="font-size:1rem;">${e.title}</strong></div><button onclick="delEv('${e.id}')" style="border:none; color:#ef4444; background:none; cursor:pointer; padding:8px;"><i data-lucide="trash-2"></i></button>`;
       l.appendChild(d);
-    });
-    lucide.createIcons();
+    }); lucide.createIcons();
   }
-  
-  async function saveEvent() {
-    const t = document.getElementById("event-title").value;
-    if(t) { await db.collection("events").add({date:selectedDateKey, title:t, type:selectedIconType, createdAt:firebase.firestore.FieldValue.serverTimestamp()}); document.getElementById("event-title").value=""; renderEventsList(); }
-  }
-  async function delEv(id) { if(confirm("¿Borrar?")) { await db.collection("events").doc(id).delete(); renderEventsList(); } }
+  async function saveEvent() { const t=document.getElementById("event-title").value; if(t){await db.collection("events").add({date:selectedDateKey, title:t, type:selectedIconType, createdAt:firebase.firestore.FieldValue.serverTimestamp()}); document.getElementById("event-title").value=""; renderEventsList();} }
+  async function delEv(id){if(confirm("¿Eliminar?")){await db.collection("events").doc(id).delete(); renderEventsList();}}
 
-  // SWIPE
-  const el = document.getElementById("calendar-wrapper-swipe");
-  let sx=0, sy=0;
-  el.addEventListener('touchstart',e=>{sx=e.changedTouches[0].screenX; sy=e.changedTouches[0].screenY}, {passive:true});
-  el.addEventListener('touchend',e=>{
-    const dx=sx-e.changedTouches[0].screenX, dy=sy-e.changedTouches[0].screenY;
-    if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>50) { if(dx>0) currentMonth++; else currentMonth--; chkM(); renderCalendar(); }
-  }, {passive:true});
-  function chkM(){ if(currentMonth>11){currentMonth=0;currentYear++} if(currentMonth<0){currentMonth=11;currentYear--} }
-
-  // AUTH
-  auth.onAuthStateChanged(u => {
-    if(u) {
-      document.getElementById("login-view").classList.add("hidden");
-      document.getElementById("app-root").classList.remove("hidden");
-      db.collection("overrides").onSnapshot(s=>{overrides={}; s.forEach(d=>overrides[d.id]=d.data().owner); renderCalendar();});
-      db.collection("events").orderBy("createdAt").onSnapshot(s=>{eventsData={}; s.forEach(d=>{const v=d.data(); if(!eventsData[v.date])eventsData[v.date]=[]; eventsData[v.date].push({id:d.id,...v})}); renderCalendar();});
-      db.collection("requests").orderBy("createdAt","desc").onSnapshot(s=>{
-        const r=document.getElementById("pending-requests"); r.innerHTML="";
-        s.forEach(d=>{if(d.data().status==="pendiente"){const x=document.createElement("div"); x.innerHTML=`<b>${d.data().startDate}</b>: ${d.data().reason}`; x.style.cssText="background:#f2f4f7; padding:10px; border-radius:12px; margin-bottom:5px;"; r.appendChild(x);}});
-        if(!r.innerHTML) r.innerHTML="<div style='color:#888; font-style:italic;'>No hay notificaciones</div>";
-      });
-    } else {
-      document.getElementById("login-view").classList.remove("hidden");
-      document.getElementById("app-root").classList.add("hidden");
-    }
-  });
-
-  document.getElementById("login-form").addEventListener("submit",e=>{e.preventDefault(); auth.signInWithEmailAndPassword(document.getElementById("login-email").value, document.getElementById("login-password").value).catch(err=>document.getElementById("login-error").textContent="Error de acceso");});
-  document.getElementById("logout-btn").onclick=()=>auth.signOut();
-  document.getElementById("prev-period").onclick=()=>{currentMonth--; chkM(); renderCalendar();};
-  document.getElementById("next-period").onclick=()=>{currentMonth++; chkM(); renderCalendar();};
-  
-  const ys=document.getElementById("year-select");
-  [2025,2026,2027].forEach(y=>{const o=document.createElement("option"); o.value=y; o.textContent=y; if(y===currentYear)o.selected=true; ys.appendChild(o)});
-  ys.onchange=e=>{currentYear=parseInt(e.target.value); renderCalendar();};
-
-  renderCalendar();
+  // SWIPE & AUTH (Igual que antes)
+  const el=document.getElementById("calendar-wrapper-swipe"); let sx=0,sy=0; el.addEventListener('touchstart',e=>{sx=e.changedTouches[0].screenX;sy=e.changedTouches[0].screenY},{passive:true}); el.addEventListener('touchend',e=>{const dx=sx-e.changedTouches[0].screenX,dy=sy-e.changedTouches[0].screenY;if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>50){dx>0?currentMonth++:currentMonth--;chkM();renderCalendar();}},{passive:true}); function chkM(){if(currentMonth>11){currentMonth=0;currentYear++}if(currentMonth<0){currentMonth=11;currentYear--}}
+  auth.onAuthStateChanged(u=>{if(u){document.getElementById("login-view").classList.add("hidden");document.getElementById("app-root").classList.remove("hidden");db.collection("overrides").onSnapshot(s=>{overrides={};s.forEach(d=>overrides[d.id]=d.data().owner);renderCalendar();});db.collection("events").orderBy("createdAt").onSnapshot(s=>{eventsData={};s.forEach(d=>{const v=d.data();if(!eventsData[v.date])eventsData[v.date]=[];eventsData[v.date].push({id:d.id,...v})});renderCalendar();});}else{document.getElementById("login-view").classList.remove("hidden");document.getElementById("app-root").classList.add("hidden");}});
+  document.getElementById("login-form").addEventListener("submit",e=>{e.preventDefault();auth.signInWithEmailAndPassword(document.getElementById("login-email").value,document.getElementById("login-password").value).catch(err=>document.getElementById("login-error").textContent="Credenciales incorrectas");}); document.getElementById("logout-btn").onclick=()=>auth.signOut(); document.getElementById("prev-period").onclick=()=>{currentMonth--;chkM();renderCalendar();}; document.getElementById("next-period").onclick=()=>{currentMonth++;chkM();renderCalendar();}; const ys=document.getElementById("year-select");[2025,2026,2027].forEach(y=>{const o=document.createElement("option");o.value=y;o.textContent=y;if(y===currentYear)o.selected=true;ys.appendChild(o)});ys.onchange=e=>{currentYear=parseInt(e.target.value);renderCalendar();}; renderCalendar();
 </script>
 </body>
 </html>

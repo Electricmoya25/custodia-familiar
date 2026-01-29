@@ -233,11 +233,20 @@
     import { getFirestore, doc, getDoc, setDoc, collection, query, onSnapshot, addDoc, updateDoc, deleteDoc, writeBatch, orderBy, limit } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     // --- CONFIGURACIÓN & ESTADO ---
-    const firebaseConfig = JSON.parse(__firebase_config);
+    let firebaseConfig;
+    let appId;
+    try {
+        firebaseConfig = JSON.parse(__firebase_config);
+        appId = typeof __app_id !== 'undefined' ? __app_id : 'custodia-alberto';
+    } catch (e) {
+        console.error("Error cargando configuración, usando defaults seguros para evitar crash");
+        firebaseConfig = {}; // Evitar crash si no hay config
+        appId = 'custodia-alberto';
+    }
+
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
-    const appId = typeof __app_id !== 'undefined' ? __app_id : 'custodia-alberto';
 
     // Emails configurados para roles
     const USER_ROLES = {
@@ -525,6 +534,7 @@
             }
         } catch (error) {
             console.error("Auth error:", error);
+            // En caso de error fatal, mostrar login manual
             document.getElementById('auth-status-text').textContent = "Inicia sesión para continuar";
             document.getElementById('login-container').classList.remove('hidden');
             document.getElementById('auth-loader').classList.add('hidden');
@@ -568,7 +578,9 @@
                 state.user = user;
                 state.userRole = USER_ROLES[user.email] || 'visitante';
                 
-                setupListeners();
+                try {
+                    setupListeners();
+                } catch(err) { console.error("Error setting up listeners", err); }
                 
                 document.getElementById('auth-screen').classList.add('hidden');
                 document.getElementById('app-content').classList.remove('hidden');
@@ -586,6 +598,18 @@
                 document.getElementById('app-content').classList.add('hidden');
             }
         });
+
+        // FALLBACK: Si tras 3 segundos seguimos viendo el loader, forzar la vista de login
+        setTimeout(() => {
+            const loader = document.getElementById('auth-loader');
+            const login = document.getElementById('login-container');
+            if (!loader.classList.contains('hidden') && login.classList.contains('hidden') && !state.user) {
+                console.warn("Auth timed out, showing login manually.");
+                loader.classList.add('hidden');
+                login.classList.remove('hidden');
+                document.getElementById('auth-status-text').textContent = "Sesión no iniciada automáticamente.";
+            }
+        }, 3000);
 
         // Lanzar proceso de auth
         initAuth();

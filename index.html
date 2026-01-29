@@ -340,7 +340,9 @@
 
         state.requests.forEach(req => {
             const isPending = req.status === 'pendiente';
-            const isMeRequester = req.requesterUid === state.user.uid;
+            // MEJORA: Comprobamos si el usuario actual es el solicitante por UID O por ROL
+            // Esto evita errores si la sesión cambia pero el rol (Padre/Madre) es el mismo.
+            const isMeRequester = req.requesterUid === state.user.uid || (state.userRole && req.requesterRole === state.userRole);
             
             let actionButtonsHTML = '';
             if (isPending) {
@@ -504,7 +506,8 @@
         const reqSnap = await getDoc(reqRef);
         const reqData = reqSnap.data();
 
-        if (reqData.requesterUid === state.user.uid) {
+        // MEJORA: Validación robusta por UID o por ROL
+        if (reqData.requesterUid === state.user.uid || (state.userRole && reqData.requesterRole === state.userRole)) {
             alert("No puedes aprobar tu propia solicitud.");
             return;
         }

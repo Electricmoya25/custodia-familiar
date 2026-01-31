@@ -76,14 +76,8 @@
             margin-top: 10px; width: 100%; padding: 14px; font-weight: 600; border-radius: 999px;
             background: linear-gradient(135deg, #4f46e5, #22d3ee); color: white; border: none; cursor: pointer;
         }
-        .google-btn {
-            margin-top: 16px; width: 100%; padding: 12px; font-weight: 600; border-radius: 999px;
-            background: #ffffff; color: #1f2937; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
-        }
-        .or-divider { text-align: center; margin: 20px 0; color: #64748b; font-size: 0.8rem; font-weight: 600; position: relative; }
-        .or-divider::before, .or-divider::after { content: ''; position: absolute; top: 50%; width: 40%; height: 1px; background: rgba(148,163,184,0.3); }
-        .or-divider::before { left: 0; } .or-divider::after { right: 0; }
         .secondary-btn { background: transparent; border: none; color: #e5e7eb; font-size: 0.85rem; cursor: pointer; margin-top: 14px; width: 100%; }
+        #login-error-msg { color: #f87171; text-align: center; margin-top: 10px; font-size: 0.8rem; min-height: 1.2em;}
 
         /* --- APP SHELL --- */
         .topbar {
@@ -139,7 +133,6 @@
             border-radius: 6px; box-shadow: 0 4px 10px rgba(0,0,0,0.4); z-index: 5;
             color: white; font-size: 0.6rem; border: 1px solid rgba(255,255,255,0.4);
         }
-        /* Colores específicos por tipo */
         .evt-medico { background: #ef4444; } /* Rojo */
         .evt-dentista { background: #06b6d4; } /* Cyan */
         .evt-escuela { background: #f97316; } /* Naranja */
@@ -245,19 +238,14 @@
             <form id="login-form">
                 <div class="login-field">
                     <label>Correo electrónico</label>
-                    <input type="email" id="login-email" placeholder="tu@email.com">
+                    <input type="email" id="login-email" required placeholder="tu@email.com">
                 </div>
                 <div class="login-field">
                     <label>Contraseña</label>
-                    <input type="password" id="login-password" placeholder="••••••••">
+                    <input type="password" id="login-password" required placeholder="••••••••">
                 </div>
                 <button type="submit" class="login-btn" id="login-submit-btn">Entrar</button>
             </form>
-            <div class="or-divider">O CONTINÚA CON</div>
-            <button type="button" class="google-btn" onclick="loginWithGoogle()">
-                <svg width="20" height="20" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.26-1.19-.58z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-                Google
-            </button>
             <button type="button" class="secondary-btn" id="toggle-auth-mode">¿No tienes cuenta? Regístrate</button>
             <div id="login-error-msg"></div>
         </div>
@@ -320,6 +308,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 
     <script>
+        // CONFIGURACIÓN FIREBASE (API Key Corregida)
         const firebaseConfig = {
             apiKey: "AIzaSyAwgk4l0zvaCUCgm1CjqqqXjJHr5KPBjc",
             authDomain: "custodia-familiar.firebaseapp.com",
@@ -332,7 +321,6 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         const auth = firebase.auth();
-        const googleProvider = new firebase.auth.GoogleAuthProvider();
 
         const now = new Date();
         let currentYear = now.getFullYear();
@@ -372,9 +360,8 @@
             setTimeout(() => { el.classList.remove("visible"); setTimeout(() => el.remove(), 200); }, 3000);
         }
 
-        // --- FUNCIÓN TELEGRAM ---
+        // --- TELEGRAM ---
         function sendTelegramMessage(text) {
-            // Nota: Este endpoint parece ser un servicio personalizado del usuario.
             const url = "https://sendtelegram-jd4jwaesba-uc.a.run.app";
             fetch(url, {
                 method: "POST",
@@ -389,12 +376,7 @@
             return `${d}/${m}/${y}`;
         }
 
-        function loginWithGoogle() {
-            auth.signInWithPopup(googleProvider).catch(error => {
-                console.error(error); showToast("Error Google: " + error.message, "error");
-            });
-        }
-
+        // --- AUTH LOGIC ---
         auth.onAuthStateChanged(async (user) => {
             if (user) {
                 currentUser = user;
@@ -406,6 +388,7 @@
                         currentChildName = data.childName || "";
                         loadApp();
                     } else {
+                        // Usuario nuevo (acaba de registrarse), mostrar Onboarding
                         document.getElementById("login-view").classList.add("hidden");
                         document.getElementById("onboarding-modal").classList.add("open");
                     }
@@ -418,27 +401,46 @@
             }
         });
 
+        // Toggle Login / Registro
+        document.getElementById("toggle-auth-mode").onclick = function() {
+            isRegistering = !isRegistering;
+            this.textContent = isRegistering ? "¿Ya tienes cuenta? Entra aquí" : "¿No tienes cuenta? Regístrate";
+            document.getElementById("login-submit-btn").textContent = isRegistering ? "Crear cuenta" : "Entrar";
+            document.getElementById("login-error-msg").textContent = "";
+        };
+
+        // Submit Login/Registro
+        document.getElementById("login-form").addEventListener("submit", (e) => {
+            e.preventDefault();
+            const email = document.getElementById("login-email").value;
+            const pass = document.getElementById("login-password").value;
+            const errorMsg = document.getElementById("login-error-msg");
+            errorMsg.textContent = "Procesando...";
+
+            if(isRegistering) {
+                auth.createUserWithEmailAndPassword(email, pass)
+                    .catch(err => errorMsg.textContent = "Error: " + err.message);
+            } else {
+                auth.signInWithEmailAndPassword(email, pass)
+                    .catch(err => errorMsg.textContent = "Credenciales incorrectas o usuario no encontrado.");
+            }
+        });
+
+        // Guardar perfil inicial
         document.getElementById("onboarding-form").addEventListener("submit", async (e) => {
             e.preventDefault();
             const role = document.getElementById("onboard-role").value;
             const childName = document.getElementById("onboard-child-name").value.trim();
-            if (!role || !childName) return showToast("Por favor completa todos los datos", "error");
+            if (!role || !childName) return showToast("Completa los datos", "error");
             try {
                 await db.collection("users").doc(currentUser.uid).set({
                     email: currentUser.email, role: role, childName: childName,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 currentRole = role; currentChildName = childName;
-                document.getElementById("onboarding-modal").classList.remove("open"); loadApp();
-            } catch (err) { showToast("Error al guardar perfil", "error"); }
-        });
-
-        document.getElementById("login-form").addEventListener("submit", (e) => {
-            e.preventDefault();
-            const email = document.getElementById("login-email").value;
-            const pass = document.getElementById("login-password").value;
-            if(isRegistering) auth.createUserWithEmailAndPassword(email, pass).catch(err => document.getElementById("login-error-msg").textContent = err.message);
-            else auth.signInWithEmailAndPassword(email, pass).catch(err => document.getElementById("login-error-msg").textContent = "Error de credenciales");
+                document.getElementById("onboarding-modal").classList.remove("open"); 
+                loadApp();
+            } catch (err) { showToast("Error guardando perfil", "error"); }
         });
 
         function loadApp() {
@@ -446,12 +448,15 @@
             roleLabel.textContent = currentRole.toUpperCase(); roleLabel.className = ""; roleLabel.classList.add(currentRole);
             document.getElementById("whoami-label").textContent = currentRole.toUpperCase();
             if(currentChildName) document.getElementById("child-name-display").textContent = "Calendario de " + currentChildName;
+            
             document.getElementById("login-view").classList.add("hidden");
             document.getElementById("app-root").classList.remove("hidden");
+            
             initDataListeners();
-            initSwipeListeners(); // Iniciar escuchas de swipe
+            initSwipeListeners();
         }
 
+        // --- CALENDAR LOGIC ---
         function getBaseOwner(year, monthIndex, day) {
             const date = new Date(year, monthIndex, day, 12, 0, 0);
             const diffMs = date - BASE_MONDAY;
@@ -498,9 +503,7 @@
                             td.innerHTML = `<span class="day-number">${dayCounter}</span>
                                             <img class="owner-icon-img" src="assets/${finalOwner}.png" onerror="this.style.display='none'">`;
                             
-                            // Renderizado de iconos mejorado
                             (eventsData[dateKey] || []).slice(0,3).forEach((evt, idx) => {
-                                // Añadimos la clase evt-TIPO para el color
                                 const colorClass = `evt-${evt.type}`; 
                                 td.innerHTML += `<div class="event-marker ${colorClass} pos-${idx}">
                                     <i data-lucide="${ICON_MAP[evt.type]||'star'}" style="width:12px;"></i>
@@ -522,10 +525,7 @@
 
         function initSwipeListeners() {
             const grid = document.getElementById("calendar-grid");
-            grid.addEventListener('touchstart', e => {
-                touchStartX = e.changedTouches[0].screenX;
-            }, {passive: true});
-
+            grid.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, {passive: true});
             grid.addEventListener('touchend', e => {
                 touchEndX = e.changedTouches[0].screenX;
                 handleSwipeGesture();
@@ -533,17 +533,10 @@
         }
 
         function handleSwipeGesture() {
-            const SWIPE_THRESHOLD = 50; // Distancia mínima para considerar swipe
             const distance = touchEndX - touchStartX;
-            
-            if (Math.abs(distance) > SWIPE_THRESHOLD) {
-                if (distance < 0) {
-                    // Swipe Izquierda -> Mes Siguiente
-                    document.getElementById("next-period").click();
-                } else {
-                    // Swipe Derecha -> Mes Anterior
-                    document.getElementById("prev-period").click();
-                }
+            if (Math.abs(distance) > 50) {
+                if (distance < 0) document.getElementById("next-period").click();
+                else document.getElementById("prev-period").click();
             }
         }
 
@@ -583,7 +576,7 @@
             await batch.commit(); 
             showToast(`Solicitud ${status}`);
             
-            // --- NOTIFICACIÓN TELEGRAM (RESPUESTA) ---
+            // Telegram Notificación
             const icon = status === "aceptado" ? "✅" : "❌";
             const responder = currentRole === "madre" ? "Madre" : "Padre";
             sendTelegramMessage(`${icon} Solicitud ${status.toUpperCase()} por ${responder}.`);
@@ -622,11 +615,6 @@
         }
 
         document.getElementById("logout-btn").onclick = () => { listenersAttached=false; auth.signOut(); };
-        document.getElementById("toggle-auth-mode").onclick = function() {
-            isRegistering = !isRegistering;
-            this.textContent = isRegistering ? "¿Ya tienes cuenta? Entra aquí" : "¿No tienes cuenta? Regístrate";
-            document.getElementById("login-submit-btn").textContent = isRegistering ? "Crear cuenta" : "Entrar";
-        };
         document.getElementById("prev-period").onclick = () => { if(--currentMonth<0){currentMonth=11;currentYear--;} renderCalendar(); };
         document.getElementById("next-period").onclick = () => { if(++currentMonth>11){currentMonth=0;currentYear++;} renderCalendar(); };
         
@@ -638,17 +626,13 @@
 
             await db.collection("requests").add({
                 requesterUid: currentUser.uid, requesterRole: currentRole,
-                startDate: startVal,
-                endDate: endVal,
-                reason: reasonVal,
+                startDate: startVal, endDate: endVal, reason: reasonVal,
                 status: "pendiente", createdAt: firebase.firestore.FieldValue.serverTimestamp()
             });
-            showToast("Solicitud enviada"); 
-            e.target.reset();
+            showToast("Solicitud enviada"); e.target.reset();
 
-            // --- NOTIFICACIÓN TELEGRAM (NUEVA SOLICITUD) ---
+            // Telegram Notificación
             const quien = currentRole === "madre" ? "Madre" : "Padre";
-            // Nota: Se envía el mensaje formateado al endpoint
             sendTelegramMessage(`📅 NUEVA SOLICITUD de ${quien}:\nDesde: ${formatearFecha(startVal)}\nHasta: ${formatearFecha(endVal)}\nMotivo: ${reasonVal}`);
         };
 

@@ -97,6 +97,13 @@
       transition: opacity 0.2s;
     }
     .login-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    
+    .secondary-btn {
+      background: transparent; border: none; color: var(--accent-color);
+      font-weight: 600; font-size: 0.9rem; cursor: pointer;
+      margin-top: 16px; width: 100%; text-align: center;
+    }
+    .secondary-btn:hover { text-decoration: underline; }
 
     /* TOPBAR */
     .topbar {
@@ -169,7 +176,7 @@
       .topbar { margin: 12px; border-radius: 20px; }
     }
 
-    /* MODAL - CORREGIDO: Faltaba este bloque para ocultar el modal */
+    /* MODAL */
     .modal-overlay {
       position: fixed; inset: 0; background: rgba(0,0,0,0.5);
       display: flex; align-items: center; justify-content: center;
@@ -254,7 +261,8 @@
         <label>Contraseña</label>
         <input type="password" id="login-password" required placeholder="••••••••">
       </div>
-      <button type="submit" class="login-btn" id="login-submit-btn">Entrar ahora</button>
+      <button type="submit" class="login-btn" id="login-submit-btn">Entrar</button>
+      <button type="button" class="secondary-btn" id="toggle-auth-mode">¿No tienes cuenta? Regístrate</button>
       <div id="login-error-msg" style="color: var(--error); font-size: 0.8rem; margin-top: 12px; text-align: center; font-weight: 600;"></div>
     </form>
   </div>
@@ -273,6 +281,8 @@
       </div>
     </div>
     <div class="topbar-right">
+      <!-- Añadido el elemento user-role-label que faltaba -->
+      <span id="user-role-label" style="font-size: 0.9rem; font-weight: 700; margin-right: 8px;"></span>
       <select id="year-select" class="year-select" style="border: none; font-weight: 700; background: #f0f2f5; padding: 8px 12px; border-radius: 12px;"></select>
       <button type="button" id="logout-btn" class="logout-btn" style="border: none; background: transparent; cursor: pointer; padding: 8px;"><i data-lucide="log-out" style="width: 20px; color: #6b7280;"></i></button>
     </div>
@@ -347,6 +357,7 @@
   let selectedDateKey = null;
   let selectedIconType = 'medico';
   let listenersAttached = false;
+  let isRegistering = false;
 
   const monthNames = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
   const weekDayNames = ["L","M","M","J","V","S","D"];
@@ -452,6 +463,7 @@
             const ownerImg = document.createElement("img");
             ownerImg.className = "owner-icon-img";
             ownerImg.src = `assets/${final}.png`;
+            ownerImg.onerror = function() { this.style.display='none'; }; // Fallback si no hay imagen
             td.appendChild(ownerImg);
 
             const dayEvents = eventsData[dateKey] || [];
@@ -593,33 +605,55 @@
     try { await db.collection("events").doc(id).delete(); showToast("Actividad eliminada"); renderModalEvents(); } catch(e) {}
   }
 
+  // --- LÓGICA DE AUTENTICACIÓN CORREGIDA ---
+
   auth.onAuthStateChanged(async (user) => {
     if (user) {
       currentUser = user;
-      try {
-        const snap = await db.collection("users").doc(user.uid).get();
-        if (snap.exists) {
-          currentRole = snap.data().role;
-          document.getElementById("user-role-label").textContent = currentRole === 'madre' ? 'Madre' : 'Padre';
-          document.getElementById("whoami-label").textContent = currentRole === 'madre' ? 'MADRE' : 'PADRE';
-          document.getElementById("login-view").classList.add("hidden");
-          document.getElementById("app-root").classList.remove("hidden");
-          initDataListeners();
-        } else {
-          auth.signOut();
-          document.getElementById("login-error-msg").textContent = "Usuario sin perfil configurado.";
+      
+      // Lógica forzada de roles por email (Petición usuario para evitar errores)
+      if (user.email === 'padre@custodia.com') {
+        currentRole = 'padre';
+      } else if (user.email === 'madre@custodia.com') {
+        currentRole = 'madre';
+      } else {
+        // Fallback a base de datos si no es uno de los emails especiales
+        try {
+          const snap = await db.collection("users").doc(user.uid).get();
+          if (snap.exists) {
+            currentRole = snap.data().role || 'madre';
+          } else {
+            currentRole = 'madre'; // Rol por defecto
+            await db.collection("users").doc(user.uid).set({
+              role: currentRole,
+              email: user.email,
+              createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+          }
+        } catch (err) {
+           console.error("Error fetching role:", err);
+           currentRole = 'madre'; // Default safe fallback
         }
-      } catch (err) {
-        auth.signOut();
-        document.getElementById("login-error-msg").textContent = "Error al verificar perfil.";
       }
+
+      // Actualizar UI con comprobación de seguridad
+      const roleLabel = document.getElementById("user-role-label");
+      if(roleLabel) roleLabel.textContent = currentRole === 'madre' ? 'Madre' : 'Padre';
+      
+      const whoamiLabel = document.getElementById("whoami-label");
+      if(whoamiLabel) whoamiLabel.textContent = currentRole === 'madre' ? 'MADRE' : 'PADRE';
+      
+      document.getElementById("login-view").classList.add("hidden");
+      document.getElementById("app-root").classList.remove("hidden");
+      initDataListeners();
+
     } else {
       currentUser = null;
       currentRole = null;
       document.getElementById("login-view").classList.remove("hidden");
       document.getElementById("app-root").classList.add("hidden");
       document.getElementById("login-submit-btn").disabled = false;
-      document.getElementById("login-submit-btn").textContent = "Entrar ahora";
+      document.getElementById("login-submit-btn").textContent = isRegistering ? "Registrarse" : "Entrar";
     }
   });
 
@@ -654,19 +688,55 @@
     lucide.createIcons();
   }
 
+  // --- TOGGLE LOGIN / REGISTRO ---
+  document.getElementById("toggle-auth-mode").addEventListener("click", () => {
+    isRegistering = !isRegistering;
+    const title = document.querySelector(".login-title");
+    const sub = document.querySelector(".login-subtitle");
+    const btn = document.getElementById("login-submit-btn");
+    const toggle = document.getElementById("toggle-auth-mode");
+    
+    if (isRegistering) {
+        title.textContent = "Crear Cuenta";
+        sub.textContent = "Regístrate para comenzar.";
+        btn.textContent = "Registrarse";
+        toggle.textContent = "¿Ya tienes cuenta? Entra aquí";
+    } else {
+        title.textContent = "Calendario";
+        sub.textContent = "Coordina la custodia familiar de forma visual.";
+        btn.textContent = "Entrar";
+        toggle.textContent = "¿No tienes cuenta? Regístrate";
+    }
+  });
+
   document.getElementById("login-form").addEventListener("submit", (e) => {
     e.preventDefault();
     const btn = document.getElementById("login-submit-btn");
     const errorMsg = document.getElementById("login-error-msg");
+    const email = document.getElementById("login-email").value;
+    const pass = document.getElementById("login-password").value;
+    
     btn.disabled = true;
-    btn.textContent = "Verificando...";
+    btn.textContent = "Procesando...";
     errorMsg.textContent = "";
 
-    auth.signInWithEmailAndPassword(document.getElementById("login-email").value, document.getElementById("login-password").value)
-    .catch((error) => { 
+    const action = isRegistering 
+        ? auth.createUserWithEmailAndPassword(email, pass)
+        : auth.signInWithEmailAndPassword(email, pass);
+
+    action.catch((error) => { 
       btn.disabled = false;
-      btn.textContent = "Entrar ahora"; 
-      errorMsg.textContent = "Credenciales incorrectas o error de conexión.";
+      btn.textContent = isRegistering ? "Registrarse" : "Entrar"; 
+      
+      if (error.code === 'auth/email-already-in-use') {
+        errorMsg.textContent = "Este correo ya está registrado.";
+      } else if (error.code === 'auth/weak-password') {
+        errorMsg.textContent = "La contraseña es muy débil.";
+      } else if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+        errorMsg.textContent = "Correo o contraseña incorrectos.";
+      } else {
+        errorMsg.textContent = "Error de conexión: " + error.message;
+      }
     });
   });
 

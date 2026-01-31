@@ -10,11 +10,11 @@
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <style>
-    /* TIPOGRAFÍA Y COLORES MODERNOS (Inspiración Pixel/Material You) */
+    /* TIPOGRAFÍA Y COLORES MODERNOS */
     :root {
-      --mother-color: #fce7f3; /* Rosa suave */
-      --father-color: #e0f2fe; /* Azul suave */
-      --accent-color: #6366f1; /* Indigo moderno */
+      --mother-color: #fce7f3; 
+      --father-color: #e0f2fe; 
+      --accent-color: #6366f1; 
       --accent-soft: #f0f1ff;
       --text-main: #1a1c1e;
       --text-muted: #44474e;
@@ -29,7 +29,7 @@
     
     body {
       margin: 0;
-      font-family: 'Inter', 'Google Sans', 'Roboto', system-ui, -apple-system, sans-serif;
+      font-family: 'Google Sans', 'Inter', 'Roboto', system-ui, -apple-system, sans-serif;
       background: var(--bg-main);
       color: var(--text-main);
       padding-bottom: 50px;
@@ -79,8 +79,9 @@
       font-size:1.75rem;
       font-weight:700; margin-bottom:12px;
       color:var(--text-main);
+      text-align: center;
     }
-    .login-subtitle { font-size:1rem; color:var(--text-muted); margin-bottom:32px; }
+    .login-subtitle { font-size:1rem; color:var(--text-muted); margin-bottom:32px; text-align: center; }
     .login-field { margin-bottom:20px; }
     .login-field label { font-size:0.85rem; font-weight:600; color:var(--text-muted); margin-bottom:8px; display:block; padding-left:4px; }
     .login-field input {
@@ -93,8 +94,9 @@
       margin-top:24px; width:100%; padding:18px; font-size:1.1rem;
       font-weight:600; border-radius:20px; background:var(--accent-color);
       color:white; border:none; cursor:pointer;
-      transition: transform 0.1s active;
+      transition: opacity 0.2s;
     }
+    .login-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
     /* TOPBAR */
     .topbar {
@@ -167,7 +169,15 @@
       .topbar { margin: 12px; border-radius: 20px; }
     }
 
-    /* MODAL */
+    /* MODAL - CORREGIDO: Faltaba este bloque para ocultar el modal */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 10000; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+      backdrop-filter: blur(4px);
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: auto; }
+    
     .modal-card {
       background: #fff; width: 92%; max-width: 420px;
       border-radius: 32px; padding: 28px;
@@ -215,18 +225,18 @@
     <div style="margin-bottom: 12px; font-weight: 700; font-size: 0.95rem; color: var(--text-muted);">¿Qué hay hoy?</div>
     <input type="text" id="event-title" placeholder="Ej. Fiesta de disfraces..." style="width: 100%; padding: 16px; border-radius: 16px; border: 1.5px solid #eee; margin-bottom: 16px; font-size: 1rem;">
     
-    <div class="icon-grid">
-      <button class="icon-btn" onclick="selectIcon('medico', this)"><i data-lucide="stethoscope" style="color: #ea4335;"></i><span class="icon-label">Médico</span></button>
-      <button class="icon-btn" onclick="selectIcon('dentista', this)"><i data-lucide="smile" style="color: #1a73e8;"></i><span class="icon-label">Dentista</span></button>
-      <button class="icon-btn" onclick="selectIcon('escuela', this)"><i data-lucide="backpack" style="color: #f29900;"></i><span class="icon-label">Escuela</span></button>
-      <button class="icon-btn" onclick="selectIcon('deporte', this)"><i data-lucide="trophy" style="color: #8e24aa;"></i><span class="icon-label">Deporte</span></button>
-      <button class="icon-btn" onclick="selectIcon('cumple', this)"><i data-lucide="cake" style="color: #e37400;"></i><span class="icon-label">Cumple</span></button>
-      <button class="icon-btn" onclick="selectIcon('parque', this)"><i data-lucide="tree-deciduous" style="color: #1e8e3e;"></i><span class="icon-label">Parque</span></button>
-      <button class="icon-btn" onclick="selectIcon('general', this)"><i data-lucide="star" style="color: #5f6368;"></i><span class="icon-label">General</span></button>
-      <button class="icon-btn" onclick="selectIcon('vacaciones', this)"><i data-lucide="palmtree" style="color: #00acc1;"></i><span class="icon-label">Viaje</span></button>
+    <div class="icon-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">
+      <button class="icon-btn" onclick="selectIcon('medico', this)" style="border: none; background: #f0f2f5; padding: 10px; border-radius: 14px; cursor: pointer;"><i data-lucide="stethoscope" style="color: #ea4335;"></i></button>
+      <button class="icon-btn" onclick="selectIcon('dentista', this)" style="border: none; background: #f0f2f5; padding: 10px; border-radius: 14px; cursor: pointer;"><i data-lucide="smile" style="color: #1a73e8;"></i></button>
+      <button class="icon-btn" onclick="selectIcon('escuela', this)" style="border: none; background: #f0f2f5; padding: 10px; border-radius: 14px; cursor: pointer;"><i data-lucide="backpack" style="color: #f29900;"></i></button>
+      <button class="icon-btn" onclick="selectIcon('deporte', this)" style="border: none; background: #f0f2f5; padding: 10px; border-radius: 14px; cursor: pointer;"><i data-lucide="trophy" style="color: #8e24aa;"></i></button>
+      <button class="icon-btn" onclick="selectIcon('cumple', this)" style="border: none; background: #f0f2f5; padding: 10px; border-radius: 14px; cursor: pointer;"><i data-lucide="cake" style="color: #e37400;"></i></button>
+      <button class="icon-btn" onclick="selectIcon('parque', this)" style="border: none; background: #f0f2f5; padding: 10px; border-radius: 14px; cursor: pointer;"><i data-lucide="tree-deciduous" style="color: #1e8e3e;"></i></button>
+      <button class="icon-btn" onclick="selectIcon('general', this)" style="border: none; background: #f0f2f5; padding: 10px; border-radius: 14px; cursor: pointer;"><i data-lucide="star" style="color: #5f6368;"></i></button>
+      <button class="icon-btn" onclick="selectIcon('vacaciones', this)" style="border: none; background: #f0f2f5; padding: 10px; border-radius: 14px; cursor: pointer;"><i data-lucide="palmtree" style="color: #00acc1;"></i></button>
     </div>
 
-    <button onclick="saveEvent()" class="primary-btn" style="width: 100%; color: #fff; border: none; cursor: pointer;">Guardar actividad</button>
+    <button onclick="saveEvent()" class="primary-btn" style="width: 100%; color: #fff; border: none; cursor: pointer; margin-top: 16px;">Guardar actividad</button>
     <div id="modal-event-list" style="margin-top: 20px; max-height: 180px; overflow-y: auto; padding-right: 4px;"></div>
   </div>
 </div>
@@ -234,17 +244,18 @@
 <div id="login-view" class="login-wrapper">
   <div class="login-card">
     <div class="login-title">Calendario</div>
-    <p class="login-subtitle">Coordina la custodia familiar de forma sencilla y visual.</p>
+    <p class="login-subtitle">Coordina la custodia familiar de forma visual.</p>
     <form id="login-form">
       <div class="login-field">
         <label>Correo electrónico</label>
-        <input type="email" id="login-email" required>
+        <input type="email" id="login-email" required placeholder="tu@email.com">
       </div>
       <div class="login-field">
         <label>Contraseña</label>
-        <input type="password" id="login-password" required>
+        <input type="password" id="login-password" required placeholder="••••••••">
       </div>
       <button type="submit" class="login-btn" id="login-submit-btn">Entrar ahora</button>
+      <div id="login-error-msg" style="color: var(--error); font-size: 0.8rem; margin-top: 12px; text-align: center; font-weight: 600;"></div>
     </form>
   </div>
 </div>
@@ -278,21 +289,21 @@
     </section>
 
     <section class="side-panel">
-      <div class="card">
+      <div class="card" style="background: #fff; border-radius: 28px; padding: 24px; box-shadow: var(--shadow-soft);">
         <div class="panel-title" style="font-size: 1rem; font-weight: 800; margin-bottom: 12px;">Solicitar cambio</div>
         <form id="request-form">
           <div class="field-group">
             <label style="font-size: 0.75rem;">Usuario: <span id="whoami-label" style="color:var(--accent-color); font-weight: 800;">...</span></label>
           </div>
           <div class="field-group" style="display:flex; gap:8px;">
-            <input type="date" id="start-date" required style="flex:1;">
-            <input type="date" id="end-date" required style="flex:1;">
+            <input type="date" id="start-date" required style="flex:1; padding: 10px; border-radius: 12px; border: 1px solid #eee;">
+            <input type="date" id="end-date" required style="flex:1; padding: 10px; border-radius: 12px; border: 1px solid #eee;">
           </div>
           <textarea id="reason" placeholder="Motivo del cambio..." required style="margin-top: 8px; width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #eee; font-family: inherit; font-size: 0.9rem;"></textarea>
           <button type="submit" class="primary-btn" style="width: 100%; border: none; color: #fff; cursor: pointer; margin-top: 12px;">Enviar solicitud</button>
         </form>
       </div>
-      <div class="card" id="pending-container">
+      <div class="card" id="pending-container" style="background: #fff; border-radius: 28px; padding: 24px; box-shadow: var(--shadow-soft); margin-top: 16px;">
         <h3 class="panel-title active" style="font-size: 0.9rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
           <i data-lucide="clock" style="width: 16px;"></i> Cambios pendientes
         </h3>
@@ -335,6 +346,7 @@
   let pendingRequests = [];
   let selectedDateKey = null;
   let selectedIconType = 'medico';
+  let listenersAttached = false;
 
   const monthNames = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
   const weekDayNames = ["L","M","M","J","V","S","D"];
@@ -345,7 +357,6 @@
     'general': 'star', 'vacaciones': 'palmtree'
   };
 
-  // FUNCIÓN TELEGRAM
   function sendTelegramMessage(text) {
     const url = "https://sendtelegram-jd4jwaesba-uc.a.run.app"; 
     fetch(url, {
@@ -494,7 +505,7 @@
           </div>
         `;
       } else {
-        actions = `<div class="req-wait">Esperando respuesta del otro usuario...</div>`;
+        actions = `<div class="req-wait">Esperando respuesta...</div>`;
       }
 
       item.innerHTML = `
@@ -585,33 +596,50 @@
   auth.onAuthStateChanged(async (user) => {
     if (user) {
       currentUser = user;
-      const snap = await db.collection("users").doc(user.uid).get();
-      if (snap.exists) {
-        currentRole = snap.data().role;
-        document.getElementById("user-role-label").textContent = currentRole === 'madre' ? 'Madre' : 'Padre';
-        document.getElementById("whoami-label").textContent = currentRole === 'madre' ? 'MADRE' : 'PADRE';
-        document.getElementById("login-view").classList.add("hidden");
-        document.getElementById("app-root").classList.remove("hidden");
-        initDataListeners();
+      try {
+        const snap = await db.collection("users").doc(user.uid).get();
+        if (snap.exists) {
+          currentRole = snap.data().role;
+          document.getElementById("user-role-label").textContent = currentRole === 'madre' ? 'Madre' : 'Padre';
+          document.getElementById("whoami-label").textContent = currentRole === 'madre' ? 'MADRE' : 'PADRE';
+          document.getElementById("login-view").classList.add("hidden");
+          document.getElementById("app-root").classList.remove("hidden");
+          initDataListeners();
+        } else {
+          auth.signOut();
+          document.getElementById("login-error-msg").textContent = "Usuario sin perfil configurado.";
+        }
+      } catch (err) {
+        auth.signOut();
+        document.getElementById("login-error-msg").textContent = "Error al verificar perfil.";
       }
     } else {
+      currentUser = null;
+      currentRole = null;
       document.getElementById("login-view").classList.remove("hidden");
       document.getElementById("app-root").classList.add("hidden");
+      document.getElementById("login-submit-btn").disabled = false;
+      document.getElementById("login-submit-btn").textContent = "Entrar ahora";
     }
   });
 
   function initDataListeners() {
+    if (listenersAttached) return;
+    listenersAttached = true;
+
     db.collection("overrides").onSnapshot(snap => {
       overrides = {}; snap.forEach(doc => overrides[doc.id] = doc.data().owner);
       renderCalendar();
-    });
+    }, () => {});
+
     db.collection("events").onSnapshot(snap => {
       eventsData = {}; snap.forEach(doc => {
         const d = doc.data(); if(!eventsData[d.date]) eventsData[d.date] = [];
         eventsData[d.date].push({ id: doc.id, ...d });
       });
       renderCalendar();
-    });
+    }, () => {});
+
     db.collection("requests").orderBy("createdAt", "desc").onSnapshot(snap => {
       pendingRequests = [];
       snap.forEach(doc => {
@@ -619,11 +647,36 @@
         if (d.status === 'pendiente') pendingRequests.push({ id: doc.id, ...d });
       });
       renderRequestsList();
-    });
+    }, () => {});
+
     document.getElementById("status-pill").className = "status-pill status-online";
     document.getElementById("status-text").textContent = "Conectado";
     lucide.createIcons();
   }
+
+  document.getElementById("login-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const btn = document.getElementById("login-submit-btn");
+    const errorMsg = document.getElementById("login-error-msg");
+    btn.disabled = true;
+    btn.textContent = "Verificando...";
+    errorMsg.textContent = "";
+
+    auth.signInWithEmailAndPassword(document.getElementById("login-email").value, document.getElementById("login-password").value)
+    .catch((error) => { 
+      btn.disabled = false;
+      btn.textContent = "Entrar ahora"; 
+      errorMsg.textContent = "Credenciales incorrectas o error de conexión.";
+    });
+  });
+
+  document.getElementById("logout-btn").onclick = () => {
+    listenersAttached = false;
+    auth.signOut();
+  };
+
+  document.getElementById("prev-period").onclick = () => { currentMonth--; if(currentMonth < 0){ currentMonth=11; currentYear--; } renderCalendar(); };
+  document.getElementById("next-period").onclick = () => { currentMonth++; if(currentMonth > 11){ currentMonth=0; currentYear++; } renderCalendar(); };
 
   document.getElementById("request-form").onsubmit = async (e) => {
     e.preventDefault();
@@ -646,18 +699,6 @@
       showToast("Error al enviar", "error");
     }
   };
-
-  document.getElementById("login-form").addEventListener("submit", (e) => {
-    e.preventDefault();
-    const btn = document.getElementById("login-submit-btn");
-    btn.textContent = "Cargando...";
-    auth.signInWithEmailAndPassword(document.getElementById("login-email").value, document.getElementById("login-password").value)
-    .catch(() => { btn.textContent = "Entrar ahora"; showToast("Error de acceso", "error"); });
-  });
-
-  document.getElementById("logout-btn").onclick = () => auth.signOut();
-  document.getElementById("prev-period").onclick = () => { currentMonth--; if(currentMonth < 0){ currentMonth=11; currentYear--; } renderCalendar(); };
-  document.getElementById("next-period").onclick = () => { currentMonth++; if(currentMonth > 11){ currentMonth=0; currentYear++; } renderCalendar(); };
 
   document.addEventListener("DOMContentLoaded", () => {
     const ys = document.getElementById("year-select");

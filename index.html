@@ -12,41 +12,31 @@
 
         :root {
             --father-primary: #0ea5e9;
-            --father-gradient: linear-gradient(135deg, #0ea5e9 0%, #22d3ee 50%, #06b6d4 100%);
             --mother-primary: #f472b6;
-            --mother-gradient: linear-gradient(135deg, #fbcfe8 0%, #f472b6 50%, #ec4899 100%);
             --text-main: #0f172a;
         }
 
-        * {
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
-            margin: 0;
-            font-family: 'Google Sans', 'Inter', system-ui, -apple-system, sans-serif;
+            margin: 0; font-family: 'Google Sans', 'Inter', system-ui, sans-serif;
             background: radial-gradient(circle at 0% 0%, rgba(236, 72, 153, 0.18), transparent 55%),
-                        radial-gradient(circle at 100% 100%, rgba(56, 189, 248, 0.2), transparent 55%),
-                        #020617;
-            color: var(--text-main);
-            padding-bottom: 50px;
-            overscroll-behavior-y: none;
-            letter-spacing: -0.01em;
+                        radial-gradient(circle at 100% 100%, rgba(56, 189, 248, 0.2), transparent 55%), #020617;
+            color: var(--text-main); padding-bottom: 50px; overscroll-behavior-y: none; letter-spacing: -0.01em;
         }
 
         .hidden { display: none !important; }
 
-        /* --- ESTILOS CALENDARIO --- */
+        /* --- CALENDARIO & SWIPE --- */
         .calendar-grid {
-            opacity: 1;
-            transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 1; transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            touch-action: pan-y; /* Permite scroll vertical pero capturamos el horizontal */
+            user-select: none;
         }
         .calendar-grid.fading { opacity: 0; transform: scale(0.97); }
         
         .day-cell {
-            opacity: 0;
-            transform: translateY(10px) scale(0.96);
+            opacity: 0; transform: translateY(10px) scale(0.96);
             transition: all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
         .day-cell.animated { opacity: 1; transform: translateY(0) scale(1); }
@@ -66,138 +56,102 @@
         .toast.visible { opacity: 1; transform: translateY(0) scale(1); }
 
         /* --- LOGIN & ONBOARDING --- */
-        .login-wrapper {
-            min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 32px 18px;
-        }
+        .login-wrapper { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 32px 18px; }
         .login-card {
-            position: relative;
-            background: radial-gradient(circle at 0% 0%, rgba(244,114,182,0.16), transparent 60%),
-                        radial-gradient(circle at 110% 110%, rgba(56,189,248,0.2), transparent 70%),
-                        rgba(15,23,42,0.92);
-            border-radius: 32px; max-width: 420px; width: 100%; padding: 40px 32px 32px;
-            box-shadow: 0 20px 60px rgba(15,23,42,0.85); border: 1px solid rgba(148,163,184,0.32);
-            overflow: hidden;
+            position: relative; background: rgba(15,23,42,0.92); border-radius: 32px; max-width: 420px; width: 100%; padding: 40px 32px 32px;
+            box-shadow: 0 20px 60px rgba(15,23,42,0.85); border: 1px solid rgba(148,163,184,0.32); overflow: hidden;
         }
         .login-title {
             font-size: 2.1rem; font-weight: 800; margin-bottom: 6px; text-align: center;
-            background: linear-gradient(135deg, #fbcfe8, #f97316, #22d3ee);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background: linear-gradient(135deg, #fbcfe8, #f97316, #22d3ee); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
         .login-subtitle { font-size: 0.95rem; color: #cbd5f5; margin-bottom: 26px; text-align: center; }
-        
         .login-field { margin-bottom: 18px; }
         .login-field label { font-size: 0.8rem; font-weight: 600; color: #94a3b8; margin-bottom: 8px; display: block; }
         .login-field input, .login-field select {
-            width: 100%; padding: 14px 14px; font-size: 0.95rem; border-radius: 14px;
-            border: 1px solid rgba(148,163,184,0.5); background: rgba(15,23,42,0.9); color: #e5e7eb;
-            transition: all 0.25s ease;
+            width: 100%; padding: 14px; border-radius: 14px; border: 1px solid rgba(148,163,184,0.5);
+            background: rgba(15,23,42,0.9); color: #e5e7eb;
         }
-        .login-field input:focus, .login-field select:focus {
-            outline: none; border-color: #22d3ee; box-shadow: 0 0 0 1px rgba(56,189,248,0.6);
-        }
-
         .login-btn {
-            margin-top: 10px; width: 100%; padding: 14px; font-size: 0.98rem; font-weight: 600;
-            border-radius: 999px; background: linear-gradient(135deg, #4f46e5, #22d3ee);
-            color: white; border: none; cursor: pointer; transition: all 0.25s ease;
-            box-shadow: 0 12px 40px rgba(56,189,248,0.4);
+            margin-top: 10px; width: 100%; padding: 14px; font-weight: 600; border-radius: 999px;
+            background: linear-gradient(135deg, #4f46e5, #22d3ee); color: white; border: none; cursor: pointer;
         }
-        .login-btn:hover { transform: translateY(-1px); }
-
         .google-btn {
-            margin-top: 16px; width: 100%; padding: 12px; font-size: 0.95rem; font-weight: 600;
-            border-radius: 999px; background: #ffffff; color: #1f2937; border: none;
-            cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
-            transition: all 0.25s ease;
+            margin-top: 16px; width: 100%; padding: 12px; font-weight: 600; border-radius: 999px;
+            background: #ffffff; color: #1f2937; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
         }
-        .google-btn:hover { background: #f3f4f6; }
-
-        .or-divider {
-            text-align: center; margin: 20px 0; color: #64748b; font-size: 0.8rem; font-weight: 600;
-            position: relative;
-        }
-        .or-divider::before, .or-divider::after {
-            content: ''; position: absolute; top: 50%; width: 40%; height: 1px; background: rgba(148,163,184,0.3);
-        }
+        .or-divider { text-align: center; margin: 20px 0; color: #64748b; font-size: 0.8rem; font-weight: 600; position: relative; }
+        .or-divider::before, .or-divider::after { content: ''; position: absolute; top: 50%; width: 40%; height: 1px; background: rgba(148,163,184,0.3); }
         .or-divider::before { left: 0; } .or-divider::after { right: 0; }
-
-        .secondary-btn {
-            background: transparent; border: none; color: #e5e7eb; font-weight: 500;
-            font-size: 0.85rem; cursor: pointer; margin-top: 14px; width: 100%; text-align: center;
-        }
+        .secondary-btn { background: transparent; border: none; color: #e5e7eb; font-size: 0.85rem; cursor: pointer; margin-top: 14px; width: 100%; }
 
         /* --- APP SHELL --- */
         .topbar {
-            margin: 18px 18px 12px; padding: 14px 18px; border-radius: 18px;
-            background: rgba(15,23,42,0.9); border: 1px solid rgba(148,163,184,0.4);
-            box-shadow: 0 14px 40px rgba(15,23,42,0.88); display: flex; align-items: center;
-            justify-content: space-between; gap: 12px; position: sticky; top: 0; z-index: 40;
-            backdrop-filter: blur(18px);
+            margin: 18px 18px 12px; padding: 14px 18px; border-radius: 18px; background: rgba(15,23,42,0.9);
+            border: 1px solid rgba(148,163,184,0.4); box-shadow: 0 14px 40px rgba(15,23,42,0.88);
+            display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 40; backdrop-filter: blur(18px);
         }
         .logo-icon {
-            width: 40px; height: 40px; border-radius: 16px;
-            background: radial-gradient(circle at 0 0, #f97316, transparent 55%),
-                        radial-gradient(circle at 100% 100%, #22d3ee, transparent 55%), #020617;
+            width: 40px; height: 40px; border-radius: 16px; background: #020617;
             display: flex; align-items: center; justify-content: center; color: #f9fafb; font-size: 20px;
         }
         .app-name { font-size: 1.15rem; font-weight: 700; color: #e5e7eb; }
         
         #user-role-label {
-            font-size: 0.78rem; font-weight: 700; margin-right: 4px; padding: 6px 10px;
-            border-radius: 999px; border: 1px solid rgba(148,163,184,0.5);
-            background: rgba(15,23,42,0.85); color: #e5e7eb; text-transform: uppercase;
+            font-size: 0.78rem; font-weight: 700; margin-right: 4px; padding: 6px 10px; border-radius: 999px;
+            border: 1px solid rgba(148,163,184,0.5); background: rgba(15,23,42,0.85); color: #e5e7eb; text-transform: uppercase;
         }
         #user-role-label.madre { border-color: rgba(244,114,182,0.7); background: rgba(76,29,149,0.65); }
         #user-role-label.padre { border-color: rgba(56,189,248,0.7); background: rgba(15,23,42,0.85); }
 
-        .layout {
-            max-width: 1180px; margin: 0 auto 40px; padding: 0 18px 18px;
-            display: grid; grid-template-columns: 2fr 1.3fr; gap: 16px;
-        }
+        .layout { max-width: 1180px; margin: 0 auto 40px; padding: 0 18px 18px; display: grid; grid-template-columns: 2fr 1.3fr; gap: 16px; }
         @media (max-width: 960px) { .layout { grid-template-columns: 1fr; } }
 
-        /* --- CALENDAR --- */
         .calendar-wrapper {
-            background: radial-gradient(circle at 0% 0%, rgba(244,114,182,0.18), transparent 55%),
-                        radial-gradient(circle at 115% 120%, rgba(56,189,248,0.16), transparent 60%),
-                        rgba(15,23,42,0.9);
-            border-radius: 22px; padding: 18px; box-shadow: 0 24px 60px rgba(15,23,42,0.9);
-            border: 1px solid rgba(148,163,184,0.5); backdrop-filter: blur(22px);
+            background: rgba(15,23,42,0.9); border-radius: 22px; padding: 18px;
+            box-shadow: 0 24px 60px rgba(15,23,42,0.9); border: 1px solid rgba(148,163,184,0.5); backdrop-filter: blur(22px);
         }
         .calendar-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
         .calendar-title { font-size: 1.4rem; font-weight: 800; color: #e5e7eb; }
         .nav-arrow {
             width: 34px; height: 34px; border-radius: 999px; border: 1px solid rgba(148,163,184,0.55);
-            background: rgba(15,23,42,0.85); display: inline-flex; align-items: center; justify-content: center;
-            cursor: pointer; color: #e5e7eb;
+            background: rgba(15,23,42,0.85); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; color: #e5e7eb;
         }
         
         .month-table { width: 100%; border-collapse: separate; border-spacing: 6px; }
         .month-table th { font-size: 0.7rem; color: #94a3b8; padding: 3px; }
         .month-table td {
             height: 80px; position: relative; border-radius: 16px; vertical-align: top; overflow: hidden;
-            cursor: pointer; border: 1px solid rgba(15,23,42,0.9);
-            background: radial-gradient(circle at 0% 0%, rgba(15,23,42,0.9), rgba(15,23,42,0.85));
+            cursor: pointer; border: 1px solid rgba(15,23,42,0.9); background: rgba(15,23,42,0.85);
         }
-        .day-father {
-            background-image: radial-gradient(circle at 0% 0%, rgba(56,189,248,0.25), transparent 60%),
-                             linear-gradient(135deg, #0ea5e9, #22d3ee);
-        }
-        .day-mother {
-            background-image: radial-gradient(circle at 0% 0%, rgba(244,114,182,0.25), transparent 60%),
-                             linear-gradient(135deg, #f9a8d4, #ec4899);
-        }
-        .day-number { position: absolute; top: 4px; left: 6px; font-size: 0.9rem; font-weight: 700; color: #f9fafb; }
+        .day-father { background-image: linear-gradient(135deg, #0ea5e9, #22d3ee); }
+        .day-mother { background-image: linear-gradient(135deg, #f9a8d4, #ec4899); }
+        
+        .day-number { position: absolute; top: 4px; left: 6px; font-size: 0.9rem; font-weight: 700; color: #f9fafb; z-index: 2; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
         .owner-icon-img {
-            position: absolute; top: 48%; left: 50%; transform: translate(-50%, -50%);
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             width: 46px; height: 46px; opacity: 0.22; pointer-events: none; object-fit: contain;
         }
+
+        /* --- ICONOS DE EVENTOS MEJORADOS --- */
         .event-marker {
-            position: absolute; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center;
-            border-radius: 999px; box-shadow: 0 6px 16px rgba(0,0,0,0.6); z-index: 5;
-            background: radial-gradient(circle at 30% 0%, #f9fafb, #e5e7eb); color: #0f172a; font-size: 0.6rem;
+            position: absolute; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center;
+            border-radius: 6px; box-shadow: 0 4px 10px rgba(0,0,0,0.4); z-index: 5;
+            color: white; font-size: 0.6rem; border: 1px solid rgba(255,255,255,0.4);
         }
-        .pos-0 { top: 4px; right: 4px; } .pos-1 { bottom: 4px; left: 4px; }
+        /* Colores específicos por tipo */
+        .evt-medico { background: #ef4444; } /* Rojo */
+        .evt-dentista { background: #06b6d4; } /* Cyan */
+        .evt-escuela { background: #f97316; } /* Naranja */
+        .evt-deporte { background: #eab308; } /* Amarillo */
+        .evt-cumple { background: #d946ef; } /* Rosa fuerte */
+        .evt-parque { background: #22c55e; } /* Verde */
+        .evt-vacaciones { background: #3b82f6; } /* Azul */
+        .evt-general { background: #6366f1; } /* Índigo */
+
+        .pos-0 { top: 4px; right: 4px; }
+        .pos-1 { bottom: 4px; right: 4px; }
+        .pos-2 { bottom: 4px; left: 4px; }
 
         /* --- MODALS --- */
         .modal-overlay {
@@ -211,11 +165,6 @@
             transform: translateY(14px) scale(0.96); transition: all 0.3s ease-out;
         }
         .modal-overlay.open .modal-card { transform: translateY(0) scale(1); }
-        
-        .custody-header {
-            margin: 8px 0 14px; padding: 10px; background: rgba(15,23,42,0.92);
-            border-radius: 16px; display: flex; align-items: center; gap: 10px; border: 1px solid rgba(148,163,184,0.5);
-        }
         
         .icon-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 10px 0 6px; }
         .icon-btn {
@@ -232,10 +181,6 @@
             background: rgba(15,23,42,0.96); border-radius: 14px; padding: 12px; margin-bottom: 6px;
             border: 1px solid rgba(148,163,184,0.55); font-size: 0.8rem; color: #e5e7eb;
         }
-
-        #child-name-display {
-            font-size: 0.75rem; color: #94a3b8; font-weight: 500; text-align: center; margin-top: -4px;
-        }
     </style>
 </head>
 <body>
@@ -245,7 +190,7 @@
         <div class="modal-card">
             <button class="close-modal" onclick="closeModal()" style="position:absolute; top:8px; right:8px; background:none; border:none; color:#94a3b8; font-size:1.4rem; cursor:pointer;">×</button>
             <div class="modal-title" id="modal-date-title" style="font-weight:700; color:#e5e7eb; margin-bottom:10px;">Detalles</div>
-            <div class="custody-header">
+            <div style="margin:8px 0 14px; padding:10px; background:rgba(15,23,42,0.92); border-radius:16px; display:flex; align-items:center; gap:10px; border:1px solid rgba(148,163,184,0.5);">
                 <img id="modal-custody-img" src="" style="width:34px; height:34px; border-radius:999px; object-fit:contain;">
                 <div>
                     <div style="font-size:0.7rem; color:#9ca3af; text-transform:uppercase; font-weight:600;">Custodia actual</div>
@@ -254,14 +199,14 @@
             </div>
             <input type="text" id="event-title" placeholder="Ej. Fiesta de disfraces…" style="width:100%; padding:12px; border-radius:14px; background:rgba(15,23,42,0.95); border:1px solid rgba(148,163,184,0.55); color:white; margin-top:6px;" />
             <div class="icon-grid">
-                <button class="icon-btn" onclick="selectIcon('medico', this)"><i data-lucide="stethoscope" style="width:16px;"></i></button>
-                <button class="icon-btn" onclick="selectIcon('dentista', this)"><i data-lucide="smile" style="width:16px;"></i></button>
-                <button class="icon-btn" onclick="selectIcon('escuela', this)"><i data-lucide="backpack" style="width:16px;"></i></button>
-                <button class="icon-btn" onclick="selectIcon('deporte', this)"><i data-lucide="trophy" style="width:16px;"></i></button>
-                <button class="icon-btn" onclick="selectIcon('cumple', this)"><i data-lucide="cake" style="width:16px;"></i></button>
-                <button class="icon-btn" onclick="selectIcon('parque', this)"><i data-lucide="tree-deciduous" style="width:16px;"></i></button>
-                <button class="icon-btn" onclick="selectIcon('general', this)"><i data-lucide="star" style="width:16px;"></i></button>
-                <button class="icon-btn" onclick="selectIcon('vacaciones', this)"><i data-lucide="palmtree" style="width:16px;"></i></button>
+                <button class="icon-btn evt-medico" onclick="selectIcon('medico', this)"><i data-lucide="stethoscope" style="width:16px;"></i></button>
+                <button class="icon-btn evt-dentista" onclick="selectIcon('dentista', this)"><i data-lucide="smile" style="width:16px;"></i></button>
+                <button class="icon-btn evt-escuela" onclick="selectIcon('escuela', this)"><i data-lucide="backpack" style="width:16px;"></i></button>
+                <button class="icon-btn evt-deporte" onclick="selectIcon('deporte', this)"><i data-lucide="trophy" style="width:16px;"></i></button>
+                <button class="icon-btn evt-cumple" onclick="selectIcon('cumple', this)"><i data-lucide="cake" style="width:16px;"></i></button>
+                <button class="icon-btn evt-parque" onclick="selectIcon('parque', this)"><i data-lucide="tree-deciduous" style="width:16px;"></i></button>
+                <button class="icon-btn evt-general" onclick="selectIcon('general', this)"><i data-lucide="star" style="width:16px;"></i></button>
+                <button class="icon-btn evt-vacaciones" onclick="selectIcon('vacaciones', this)"><i data-lucide="palmtree" style="width:16px;"></i></button>
             </div>
             <button onclick="saveEvent()" class="login-btn" style="margin-top:8px;">Guardar actividad</button>
             <div id="modal-event-list" style="margin-top:10px; max-height:180px; overflow-y:auto;"></div>
@@ -297,7 +242,6 @@
         <div class="login-card">
             <div class="login-title">Calendario</div>
             <p class="login-subtitle">Coordina la custodia familiar de forma visual.</p>
-            
             <form id="login-form">
                 <div class="login-field">
                     <label>Correo electrónico</label>
@@ -309,19 +253,11 @@
                 </div>
                 <button type="submit" class="login-btn" id="login-submit-btn">Entrar</button>
             </form>
-
             <div class="or-divider">O CONTINÚA CON</div>
-
             <button type="button" class="google-btn" onclick="loginWithGoogle()">
-                <svg width="20" height="20" viewBox="0 0 24 24">
-                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.26-1.19-.58z" fill="#FBBC05"/>
-                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-                </svg>
+                <svg width="20" height="20" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.26-1.19-.58z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
                 Google
             </button>
-            
             <button type="button" class="secondary-btn" id="toggle-auth-mode">¿No tienes cuenta? Regístrate</button>
             <div id="login-error-msg"></div>
         </div>
@@ -333,15 +269,13 @@
                 <div class="logo-icon">👨‍👩‍👧‍👦</div>
                 <div>
                     <div class="app-name">Custodia Familiar</div>
-                    <div id="child-name-display"></div>
+                    <div id="child-name-display" style="font-size:0.75rem; color:#94a3b8; font-weight:500;"></div>
                 </div>
             </div>
             <div style="display:flex; align-items:center; gap:8px;">
                 <span id="user-role-label"></span>
                 <select id="year-select" style="background:rgba(15,23,42,0.95); border:1px solid rgba(148,163,184,0.55); color:#e5e7eb; padding:6px; border-radius:999px;"></select>
-                <button type="button" id="logout-btn" style="background:none; border:none; color:#9ca3af; cursor:pointer;">
-                    <i data-lucide="log-out" style="width:18px;"></i>
-                </button>
+                <button type="button" id="logout-btn" style="background:none; border:none; color:#9ca3af; cursor:pointer;"><i data-lucide="log-out" style="width:18px;"></i></button>
             </div>
         </header>
 
@@ -357,7 +291,7 @@
 
             <section class="side-panel">
                 <div class="card">
-                    <div class="panel-title">
+                    <div style="font-size:0.95rem; font-weight:700; color:#e5e7eb; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
                         <i data-lucide="send" style="width:16px;"></i> Solicitar cambio
                     </div>
                     <form id="request-form">
@@ -372,8 +306,10 @@
                 </div>
 
                 <div class="card" id="pending-container">
-                    <h3 class="panel-title"><i data-lucide="clock" style="width:16px;"></i> Cambios pendientes</h3>
-                    <div class="requests-list" id="pending-requests"></div>
+                    <h3 style="font-size:0.95rem; font-weight:700; color:#e5e7eb; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
+                        <i data-lucide="clock" style="width:16px;"></i> Cambios pendientes
+                    </h3>
+                    <div id="pending-requests" style="max-height:260px; overflow-y:auto;"></div>
                 </div>
             </section>
         </div>
@@ -384,15 +320,14 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 
     <script>
-        // CONFIGURACIÓN FIREBASE
-      const firebaseConfig = {
-                              apiKey: "AIzaSyAwgk4_l0zvaCUCgm1CjqqqXjJHr5KPBjc",
-                              authDomain: "custodia-familiar.firebaseapp.com",
-                              projectId: "custodia-familiar",
-                              storageBucket: "custodia-familiar.firebasestorage.app",
-                              messagingSenderId: "1038952432258",
-                              appId: "1:1038952432258:web:7608d6a48d8ad8308a6a9b"
-                                };
+        const firebaseConfig = {
+            apiKey: "AIzaSyAwgk4l0zvaCUCgm1CjqqqXjJHr5KPBjc",
+            authDomain: "custodia-familiar.firebaseapp.com",
+            projectId: "custodia-familiar",
+            storageBucket: "custodia-familiar.firebasestorage.app",
+            messagingSenderId: "1038952432258",
+            appId: "1:1038952432258:web:7608d6a48d8ad8308a6a9b"
+        };
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
@@ -415,9 +350,17 @@
         let listenersAttached = false;
         let isRegistering = false;
 
+        // Variables para Swipe
+        let touchStartX = 0;
+        let touchEndX = 0;
+
         const monthNames = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
         const weekDayNames = ["L","M","X","J","V","S","D"];
-        const ICON_MAP = { medico: "stethoscope", dentista: "smile", escuela: "backpack", deporte: "trophy", cumple: "cake", parque: "tree-deciduous", general: "star", vacaciones: "palmtree" };
+        const ICON_MAP = {
+            medico: "stethoscope", dentista: "smile", escuela: "backpack",
+            deporte: "trophy", cumple: "cake", parque: "tree-deciduous",
+            general: "star", vacaciones: "palmtree"
+        };
 
         function showToast(msg, type = "success") {
             const container = document.getElementById("toast-container");
@@ -429,19 +372,32 @@
             setTimeout(() => { el.classList.remove("visible"); setTimeout(() => el.remove(), 200); }, 3000);
         }
 
-        // --- AUTH GOOGLE ---
+        // --- FUNCIÓN TELEGRAM ---
+        function sendTelegramMessage(text) {
+            // Nota: Este endpoint parece ser un servicio personalizado del usuario.
+            const url = "https://sendtelegram-jd4jwaesba-uc.a.run.app";
+            fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ text })
+            }).catch(err => console.error("Error Telegram", err));
+        }
+
+        function formatearFecha(dateStr) {
+            if (!dateStr) return "";
+            const [y, m, d] = dateStr.split("-");
+            return `${d}/${m}/${y}`;
+        }
+
         function loginWithGoogle() {
             auth.signInWithPopup(googleProvider).catch(error => {
-                console.error(error);
-                showToast("Error Google: " + error.message, "error");
+                console.error(error); showToast("Error Google: " + error.message, "error");
             });
         }
 
-        // --- AUTH STATE CHANGED ---
         auth.onAuthStateChanged(async (user) => {
             if (user) {
                 currentUser = user;
-                // Verificar si existe en DB para saber Rol y Nombre Niño
                 try {
                     const snap = await db.collection("users").doc(user.uid).get();
                     if (snap.exists) {
@@ -450,85 +406,52 @@
                         currentChildName = data.childName || "";
                         loadApp();
                     } else {
-                        // NO EXISTE EN DB (Usuario Nuevo por Google o Email)
-                        // Mostramos Modal de Onboarding para pedir Rol y Niño
                         document.getElementById("login-view").classList.add("hidden");
                         document.getElementById("onboarding-modal").classList.add("open");
                     }
-                } catch (err) {
-                    console.error("Error fetching user data", err);
-                    showToast("Error de conexión", "error");
-                }
+                } catch (err) { console.error(err); }
             } else {
-                currentUser = null;
-                currentRole = null;
+                currentUser = null; currentRole = null;
                 document.getElementById("login-view").classList.remove("hidden");
                 document.getElementById("app-root").classList.add("hidden");
                 document.getElementById("onboarding-modal").classList.remove("open");
             }
         });
 
-        // --- GUARDAR DATOS ONBOARDING ---
         document.getElementById("onboarding-form").addEventListener("submit", async (e) => {
             e.preventDefault();
             const role = document.getElementById("onboard-role").value;
             const childName = document.getElementById("onboard-child-name").value.trim();
-
             if (!role || !childName) return showToast("Por favor completa todos los datos", "error");
-
             try {
                 await db.collection("users").doc(currentUser.uid).set({
-                    email: currentUser.email,
-                    role: role,
-                    childName: childName,
+                    email: currentUser.email, role: role, childName: childName,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
-                
-                currentRole = role;
-                currentChildName = childName;
-                document.getElementById("onboarding-modal").classList.remove("open");
-                loadApp();
-                showToast("¡Perfil creado correctamente!");
-            } catch (err) {
-                console.error(err);
-                showToast("Error al guardar perfil", "error");
-            }
+                currentRole = role; currentChildName = childName;
+                document.getElementById("onboarding-modal").classList.remove("open"); loadApp();
+            } catch (err) { showToast("Error al guardar perfil", "error"); }
         });
 
-        // --- LOGIN EMAIL/PASS CLÁSICO ---
         document.getElementById("login-form").addEventListener("submit", (e) => {
             e.preventDefault();
             const email = document.getElementById("login-email").value;
             const pass = document.getElementById("login-password").value;
-            const errorMsg = document.getElementById("login-error-msg");
-            errorMsg.textContent = "";
-
-            if(isRegistering) {
-                auth.createUserWithEmailAndPassword(email, pass).catch(err => errorMsg.textContent = err.message);
-            } else {
-                auth.signInWithEmailAndPassword(email, pass).catch(err => errorMsg.textContent = "Email o contraseña incorrectos");
-            }
+            if(isRegistering) auth.createUserWithEmailAndPassword(email, pass).catch(err => document.getElementById("login-error-msg").textContent = err.message);
+            else auth.signInWithEmailAndPassword(email, pass).catch(err => document.getElementById("login-error-msg").textContent = "Error de credenciales");
         });
 
         function loadApp() {
-            // Actualizar UI con datos del usuario
             const roleLabel = document.getElementById("user-role-label");
-            roleLabel.textContent = currentRole.toUpperCase();
-            roleLabel.className = ""; 
-            roleLabel.classList.add(currentRole);
-            
+            roleLabel.textContent = currentRole.toUpperCase(); roleLabel.className = ""; roleLabel.classList.add(currentRole);
             document.getElementById("whoami-label").textContent = currentRole.toUpperCase();
-            
-            if(currentChildName) {
-                document.getElementById("child-name-display").textContent = "Calendario de " + currentChildName;
-            }
-
+            if(currentChildName) document.getElementById("child-name-display").textContent = "Calendario de " + currentChildName;
             document.getElementById("login-view").classList.add("hidden");
             document.getElementById("app-root").classList.remove("hidden");
             initDataListeners();
+            initSwipeListeners(); // Iniciar escuchas de swipe
         }
 
-        // --- LÓGICA DEL CALENDARIO ---
         function getBaseOwner(year, monthIndex, day) {
             const date = new Date(year, monthIndex, day, 12, 0, 0);
             const diffMs = date - BASE_MONDAY;
@@ -542,12 +465,10 @@
             const titleEl = document.getElementById("calendar-title");
             if (!grid) return;
             grid.classList.add("fading");
-
             setTimeout(() => {
                 grid.innerHTML = "";
                 titleEl.textContent = `${monthNames[currentMonth]} ${currentYear}`;
                 const table = document.createElement("table"); table.className = "month-table";
-                
                 const thead = document.createElement("thead");
                 const trHead = document.createElement("tr");
                 weekDayNames.forEach(d => { const th = document.createElement("th"); th.textContent = d; trHead.appendChild(th); });
@@ -577,8 +498,13 @@
                             td.innerHTML = `<span class="day-number">${dayCounter}</span>
                                             <img class="owner-icon-img" src="assets/${finalOwner}.png" onerror="this.style.display='none'">`;
                             
+                            // Renderizado de iconos mejorado
                             (eventsData[dateKey] || []).slice(0,3).forEach((evt, idx) => {
-                                td.innerHTML += `<div class="event-marker pos-${idx}"><i data-lucide="${ICON_MAP[evt.type]||'star'}"></i></div>`;
+                                // Añadimos la clase evt-TIPO para el color
+                                const colorClass = `evt-${evt.type}`; 
+                                td.innerHTML += `<div class="event-marker ${colorClass} pos-${idx}">
+                                    <i data-lucide="${ICON_MAP[evt.type]||'star'}" style="width:12px;"></i>
+                                </div>`;
                             });
                             dayCounter++;
                         } else { td.style.pointerEvents = "none"; td.style.background = "transparent"; td.style.border = "none"; }
@@ -592,6 +518,33 @@
                 grid.classList.remove("fading");
                 grid.querySelectorAll(".day-cell").forEach((c, i) => setTimeout(() => c.classList.add("animated"), 30 * i));
             }, 150);
+        }
+
+        function initSwipeListeners() {
+            const grid = document.getElementById("calendar-grid");
+            grid.addEventListener('touchstart', e => {
+                touchStartX = e.changedTouches[0].screenX;
+            }, {passive: true});
+
+            grid.addEventListener('touchend', e => {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipeGesture();
+            }, {passive: true});
+        }
+
+        function handleSwipeGesture() {
+            const SWIPE_THRESHOLD = 50; // Distancia mínima para considerar swipe
+            const distance = touchEndX - touchStartX;
+            
+            if (Math.abs(distance) > SWIPE_THRESHOLD) {
+                if (distance < 0) {
+                    // Swipe Izquierda -> Mes Siguiente
+                    document.getElementById("next-period").click();
+                } else {
+                    // Swipe Derecha -> Mes Anterior
+                    document.getElementById("prev-period").click();
+                }
+            }
         }
 
         function initDataListeners() {
@@ -612,14 +565,13 @@
                         : `<div style="font-style:italic;color:#9ca3af;font-size:0.7rem;margin-top:4px;">Esperando respuesta...</div>`;
                     
                     listEl.innerHTML += `<div class="request-item">
-                        <div style="font-weight:700;display:flex;justify-content:space-between;"><span>${req.requesterRole.toUpperCase()}</span><span style="color:#38bdf8;">${req.startDate.split("-").reverse().join("/")}</span></div>
+                        <div style="font-weight:700;display:flex;justify-content:space-between;"><span>${req.requesterRole.toUpperCase()}</span><span style="color:#38bdf8;">${formatearFecha(req.startDate)} - ${formatearFecha(req.endDate)}</span></div>
                         <div style="color:#cbd5f5;">${req.reason}</div>${actions}</div>`;
                 });
             });
             lucide.createIcons();
         }
 
-        // --- FUNCIONES AUXILIARES ---
         window.processRequest = async (id, status, role, start, end) => {
             const batch = db.batch();
             batch.update(db.collection("requests").doc(id), { status });
@@ -628,7 +580,13 @@
                     batch.set(db.collection("overrides").doc(d.toISOString().split("T")[0]), { owner: role });
                 }
             }
-            await batch.commit(); showToast(`Solicitud ${status}`);
+            await batch.commit(); 
+            showToast(`Solicitud ${status}`);
+            
+            // --- NOTIFICACIÓN TELEGRAM (RESPUESTA) ---
+            const icon = status === "aceptado" ? "✅" : "❌";
+            const responder = currentRole === "madre" ? "Madre" : "Padre";
+            sendTelegramMessage(`${icon} Solicitud ${status.toUpperCase()} por ${responder}.`);
         };
 
         function openDayModal(date, owner) {
@@ -652,13 +610,17 @@
             const list = document.getElementById("modal-event-list"); list.innerHTML = "";
             (eventsData[selectedDateKey]||[]).forEach(e => {
                 list.innerHTML += `<div class="request-item" style="display:flex;justify-content:space-between;align-items:center;">
-                    <div style="display:flex;gap:8px;align-items:center;"><i data-lucide="${ICON_MAP[e.type]}"></i> ${e.title}</div>
+                    <div style="display:flex;gap:8px;align-items:center;">
+                        <div style="width:20px;height:20px;border-radius:4px;display:flex;align-items:center;justify-content:center;color:white;" class="evt-${e.type}">
+                            <i data-lucide="${ICON_MAP[e.type]}" style="width:12px;"></i>
+                        </div>
+                        ${e.title}
+                    </div>
                     <button onclick="deleteEvent('${e.id}')" style="background:none;border:none;color:#f87171;cursor:pointer;">×</button></div>`;
             });
             lucide.createIcons();
         }
-        
-        // --- INTERFAZ ---
+
         document.getElementById("logout-btn").onclick = () => { listenersAttached=false; auth.signOut(); };
         document.getElementById("toggle-auth-mode").onclick = function() {
             isRegistering = !isRegistering;
@@ -670,14 +632,24 @@
         
         document.getElementById("request-form").onsubmit = async (e) => {
             e.preventDefault();
+            const startVal = document.getElementById("start-date").value;
+            const endVal = document.getElementById("end-date").value;
+            const reasonVal = document.getElementById("reason").value;
+
             await db.collection("requests").add({
                 requesterUid: currentUser.uid, requesterRole: currentRole,
-                startDate: document.getElementById("start-date").value,
-                endDate: document.getElementById("end-date").value,
-                reason: document.getElementById("reason").value,
+                startDate: startVal,
+                endDate: endVal,
+                reason: reasonVal,
                 status: "pendiente", createdAt: firebase.firestore.FieldValue.serverTimestamp()
             });
-            showToast("Solicitud enviada"); e.target.reset();
+            showToast("Solicitud enviada"); 
+            e.target.reset();
+
+            // --- NOTIFICACIÓN TELEGRAM (NUEVA SOLICITUD) ---
+            const quien = currentRole === "madre" ? "Madre" : "Padre";
+            // Nota: Se envía el mensaje formateado al endpoint
+            sendTelegramMessage(`📅 NUEVA SOLICITUD de ${quien}:\nDesde: ${formatearFecha(startVal)}\nHasta: ${formatearFecha(endVal)}\nMotivo: ${reasonVal}`);
         };
 
         document.addEventListener("DOMContentLoaded", () => {
@@ -688,4 +660,4 @@
         });
     </script>
 </body>
-</html>	
+</html>

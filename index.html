@@ -10,29 +10,33 @@
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <style>
+    /* TIPOGRAFÍA Y COLORES MODERNOS (Inspiración Pixel/Material You) */
     :root {
-      --mother-color: #fce7f3; /* Rosa pastel */
-      --father-color: #dbeafe; /* Azul pastel */
-      --accent-color: #7c3aed;
-      --accent-soft: #ede9fe;
-      --text-main: #111827;
-      --text-muted: #6b7280;
-      --bg-main: #f8fafc;
+      --mother-color: #fce7f3; /* Rosa suave */
+      --father-color: #e0f2fe; /* Azul suave */
+      --accent-color: #6366f1; /* Indigo moderno */
+      --accent-soft: #f0f1ff;
+      --text-main: #1a1c1e;
+      --text-muted: #44474e;
+      --bg-main: #fbfcff;
       --card-bg: #ffffff;
-      --shadow-soft: 0 16px 40px rgba(15, 23, 42, 0.08);
-      --success: #10b981;
-      --error: #ef4444;
+      --shadow-soft: 0 4px 24px rgba(0, 0, 0, 0.04);
+      --success: #34a853;
+      --error: #ea4335;
     }
+
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     
     body {
       margin: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: 'Inter', 'Google Sans', 'Roboto', system-ui, -apple-system, sans-serif;
       background: var(--bg-main);
       color: var(--text-main);
       padding-bottom: 50px;
       overscroll-behavior-y: none;
+      letter-spacing: -0.01em;
     }
+
     .hidden { display: none !important; }
 
     /* ANIMACIONES */
@@ -41,225 +45,151 @@
       transition: opacity 0.3s ease, transform 0.3s ease; 
       touch-action: pan-y;
     }
-    .calendar-grid.fading { opacity: 0; transform: scale(0.98); }
+    .calendar-grid.fading { opacity: 0; transform: scale(0.99); }
     
-    .day-cell { opacity: 0; transform: translateY(10px); transition: opacity 0.4s ease, transform 0.4s ease; }
+    .day-cell { opacity: 0; transform: translateY(8px); transition: opacity 0.4s ease, transform 0.4s ease; }
     .day-cell.animated { opacity: 1; transform: translateY(0); }
 
     /* TOASTS */
     .toast-container {
       position: fixed;
-      bottom: 20px; left: 50%; transform: translateX(-50%);
-      z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none;
+      bottom: 24px; left: 50%; transform: translateX(-50%);
+      z-index: 9999; display: flex; flex-direction: column; gap: 12px; pointer-events: none;
     }
     .toast {
-      background: #333; color: #fff; padding: 14px 28px; border-radius: 50px;
-      font-size: 0.95rem; font-weight: 600; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-      opacity: 0; transform: translateY(20px); transition: all 0.4s ease;
-      display: flex; align-items: center; gap: 10px;
+      background: #2f3033; color: #fff; padding: 12px 24px; border-radius: 16px;
+      font-size: 0.9rem; font-weight: 500; box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+      opacity: 0; transform: translateY(12px); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex; align-items: center; gap: 12px;
     }
     .toast.visible { opacity: 1; transform: translateY(0); }
-    .toast.success { background: var(--success); }
-    .toast.error { background: var(--error); }
 
     /* LOGIN */
     .login-wrapper {
       min-height: 100vh; display:flex;
       align-items:center; justify-content:center;
-      padding:20px; background: radial-gradient(circle at top, #ede9fe, #f3f4fb);
+      padding:24px; background: #f0f4f8;
     }
     .login-card {
       background:#fff;
-      max-width:380px; width:100%; border-radius:28px;
-      box-shadow:0 25px 50px rgba(15,23,42,0.18); padding:40px 32px;
+      max-width:400px; width:100%; border-radius:32px;
+      box-shadow:0 12px 32px rgba(0,0,0,0.05); padding:48px 32px;
     }
     .login-title {
-      font-size:1.5rem;
-      font-weight:700; margin-bottom:8px;
-      display:flex; align-items:center; gap:12px; color:var(--accent-color);
+      font-size:1.75rem;
+      font-weight:700; margin-bottom:12px;
+      color:var(--text-main);
     }
-    .login-subtitle { font-size:0.95rem; color:var(--text-muted); margin-bottom:28px; }
-    .login-field { margin-bottom:16px; }
-    .login-field label { font-size:0.9rem; font-weight:500; color:#4b5563; margin-bottom:6px; display:block; }
+    .login-subtitle { font-size:1rem; color:var(--text-muted); margin-bottom:32px; }
+    .login-field { margin-bottom:20px; }
+    .login-field label { font-size:0.85rem; font-weight:600; color:var(--text-muted); margin-bottom:8px; display:block; padding-left:4px; }
     .login-field input {
-      width:100%; padding:15px; font-size:1rem; border-radius:14px;
-      border:1px solid #d1d5db;
-      transition:border-color .2s, box-shadow .2s;
+      width:100%; padding:16px; font-size:1rem; border-radius:16px;
+      border:1.5px solid #e1e3e8; background: #fbfcff;
+      transition: all 0.2s ease;
     }
-    .login-field input:focus { outline:none; border-color:var(--accent-color); box-shadow:0 0 0 3px rgba(124,58,237,.15); }
+    .login-field input:focus { outline:none; border-color:var(--accent-color); background: #fff; box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1); }
     .login-btn {
-      margin:16px 0 8px; width:100%; padding:17px; font-size:1.15rem;
+      margin-top:24px; width:100%; padding:18px; font-size:1.1rem;
       font-weight:600; border-radius:20px; background:var(--accent-color);
       color:white; border:none; cursor:pointer;
-      transition:background .3s, transform .2s;
+      transition: transform 0.1s active;
     }
-    .login-btn:hover { background:#6d28d9; }
-    .login-error { color:#dc2626; font-size:0.9rem; margin-top:8px; text-align:center; min-height:1.2em; }
 
     /* TOPBAR */
     .topbar {
-      padding:14px 18px; border-radius:24px;
-      background:#fff;
-      box-shadow:var(--shadow-soft); margin-bottom:20px;
-      display:flex; align-items:center; justify-content:space-between;
+      padding: 16px 20px; border-radius: 24px;
+      background: #fff; border: 1px solid #f0f2f5;
+      box-shadow: var(--shadow-soft); margin: 16px;
+      display: flex; align-items: center; justify-content: space-between;
     }
-    .logo-icon { width:40px; height:40px; font-size:24px; border-radius:12px; background:var(--accent-soft); display:flex; align-items:center; justify-content:center; }
-    .app-name { font-size:1.2rem; font-weight:700; }
-    .status-pill {
-      margin-top:4px;
-      display:inline-flex; align-items:center; gap:6px;
-      padding:4px 10px; border-radius:999px; font-size:0.75rem; font-weight:500;
-      background:#e5e7eb; color:#374151;
-    }
-    .status-dot { width:8px; height:8px; border-radius:50%; background:#9ca3af; }
-    .status-online { background:#dcfce7; color:#166534; } .status-online .status-dot { background:#22c55e; }
-    .status-connecting { background:#fef3c7; color:#92400e; } .status-connecting .status-dot { background:#facc15; }
-    .status-error { background:#fee2e2; color:#b91c1c; } .status-error .status-dot { background:#ef4444; }
-
-    .topbar-right { display:flex; align-items:center; gap:8px; }
-    .year-select { padding:8px 10px; border-radius:999px; border:1px solid #e5e7eb; background:#fff; font-size:0.9rem; }
-    .user-info { display:flex; align-items:center; gap:10px; margin-left:16px; }
-    .user-role-label { font-size:0.9rem; font-weight:600; color:#374151; }
-    .logout-btn { padding:6px 10px; font-size:0.8rem; border-radius:999px; border:1px solid #e5e7eb; background:#fff; cursor:pointer; }
-
-    /* LAYOUT */
-    .layout { padding:16px; display:grid; grid-template-columns:2fr 1fr; gap:16px; }
-    @media (max-width:900px){ .layout { grid-template-columns:1fr; } }
-    
-    .side-panel .card { background:#fff; border-radius:20px; box-shadow:var(--shadow-soft); padding:14px 16px; margin-bottom: 16px; }
-    .panel-title { margin:0 0 10px; font-size:1rem; font-weight:600; }
-    .panel-title.active { color:var(--accent-color); }
-    .field-group { margin-bottom:12px; }
-    .field-group label { display:block; margin-bottom:4px; font-size:0.85rem; font-weight:500; color:#4b5563; }
-    .field-group input, .field-group textarea { width:100%; padding:8px 10px; border-radius:10px; border:1px solid #d1d5db; font-size:0.9rem; }
-    .field-group textarea { min-height:60px; resize:vertical; }
-    .primary-btn { display:inline-block; margin-top:8px; padding:10px 14px; border-radius:999px; border:none; background:var(--accent-color); color:#fff; font-size:0.9rem; font-weight:600; cursor:pointer; width:100%; transition: opacity 0.2s; }
-    .primary-btn:hover { opacity: 0.9; }
+    .logo-icon { width:44px; height:44px; font-size:24px; border-radius:14px; background:var(--accent-soft); display:flex; align-items:center; justify-content:center; }
+    .app-name { font-size:1.25rem; font-weight:700; color: var(--text-main); }
 
     /* CALENDARIO */
-    .calendar-wrapper { background:var(--card-bg); border-radius:28px; padding:16px 12px; box-shadow:var(--shadow-soft); overflow: hidden; }
-    .calendar-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
-    .nav-arrow { width:36px; height:36px; font-size:24px; border-radius:50%; border:1px solid #e5e7eb; background:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all .2s; }
-    .nav-arrow:hover { background:#f3f4f6; transform:scale(1.1); }
-    .calendar-title { font-size:1.5rem; font-weight:700; user-select: none; }
-    .calendar-subheader { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; padding-bottom:10px; border-bottom:1px solid #f3f4f6; margin-bottom:12px; }
-    .legend { font-size:0.9rem; gap:16px; font-weight:600; display:flex; }
-    .legend-item { display: flex; align-items: center; gap: 5px; }
+    .calendar-wrapper { background:var(--card-bg); border-radius:32px; padding:20px; box-shadow:var(--shadow-soft); }
+    .calendar-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
+    .calendar-title { font-size:1.6rem; font-weight:800; color: var(--text-main); }
+    .nav-arrow { width:40px; height:40px; border-radius:50%; border:none; background:#f0f2f5; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:background 0.2s; }
+    .nav-arrow:hover { background:#e4e6e9; }
 
-    .month { border-radius:16px; background:#ffffff; border:1px solid #f3f4f6; overflow:hidden; margin-bottom:24px; }
-    .month-header { text-align:center; padding:8px; background:#f9fafb; font-weight:600; font-size:0.9rem; color:#374151; }
-    table.month-table { width:100%; border-collapse:separate; border-spacing:2px; table-layout:fixed; }
-    .month-table th { font-size:0.7rem; color:#9ca3af; font-weight:500; padding:4px 0; }
-    
+    /* ESTILOS DE CELDA */
     .month-table td { 
-      height: 90px;
+      height: 100px;
       position: relative; 
-      border-radius: 12px; 
+      border-radius: 20px; 
       vertical-align: top; 
       overflow: hidden; 
       cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-    .month-table td:hover {
-      transform: scale(0.98);
-      box-shadow: inset 0 0 0 2px var(--accent-color);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      border: 2px solid transparent;
     }
 
-    .day-mother { background:var(--mother-color); }
-    .day-father { background:var(--father-color); }
+    .day-mother { background-color: var(--mother-color) !important; }
+    .day-father { background-color: var(--father-color) !important; }
     
+    .day-cell:hover { transform: scale(0.97); }
+    .day-cell.is-today { border-color: var(--accent-color); z-index: 10; }
+
     .day-number { 
-      position: absolute; top: 4px; left: 6px; 
-      font-size: 0.9rem; font-weight: 700; color: #1f2937; z-index: 2; 
+      position: absolute; top: 8px; left: 10px; 
+      font-size: 1rem; font-weight: 700; color: #1f2937; z-index: 2; 
     }
     
-    /* MODIFICACIÓN PARA ICONOS PNG EN ASSETS */
     .owner-icon-img {
       position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-      width: 50px; height: 50px; opacity: 0.15; pointer-events: none; z-index: 1; user-select: none;
-      transition: opacity 0.3s ease, transform 0.3s ease;
-      object-fit: contain;
+      width: 54px; height: 54px; opacity: 0.12; pointer-events: none; z-index: 1;
+      object-fit: contain; background: none !important; border: none !important;
+      transition: opacity 0.3s ease;
     }
 
-    .day-overridden::after { content:"⇄"; position:absolute; bottom:2px; left:50%; transform:translateX(-50%); font-size:0.8rem; color:var(--accent-color); opacity:0.9; z-index: 3; }
-    
-    .day-cell.is-today .owner-icon-img {
-      opacity: 0.8 !important;
-      transform: translate(-50%, -50%) scale(1.1);
-    }
+    .is-today .owner-icon-img { opacity: 0.7 !important; transform: translate(-50%, -50%) scale(1.05); }
+    .day-overridden::after { content:"⇄"; position:absolute; bottom:6px; left:50%; transform:translateX(-50%); font-size:0.9rem; color:var(--accent-color); font-weight:bold; z-index: 3; }
 
-    /* ESTILO PARA PEGATINAS (LUCIDE) */
+    /* PEGATINAS */
     .event-marker {
       position: absolute;
-      width: 26px; height: 26px;
+      width: 28px; height: 28px;
       display: flex; align-items: center; justify-content: center;
       border-radius: 50%; 
-      color: #fff;
-      font-size: 14px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
       z-index: 5;
       border: 2px solid white;
     }
-    .event-marker svg { width: 14px; height: 14px; }
     
-    .pos-0 { top: 4px; right: 4px; }
-    .pos-1 { bottom: 4px; left: 4px; }
-    .pos-2 { bottom: 4px; right: 4px; }
-
-    .evt-medico { background: #ef4444; }
-    .evt-dentista { background: #0ea5e9; }
-    .evt-escuela { background: #f97316; }
-    .evt-deporte { background: #8b5cf6; }
-    .evt-cumple { background: #eab308; }
-    .evt-parque { background: #84cc16; }
-    .evt-general { background: #64748b; }
-    .evt-vacaciones { background: #06b6d4; }
+    .pos-0 { top: 8px; right: 8px; }
+    .pos-1 { bottom: 8px; left: 8px; }
+    .pos-2 { bottom: 8px; right: 8px; }
 
     @media (max-width: 768px) {
-      .month-table td { height: 65px !important; }
-      .day-number { font-size: 0.8rem; }
-      .owner-icon-img { width: 35px; height: 35px; }
-      .event-marker { width: 20px; height: 20px; }
-      .event-marker svg { width: 11px; height: 11px; }
+      .month-table td { height: 75px !important; border-radius: 16px; }
+      .owner-icon-img { width: 40px; height: 40px; }
+      .topbar { margin: 12px; border-radius: 20px; }
     }
 
     /* MODAL */
-    .modal-overlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.5);
-      display: flex; align-items: center; justify-content: center;
-      z-index: 10000; opacity: 0; pointer-events: none; transition: opacity 0.3s;
-      backdrop-filter: blur(4px);
-    }
-    .modal-overlay.open { opacity: 1; pointer-events: auto; }
     .modal-card {
-      background: #fff; width: 90%; max-width: 400px;
-      border-radius: 24px; padding: 24px;
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-      transform: scale(0.95); transition: transform 0.3s;
+      background: #fff; width: 92%; max-width: 420px;
+      border-radius: 32px; padding: 28px;
+      box-shadow: 0 24px 48px rgba(0,0,0,0.12);
     }
-    .modal-overlay.open .modal-card { transform: scale(1); }
-    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-    .modal-title { font-size: 1.25rem; font-weight: 700; color: #1f2937; }
-    .close-modal { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #9ca3af; }
-    
-    .icon-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 20px; }
-    .icon-btn {
-      aspect-ratio: 1; border-radius: 12px; border: 2px solid transparent;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      background: #f3f4f6; cursor: pointer; transition: all 0.2s; color: #6b7280; padding: 4px;
+    .modal-title { font-size: 1.4rem; font-weight: 800; }
+    .primary-btn { 
+      padding: 16px; border-radius: 18px; background: var(--accent-color); 
+      font-weight: 700; letter-spacing: 0.02em; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
     }
-    .icon-btn:hover { background: #e5e7eb; transform: translateY(-2px); }
-    .icon-btn.selected { border-color: var(--accent-color); background: var(--accent-soft); color: var(--accent-color); }
-    .icon-btn svg { margin-bottom: 2px; width: 18px; height: 18px; }
-    .icon-label { font-size: 0.55rem; font-weight: 700; text-transform: uppercase; text-align: center; margin-top: 2px; }
 
-    /* REQUESTS */
-    .requests-list { max-height:300px; overflow:auto; border-radius:12px; border:1px solid #e5e7eb; padding:8px; }
-    .request-item { border-radius:10px; border:1px solid #e5e7eb; padding:10px; margin-bottom:8px; font-size:0.85rem; background: #f9fafb; }
-    .req-actions { display: flex; gap: 8px; margin-top: 8px; }
-    .btn-action { flex: 1; padding: 6px; border-radius: 6px; border: none; font-weight: 600; cursor: pointer; font-size: 0.8rem; }
+    /* REQUESTS STYLING */
+    .requests-list { max-height: 300px; overflow-y: auto; padding-top: 8px; }
+    .request-item { 
+      background: #f8f9fc; border-radius: 16px; padding: 16px; margin-bottom: 12px; 
+      border: 1px solid #eee; font-size: 0.85rem; 
+    }
+    .req-actions { display: flex; gap: 8px; margin-top: 12px; }
+    .btn-action { flex: 1; padding: 10px; border-radius: 12px; border: none; font-weight: 700; cursor: pointer; font-size: 0.75rem; transition: opacity 0.2s; }
     .btn-accept { background: #dcfce7; color: #166534; }
     .btn-reject { background: #fee2e2; color: #b91c1c; }
+    .req-wait { font-size: 0.7rem; color: #9ca3af; font-style: italic; margin-top: 8px; }
   </style>
 </head>
 <body>
@@ -270,155 +200,114 @@
 <div class="modal-overlay" id="day-modal">
   <div class="modal-card">
     <div class="modal-header">
-      <div class="modal-title" id="modal-date-title">Detalles del día</div>
+      <div class="modal-title" id="modal-date-title">Detalles</div>
       <button class="close-modal" onclick="closeModal()">×</button>
     </div>
     
-    <div style="margin-bottom: 20px; padding: 12px; background: #f3f4f6; border-radius: 12px; display: flex; align-items: center; gap: 10px;">
-      <img id="modal-custody-img" src="" style="width: 40px; height: 40px; object-fit: contain;">
+    <div style="margin-bottom: 24px; padding: 16px; background: #f8f9fc; border-radius: 20px; display: flex; align-items: center; gap: 12px;">
+      <img id="modal-custody-img" src="" style="width: 44px; height: 44px; object-fit: contain; background: none;">
       <div>
-        <div style="font-size: 0.75rem; color: #6b7280; font-weight: 600; text-transform: uppercase;">Custodia</div>
-        <div id="modal-custody-text" style="font-weight: 700; color: #374151;"></div>
+        <div style="font-size: 0.7rem; color: #6b7280; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em;">Custodia actual</div>
+        <div id="modal-custody-text" style="font-weight: 800; font-size: 1.1rem;"></div>
       </div>
     </div>
 
-    <div style="margin-bottom: 10px; font-weight: 600; font-size: 0.9rem;">¿Qué actividad es?</div>
-    <input type="text" id="event-title" placeholder="Ej. Revisión pediatra..." style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #d1d5db; margin-bottom: 12px;">
+    <div style="margin-bottom: 12px; font-weight: 700; font-size: 0.95rem; color: var(--text-muted);">¿Qué hay hoy?</div>
+    <input type="text" id="event-title" placeholder="Ej. Fiesta de disfraces..." style="width: 100%; padding: 16px; border-radius: 16px; border: 1.5px solid #eee; margin-bottom: 16px; font-size: 1rem;">
     
     <div class="icon-grid">
-      <button class="icon-btn" onclick="selectIcon('medico', this)">
-        <i data-lucide="stethoscope" style="color: #ef4444;"></i>
-        <span class="icon-label">Médico</span>
-      </button>
-      <button class="icon-btn" onclick="selectIcon('dentista', this)">
-        <i data-lucide="smile" style="color: #0ea5e9;"></i>
-        <span class="icon-label">Dentista</span>
-      </button>
-      <button class="icon-btn" onclick="selectIcon('escuela', this)">
-        <i data-lucide="backpack" style="color: #f97316;"></i>
-        <span class="icon-label">Escuela</span>
-      </button>
-      <button class="icon-btn" onclick="selectIcon('deporte', this)">
-        <i data-lucide="trophy" style="color: #8b5cf6;"></i>
-        <span class="icon-label">Deporte</span>
-      </button>
-      <button class="icon-btn" onclick="selectIcon('cumple', this)">
-        <i data-lucide="cake" style="color: #eab308;"></i>
-        <span class="icon-label">Cumple</span>
-      </button>
-      <button class="icon-btn" onclick="selectIcon('parque', this)">
-        <i data-lucide="tree-deciduous" style="color: #84cc16;"></i>
-        <span class="icon-label">Parque</span>
-      </button>
-      <button class="icon-btn" onclick="selectIcon('general', this)">
-        <i data-lucide="star" style="color: #64748b;"></i>
-        <span class="icon-label">General</span>
-      </button>
-      <button class="icon-btn" onclick="selectIcon('vacaciones', this)">
-        <i data-lucide="palmtree" style="color: #06b6d4;"></i>
-        <span class="icon-label">Vacaciones</span>
-      </button>
+      <button class="icon-btn" onclick="selectIcon('medico', this)"><i data-lucide="stethoscope" style="color: #ea4335;"></i><span class="icon-label">Médico</span></button>
+      <button class="icon-btn" onclick="selectIcon('dentista', this)"><i data-lucide="smile" style="color: #1a73e8;"></i><span class="icon-label">Dentista</span></button>
+      <button class="icon-btn" onclick="selectIcon('escuela', this)"><i data-lucide="backpack" style="color: #f29900;"></i><span class="icon-label">Escuela</span></button>
+      <button class="icon-btn" onclick="selectIcon('deporte', this)"><i data-lucide="trophy" style="color: #8e24aa;"></i><span class="icon-label">Deporte</span></button>
+      <button class="icon-btn" onclick="selectIcon('cumple', this)"><i data-lucide="cake" style="color: #e37400;"></i><span class="icon-label">Cumple</span></button>
+      <button class="icon-btn" onclick="selectIcon('parque', this)"><i data-lucide="tree-deciduous" style="color: #1e8e3e;"></i><span class="icon-label">Parque</span></button>
+      <button class="icon-btn" onclick="selectIcon('general', this)"><i data-lucide="star" style="color: #5f6368;"></i><span class="icon-label">General</span></button>
+      <button class="icon-btn" onclick="selectIcon('vacaciones', this)"><i data-lucide="palmtree" style="color: #00acc1;"></i><span class="icon-label">Viaje</span></button>
     </div>
 
-    <button onclick="saveEvent()" class="primary-btn" style="width: 100%;">Guardar Nota</button>
-    <div id="modal-event-list" style="margin-top: 16px; max-height: 150px; overflow-y: auto;"></div>
+    <button onclick="saveEvent()" class="primary-btn" style="width: 100%; color: #fff; border: none; cursor: pointer;">Guardar actividad</button>
+    <div id="modal-event-list" style="margin-top: 20px; max-height: 180px; overflow-y: auto; padding-right: 4px;"></div>
   </div>
 </div>
 
 <div id="login-view" class="login-wrapper">
   <div class="login-card">
-    <div class="login-title">📅 Custodia Familiar</div>
-    <p class="login-subtitle">Introduce tu correo y contraseña para acceder.</p>
+    <div class="login-title">Calendario</div>
+    <p class="login-subtitle">Coordina la custodia familiar de forma sencilla y visual.</p>
     <form id="login-form">
       <div class="login-field">
-        <label for="login-email">Correo electrónico</label>
-        <input type="email" id="login-email" required autocomplete="email">
+        <label>Correo electrónico</label>
+        <input type="email" id="login-email" required>
       </div>
       <div class="login-field">
-        <label for="login-password">Contraseña</label>
-        <input type="password" id="login-password" required autocomplete="current-password">
+        <label>Contraseña</label>
+        <input type="password" id="login-password" required>
       </div>
-      <button type="submit" class="login-btn primary-btn" id="login-submit-btn">Entrar</button>
-      <p id="login-error" class="login-error"></p>
+      <button type="submit" class="login-btn" id="login-submit-btn">Entrar ahora</button>
     </form>
   </div>
 </div>
 
 <div id="app-root" class="app hidden">
   <header class="topbar">
-    <div class="topbar-left" style="display:flex;align-items:center;gap:10px;">
-      <div class="logo-icon">📅</div>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div class="logo-icon">🗓️</div>
       <div>
         <div class="app-name">Custodia Familiar</div>
         <div class="status-pill status-connecting" id="status-pill">
           <span class="status-dot"></span>
-          <span id="status-text">Conectando...</span>
+          <span id="status-text" style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase;">...</span>
         </div>
       </div>
     </div>
     <div class="topbar-right">
-      <select id="year-select" class="year-select"></select>
-      <div class="user-info">
-        <span class="user-role-label" id="user-role-label">Usuario</span>
-        <button type="button" id="logout-btn" class="logout-btn">Salir</button>
-      </div>
+      <select id="year-select" class="year-select" style="border: none; font-weight: 700; background: #f0f2f5; padding: 8px 12px; border-radius: 12px;"></select>
+      <button type="button" id="logout-btn" class="logout-btn" style="border: none; background: transparent; cursor: pointer; padding: 8px;"><i data-lucide="log-out" style="width: 20px; color: #6b7280;"></i></button>
     </div>
   </header>
 
-  <div class="layout">
+  <div class="layout" style="max-width: 1200px; margin: 0 auto;">
     <section class="calendar-wrapper">
       <div class="calendar-header">
-        <button id="prev-period" class="nav-arrow">‹</button>
-        <div class="month-nav">
-          <div class="calendar-title" id="calendar-title"></div>
-        </div>
-        <button id="next-period" class="nav-arrow">›</button>
-      </div>
-      <div class="calendar-subheader">
-        <div class="legend">
-          <span class="legend-item"><img src="assets/madre.png" style="width:16px; height:16px;"> Madre</span>
-          <span class="legend-item"><img src="assets/padre.png" style="width:16px; height:16px;"> Padre</span>
-        </div>
+        <button id="prev-period" class="nav-arrow"><i data-lucide="chevron-left"></i></button>
+        <div class="calendar-title" id="calendar-title"></div>
+        <button id="next-period" class="nav-arrow"><i data-lucide="chevron-right"></i></button>
       </div>
       <div id="calendar-grid" class="calendar-grid"></div>
     </section>
 
     <section class="side-panel">
       <div class="card">
-        <div class="panel-title">➕ Nueva solicitud de cambio</div>
+        <div class="panel-title" style="font-size: 1rem; font-weight: 800; margin-bottom: 12px;">Solicitar cambio</div>
         <form id="request-form">
           <div class="field-group">
-            <label>Solicitante: <span id="whoami-label" style="font-weight:600;">...</span></label>
+            <label style="font-size: 0.75rem;">Usuario: <span id="whoami-label" style="color:var(--accent-color); font-weight: 800;">...</span></label>
           </div>
-          <div class="field-group">
-            <label>Fechas</label>
-            <div style="display:flex; gap:10px;">
-              <input type="date" id="start-date" required>
-              <input type="date" id="end-date" required>
-            </div>
+          <div class="field-group" style="display:flex; gap:8px;">
+            <input type="date" id="start-date" required style="flex:1;">
+            <input type="date" id="end-date" required style="flex:1;">
           </div>
-          <div class="field-group">
-            <label for="reason">Motivo</label>
-            <textarea id="reason" placeholder="Ej: Viaje de trabajo..." required></textarea>
-          </div>
-          <button type="submit" class="primary-btn">Enviar Solicitud</button>
+          <textarea id="reason" placeholder="Motivo del cambio..." required style="margin-top: 8px; width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #eee; font-family: inherit; font-size: 0.9rem;"></textarea>
+          <button type="submit" class="primary-btn" style="width: 100%; border: none; color: #fff; cursor: pointer; margin-top: 12px;">Enviar solicitud</button>
         </form>
       </div>
-      <div class="card">
-        <h3 class="panel-title active">Pendientes</h3>
+      <div class="card" id="pending-container">
+        <h3 class="panel-title active" style="font-size: 0.9rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+          <i data-lucide="clock" style="width: 16px;"></i> Cambios pendientes
+        </h3>
         <div class="requests-list" id="pending-requests"></div>
       </div>
     </section>
   </div>
 </div>
 
-<!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 
 <script>
-  // CONFIGURACIÓN FIREBASE (Mantener tus datos)
+  // CONFIGURACIÓN FIREBASE
   const firebaseConfig = {
     apiKey: "AIzaSyAwgk4_l0zvaCUCgm1CjqqqXjJHr5KPBjc",
     authDomain: "custodia-familiar.firebaseapp.com",
@@ -431,7 +320,6 @@
   const db = firebase.firestore();
   const auth = firebase.auth();
 
-  // FECHA ACTUAL PARA EL ARRANQUE
   const now = new Date();
   let currentYear = now.getFullYear();
   let currentMonth = now.getMonth();
@@ -444,11 +332,12 @@
   let currentRole = null;
   let overrides = {};
   let eventsData = {};
+  let pendingRequests = [];
   let selectedDateKey = null;
   let selectedIconType = 'medico';
 
   const monthNames = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
-  const weekDayNames = ["Lun","Mar","Mié","Jue","Vie","Sáb","Dom"];
+  const weekDayNames = ["L","M","M","J","V","S","D"];
 
   const ICON_MAP = {
     'medico': 'stethoscope', 'dentista': 'smile', 'escuela': 'backpack', 
@@ -456,12 +345,27 @@
     'general': 'star', 'vacaciones': 'palmtree'
   };
 
+  // FUNCIÓN TELEGRAM
+  function sendTelegramMessage(text) {
+    const url = "https://sendtelegram-jd4jwaesba-uc.a.run.app"; 
+    fetch(url, {
+      method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({ text }),
+    }).catch(err => console.error("Error Telegram:", err));
+  }
+
+  function formatearFecha(dateStr) {
+    if (!dateStr) return "";
+    const [y, m, d] = dateStr.split('-');
+    return `${d}/${m}/${y}`;
+  }
+
   function showToast(msg, type = 'success') {
     const container = document.getElementById('toast-container');
     const el = document.createElement('div');
     el.className = `toast ${type}`;
-    el.innerHTML = type === 'success' ? `✅ ${msg}` : `⚠️ ${msg}`;
+    el.innerHTML = type === 'success' ? `<i data-lucide="check-circle" style="color:#34a853"></i> ${msg}` : `<i data-lucide="alert-circle" style="color:#ea4335"></i> ${msg}`;
     container.appendChild(el);
+    lucide.createIcons();
     requestAnimationFrame(() => el.classList.add('visible'));
     setTimeout(() => { el.classList.remove('visible'); setTimeout(() => el.remove(), 300); }, 4000);
   }
@@ -482,15 +386,22 @@
     grid.classList.add('fading');
     setTimeout(() => {
       grid.innerHTML = "";
-      titleEl.innerHTML = `${monthNames[currentMonth]} <span class="year">${currentYear}</span>`;
+      titleEl.innerHTML = `${monthNames[currentMonth]} ${currentYear}`;
 
-      const monthDiv = document.createElement("div");
-      monthDiv.className = "month";
       const table = document.createElement("table");
       table.className = "month-table";
+      table.style.width = "100%";
+      table.style.borderCollapse = "separate";
+      table.style.borderSpacing = "8px";
+
       const thead = document.createElement("thead");
       const trHead = document.createElement("tr");
-      weekDayNames.forEach(d => { const th = document.createElement("th"); th.textContent = d.charAt(0); trHead.appendChild(th); });
+      weekDayNames.forEach(d => { 
+        const th = document.createElement("th"); 
+        th.textContent = d; 
+        th.style = "font-size: 0.75rem; color: #9ca3af; padding: 4px; font-weight: 800;";
+        trHead.appendChild(th); 
+      });
       thead.appendChild(trHead);
       table.appendChild(thead);
 
@@ -541,6 +452,8 @@
             });
 
             dayCounter++;
+          } else {
+            td.style.pointerEvents = "none";
           }
           tr.appendChild(td);
         }
@@ -548,21 +461,86 @@
         if(dayCounter > daysInMonth) finished = true;
       }
       table.appendChild(tbody);
-      monthDiv.appendChild(table);
-      grid.appendChild(monthDiv);
+      grid.appendChild(table);
 
       lucide.createIcons();
       grid.classList.remove('fading');
-      grid.querySelectorAll('.day-cell').forEach((c, i) => setTimeout(() => c.classList.add('animated'), i * 10));
-    }, 250);
+      grid.querySelectorAll('.day-cell').forEach((c, i) => setTimeout(() => c.classList.add('animated'), i * 8));
+    }, 200);
   }
+
+  function renderRequestsList() {
+    const listEl = document.getElementById("pending-requests");
+    if (!listEl) return;
+    listEl.innerHTML = "";
+
+    if (pendingRequests.length === 0) {
+      listEl.innerHTML = `<div style="text-align:center; color:#9ca3af; font-size:0.8rem; margin-top:20px;">Sin solicitudes pendientes</div>`;
+      return;
+    }
+
+    pendingRequests.forEach(req => {
+      const item = document.createElement("div");
+      item.className = "request-item";
+      const quien = req.requesterRole === 'madre' ? 'Madre' : 'Padre';
+      const fechas = `${formatearFecha(req.startDate)} - ${formatearFecha(req.endDate)}`;
+      
+      let actions = "";
+      if (req.requesterRole !== currentRole) {
+        actions = `
+          <div class="req-actions">
+            <button class="btn-action btn-accept" onclick="processRequest('${req.id}', 'aceptado', '${req.requesterRole}', '${req.startDate}', '${req.endDate}')">ACEPTAR</button>
+            <button class="btn-action btn-reject" onclick="processRequest('${req.id}', 'rechazado')">RECHAZAR</button>
+          </div>
+        `;
+      } else {
+        actions = `<div class="req-wait">Esperando respuesta del otro usuario...</div>`;
+      }
+
+      item.innerHTML = `
+        <div style="font-weight:800; margin-bottom:4px; display:flex; justify-content:space-between;">
+          <span>${quien}</span>
+          <span style="font-size:0.7rem; color:var(--accent-color);">${fechas}</span>
+        </div>
+        <div style="color:var(--text-muted); font-size:0.8rem;">"${req.reason}"</div>
+        ${actions}
+      `;
+      listEl.appendChild(item);
+    });
+    lucide.createIcons();
+  }
+
+  window.processRequest = async function(reqId, newStatus, reqRole, startStr, endStr) {
+    try {
+      const batch = db.batch();
+      batch.update(db.collection("requests").doc(reqId), { status: newStatus });
+
+      if (newStatus === 'aceptado' && startStr && endStr) {
+        const start = new Date(startStr);
+        const end = new Date(endStr);
+        for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+          const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+          batch.set(db.collection("overrides").doc(dateStr), { owner: reqRole });
+        }
+      }
+
+      await batch.commit();
+      showToast(`Solicitud ${newStatus}`);
+      
+      const icon = newStatus === 'aceptado' ? "✅" : "❌";
+      const responder = currentRole === 'madre' ? 'Madre' : 'Padre';
+      sendTelegramMessage(`${icon} Solicitud **${newStatus.toUpperCase()}** por ${responder}.`);
+    } catch (e) {
+      showToast("Error al procesar", "error");
+    }
+  };
 
   function openDayModal(dateKey, owner) {
     selectedDateKey = dateKey;
     const modal = document.getElementById('day-modal');
-    document.getElementById('modal-date-title').textContent = dateKey;
+    document.getElementById('modal-date-title').textContent = dateKey.split('-').reverse().join(' / ');
     document.getElementById('modal-custody-img').src = `assets/${owner}.png`;
-    document.getElementById('modal-custody-text').textContent = owner.toUpperCase();
+    document.getElementById('modal-custody-text').textContent = owner === 'madre' ? 'Madre' : 'Padre';
     document.getElementById('modal-custody-text').style.color = owner === 'madre' ? '#db2777' : '#2563eb';
     document.getElementById('event-title').value = '';
     renderModalEvents();
@@ -583,10 +561,11 @@
     const evts = eventsData[selectedDateKey] || [];
     evts.forEach(evt => {
       const item = document.createElement('div');
-      item.style = "display:flex; align-items:center; justify-content:space-between; padding:8px; background:#f9fafb; border-radius:8px; margin-bottom:8px;";
-      item.innerHTML = `<span>${evt.title}</span><button onclick="deleteEvent('${evt.id}')" style="border:none; background:none; color:red; cursor:pointer;">✖</button>`;
+      item.style = "display:flex; align-items:center; justify-content:space-between; padding:12px; background:#f8f9fa; border-radius:14px; margin-bottom:8px; border:1px solid #eee;";
+      item.innerHTML = `<div style="display:flex;align-items:center;gap:10px;"><i data-lucide="${ICON_MAP[evt.type]}" style="width:16px; color:#6b7280;"></i><span style="font-weight:600; font-size:0.9rem;">${evt.title}</span></div><button onclick="deleteEvent('${evt.id}')" style="border:none; background:none; color:#ea4335; cursor:pointer; font-size:1.2rem;">✖</button>`;
       list.appendChild(item);
     });
+    lucide.createIcons();
   }
 
   async function saveEvent() {
@@ -594,24 +573,23 @@
     if(!title) return showToast("Escribe un título", "error");
     try {
       await db.collection("events").add({ date: selectedDateKey, title, type: selectedIconType, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
-      showToast("Nota añadida");
+      showToast("Actividad guardada");
       closeModal();
-    } catch(e) { showToast("Error", "error"); }
+    } catch(e) { showToast("Error al guardar", "error"); }
   }
 
   async function deleteEvent(id) {
-    try { await db.collection("events").doc(id).delete(); showToast("Borrado"); renderModalEvents(); } catch(e) {}
+    try { await db.collection("events").doc(id).delete(); showToast("Actividad eliminada"); renderModalEvents(); } catch(e) {}
   }
 
-  // AUTH & LISTENERS
   auth.onAuthStateChanged(async (user) => {
     if (user) {
       currentUser = user;
       const snap = await db.collection("users").doc(user.uid).get();
       if (snap.exists) {
         currentRole = snap.data().role;
-        document.getElementById("user-role-label").textContent = currentRole.toUpperCase();
-        document.getElementById("whoami-label").textContent = currentRole.toUpperCase();
+        document.getElementById("user-role-label").textContent = currentRole === 'madre' ? 'Madre' : 'Padre';
+        document.getElementById("whoami-label").textContent = currentRole === 'madre' ? 'MADRE' : 'PADRE';
         document.getElementById("login-view").classList.add("hidden");
         document.getElementById("app-root").classList.remove("hidden");
         initDataListeners();
@@ -634,14 +612,49 @@
       });
       renderCalendar();
     });
+    db.collection("requests").orderBy("createdAt", "desc").onSnapshot(snap => {
+      pendingRequests = [];
+      snap.forEach(doc => {
+        const d = doc.data();
+        if (d.status === 'pendiente') pendingRequests.push({ id: doc.id, ...d });
+      });
+      renderRequestsList();
+    });
     document.getElementById("status-pill").className = "status-pill status-online";
-    document.getElementById("status-text").textContent = "En línea";
+    document.getElementById("status-text").textContent = "Conectado";
+    lucide.createIcons();
   }
+
+  document.getElementById("request-form").onsubmit = async (e) => {
+    e.preventDefault();
+    const startDate = document.getElementById("start-date").value;
+    const endDate = document.getElementById("end-date").value;
+    const reason = document.getElementById("reason").value.trim();
+    
+    try {
+      await db.collection("requests").add({
+        requesterUid: currentUser.uid, requesterRole: currentRole,
+        startDate, endDate, reason, status: "pendiente",
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      showToast("Solicitud enviada");
+      e.target.reset();
+      
+      const quien = currentRole === 'madre' ? 'Madre' : 'Padre';
+      sendTelegramMessage(`📢 **NUEVA SOLICITUD**\nDe: ${quien}\n📅: ${formatearFecha(startDate)} - ${formatearFecha(endDate)}\n💬: "${reason}"`);
+    } catch(e) {
+      showToast("Error al enviar", "error");
+    }
+  };
 
   document.getElementById("login-form").addEventListener("submit", (e) => {
     e.preventDefault();
-    auth.signInWithEmailAndPassword(document.getElementById("login-email").value, document.getElementById("login-password").value);
+    const btn = document.getElementById("login-submit-btn");
+    btn.textContent = "Cargando...";
+    auth.signInWithEmailAndPassword(document.getElementById("login-email").value, document.getElementById("login-password").value)
+    .catch(() => { btn.textContent = "Entrar ahora"; showToast("Error de acceso", "error"); });
   });
+
   document.getElementById("logout-btn").onclick = () => auth.signOut();
   document.getElementById("prev-period").onclick = () => { currentMonth--; if(currentMonth < 0){ currentMonth=11; currentYear--; } renderCalendar(); };
   document.getElementById("next-period").onclick = () => { currentMonth++; if(currentMonth > 11){ currentMonth=0; currentYear++; } renderCalendar(); };
@@ -653,6 +666,7 @@
       if(y === currentYear) o.selected = true; ys.appendChild(o);
     });
     renderCalendar();
+    lucide.createIcons();
   });
 </script>
 </body>

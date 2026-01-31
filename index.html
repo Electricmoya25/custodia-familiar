@@ -4,223 +4,208 @@
   <meta charset="UTF-8">
   <title>Custodia Familiar</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' x='0.1em' font-size='80'%3E%F0%9F%93%85%3C/text%3E%3C/svg%3C/svg%3E">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' x='0.1em' font-size='80'%3E%F0%9F%93%85%3C/text%3E%3C/svg%3E">
   
   <!-- Iconos Lucide -->
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <style>
     :root {
-      --mother-color: #fce7f3; /* Rosa pastel fondo */
-      --father-color: #dbeafe; /* Azul pastel fondo */
-      --mother-icon-color: #db2777; /* Rosa fuerte icono */
-      --father-icon-color: #2563eb; /* Azul fuerte icono */
+      --mother-color: #fce7f3; /* Rosa pastel */
+      --father-color: #dbeafe; /* Azul pastel */
       --accent-color: #7c3aed;
-      --text-main: #1f2937;
+      --accent-soft: #ede9fe;
+      --text-main: #111827;
+      --text-muted: #6b7280;
       --bg-main: #f8fafc;
       --card-bg: #ffffff;
-      --shadow-soft: 0 10px 30px -5px rgba(0, 0, 0, 0.08);
+      --shadow-soft: 0 16px 40px rgba(15, 23, 42, 0.08);
+      --success: #10b981;
+      --error: #ef4444;
     }
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     
     body {
       margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background: var(--bg-main);
       color: var(--text-main);
       padding-bottom: 50px;
-      overscroll-behavior-y: none; /* Evita rebote en scroll */
+      overscroll-behavior-y: none;
     }
     .hidden { display: none !important; }
 
     /* ANIMACIONES */
     .calendar-grid { 
-      opacity: 1; transition: opacity 0.3s ease; touch-action: pan-y; /* Permite scroll vertical, bloquea horizontal para el JS */
+      opacity: 1;
+      transition: opacity 0.3s ease, transform 0.3s ease; 
+      touch-action: pan-y;
     }
-    .calendar-grid.fading { opacity: 0; }
+    .calendar-grid.fading { opacity: 0; transform: scale(0.98); }
     
     .day-cell { opacity: 0; transform: translateY(10px); transition: opacity 0.4s ease, transform 0.4s ease; }
     .day-cell.animated { opacity: 1; transform: translateY(0); }
 
     /* TOASTS */
     .toast-container {
-      position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+      position: fixed;
+      bottom: 20px; left: 50%; transform: translateX(-50%);
       z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none;
     }
     .toast {
-      background: rgba(0,0,0,0.85); color: #fff; padding: 12px 24px; border-radius: 99px;
-      font-size: 0.9rem; font-weight: 500; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      opacity: 0; transform: translateY(20px); transition: all 0.3s ease;
-      backdrop-filter: blur(4px);
+      background: #333; color: #fff; padding: 14px 28px; border-radius: 50px;
+      font-size: 0.95rem; font-weight: 600; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      opacity: 0; transform: translateY(20px); transition: all 0.4s ease;
+      display: flex; align-items: center; gap: 10px;
     }
     .toast.visible { opacity: 1; transform: translateY(0); }
+    .toast.success { background: var(--success); }
+    .toast.error { background: var(--error); }
 
     /* LOGIN */
     .login-wrapper {
-      min-height: 100vh; display:flex; align-items:center; justify-content:center;
+      min-height: 100vh; display:flex;
+      align-items:center; justify-content:center;
       padding:20px; background: radial-gradient(circle at top, #ede9fe, #f3f4fb);
     }
     .login-card {
-      background:#fff; width:100%; max-width:360px; border-radius:24px;
-      box-shadow: 0 20px 40px -10px rgba(0,0,0,0.1); padding:40px 30px;
+      background:#fff;
+      max-width:380px; width:100%; border-radius:28px;
+      box-shadow:0 25px 50px rgba(15,23,42,0.18); padding:40px 32px;
     }
     .login-title {
-      font-size:1.4rem; font-weight:800; margin-bottom:10px;
-      color: var(--accent-color); text-align: center;
+      font-size:1.5rem;
+      font-weight:700; margin-bottom:8px;
+      display:flex; align-items:center; gap:12px; color:var(--accent-color);
     }
-    .login-subtitle { font-size:0.9rem; color:#6b7280; margin-bottom:30px; text-align: center; }
-    .login-field { margin-bottom:15px; }
+    .login-subtitle { font-size:0.95rem; color:var(--text-muted); margin-bottom:28px; }
+    .login-field { margin-bottom:16px; }
+    .login-field label { font-size:0.9rem; font-weight:500; color:#4b5563; margin-bottom:6px; display:block; }
     .login-field input {
-      width:100%; padding:14px; font-size:1rem; border-radius:12px; border:1px solid #e5e7eb;
-      background: #f9fafb; transition: all 0.2s;
+      width:100%; padding:15px; font-size:1rem; border-radius:14px;
+      border:1px solid #d1d5db;
+      transition:border-color .2s, box-shadow .2s;
     }
-    .login-field input:focus { outline:none; border-color:var(--accent-color); background: #fff; box-shadow: 0 0 0 3px rgba(124,58,237,0.1); }
+    .login-field input:focus { outline:none; border-color:var(--accent-color); box-shadow:0 0 0 3px rgba(124,58,237,.15); }
     .login-btn {
-      margin-top:10px; width:100%; padding:14px; font-size:1rem; font-weight:600;
-      border-radius:12px; background:var(--accent-color); color:white; border:none; cursor:pointer;
-      transition: opacity 0.2s;
+      margin:16px 0 8px; width:100%; padding:17px; font-size:1.15rem;
+      font-weight:600; border-radius:20px; background:var(--accent-color);
+      color:white; border:none; cursor:pointer;
+      transition:background .3s, transform .2s;
     }
-    .login-btn:hover { opacity: 0.9; }
+    .login-btn:hover { background:#6d28d9; }
+    .login-error { color:#dc2626; font-size:0.9rem; margin-top:8px; text-align:center; min-height:1.2em; }
 
     /* TOPBAR */
     .topbar {
-      padding:12px 16px; background:#fff; margin-bottom:20px;
+      padding:14px 18px; border-radius:24px;
+      background:#fff;
+      box-shadow:var(--shadow-soft); margin-bottom:20px;
       display:flex; align-items:center; justify-content:space-between;
-      border-bottom: 1px solid #f3f4f6; position: sticky; top: 0; z-index: 50;
     }
-    .app-name { font-size:1.1rem; font-weight:700; color: #111; }
+    .logo-icon { width:40px; height:40px; font-size:24px; border-radius:12px; background:var(--accent-soft); display:flex; align-items:center; justify-content:center; }
+    .app-name { font-size:1.2rem; font-weight:700; }
     .status-pill {
-      font-size:0.7rem; font-weight:600; padding:2px 8px; border-radius:99px;
-      background:#f3f4f6; color:#6b7280; display: inline-flex; align-items: center; gap: 4px;
+      margin-top:4px;
+      display:inline-flex; align-items:center; gap:6px;
+      padding:4px 10px; border-radius:999px; font-size:0.75rem; font-weight:500;
+      background:#e5e7eb; color:#374151;
     }
-    .status-pill.online { color: #166534; background: #dcfce7; }
-    .status-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
-    
+    .status-dot { width:8px; height:8px; border-radius:50%; background:#9ca3af; }
+    .status-online { background:#dcfce7; color:#166534; } .status-online .status-dot { background:#22c55e; }
+    .status-connecting { background:#fef3c7; color:#92400e; } .status-connecting .status-dot { background:#facc15; }
+    .status-error { background:#fee2e2; color:#b91c1c; } .status-error .status-dot { background:#ef4444; }
+
     .topbar-right { display:flex; align-items:center; gap:8px; }
-    .user-info { font-size: 0.85rem; font-weight: 500; }
-    .logout-btn { background:none; border:none; color: #ef4444; font-weight: 600; font-size: 0.8rem; cursor: pointer; }
+    .year-select { padding:8px 10px; border-radius:999px; border:1px solid #e5e7eb; background:#fff; font-size:0.9rem; }
+    .user-info { display:flex; align-items:center; gap:10px; margin-left:16px; }
+    .user-role-label { font-size:0.9rem; font-weight:600; color:#374151; }
+    .logout-btn { padding:6px 10px; font-size:0.8rem; border-radius:999px; border:1px solid #e5e7eb; background:#fff; cursor:pointer; }
 
     /* LAYOUT */
-    .layout { padding:10px; max-width: 1000px; margin: 0 auto; display:grid; grid-template-columns:1fr; gap:20px; }
-    @media (min-width:800px){ .layout { grid-template-columns:2fr 1fr; } }
+    .layout { padding:16px; display:grid; grid-template-columns:2fr 1fr; gap:16px; }
+    @media (max-width:900px){ .layout { grid-template-columns:1fr; } }
     
-    .card { background:#fff; border-radius:20px; box-shadow:var(--shadow-soft); padding:20px; margin-bottom: 16px; }
-    .panel-title { margin:0 0 15px; font-size:1rem; font-weight:700; color: #374151; }
-    
-    /* CALENDARIO ESTILO APPLE */
-    .calendar-wrapper { 
-      background:#fff; border-radius:24px; padding:20px; box-shadow:var(--shadow-soft); 
-      /* Importante para que el swipe se sienta bien */
-      user-select: none;
-    }
-    .calendar-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
-    .calendar-title { font-size:1.4rem; font-weight:800; text-transform: capitalize; color: #111; }
-    .nav-arrow { 
-      width:40px; height:40px; border-radius:50%; border:none; background:#f3f4f6; 
-      font-size:1.2rem; display:flex; align-items:center; justify-content:center; 
-      cursor:pointer; transition: background 0.2s; color: #374151;
-    }
-    .nav-arrow:hover { background:#e5e7eb; }
+    .side-panel .card { background:#fff; border-radius:20px; box-shadow:var(--shadow-soft); padding:14px 16px; margin-bottom: 16px; }
+    .panel-title { margin:0 0 10px; font-size:1rem; font-weight:600; }
+    .panel-title.active { color:var(--accent-color); }
+    .field-group { margin-bottom:12px; }
+    .field-group label { display:block; margin-bottom:4px; font-size:0.85rem; font-weight:500; color:#4b5563; }
+    .field-group input, .field-group textarea { width:100%; padding:8px 10px; border-radius:10px; border:1px solid #d1d5db; font-size:0.9rem; }
+    .field-group textarea { min-height:60px; resize:vertical; }
+    .primary-btn { display:inline-block; margin-top:8px; padding:10px 14px; border-radius:999px; border:none; background:var(--accent-color); color:#fff; font-size:0.9rem; font-weight:600; cursor:pointer; width:100%; transition: opacity 0.2s; }
+    .primary-btn:hover { opacity: 0.9; }
 
-    .month-table { width:100%; border-collapse:separate; border-spacing:4px; table-layout:fixed; }
-    
-    /* AUMENTADO: Cabecera días semana */
-    .month-table th { 
-      font-size: 0.9rem; font-weight: 700; color: #9ca3af; 
-      padding-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px;
-    }
+    /* CALENDARIO */
+    .calendar-wrapper { background:var(--card-bg); border-radius:28px; padding:16px 12px; box-shadow:var(--shadow-soft); overflow: hidden; }
+    .calendar-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+    .nav-arrow { width:36px; height:36px; font-size:24px; border-radius:50%; border:1px solid #e5e7eb; background:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all .2s; }
+    .nav-arrow:hover { background:#f3f4f6; transform:scale(1.1); }
+    .calendar-title { font-size:1.5rem; font-weight:700; user-select: none; }
+    .calendar-subheader { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; padding-bottom:10px; border-bottom:1px solid #f3f4f6; margin-bottom:12px; }
+    .legend { font-size:0.9rem; gap:16px; font-weight:600; display:flex; }
+    .legend-item { display: flex; align-items: center; gap: 5px; }
+
+    .month { border-radius:16px; background:#ffffff; border:1px solid #f3f4f6; overflow:hidden; margin-bottom:24px; }
+    .month-header { text-align:center; padding:8px; background:#f9fafb; font-weight:600; font-size:0.9rem; color:#374151; }
+    table.month-table { width:100%; border-collapse:separate; border-spacing:2px; table-layout:fixed; }
+    .month-table th { font-size:0.7rem; color:#9ca3af; font-weight:500; padding:4px 0; }
     
     .month-table td { 
-      height: 85px; /* Altura cómoda */
+      height: 90px;
       position: relative; 
-      border-radius: 16px; 
+      border-radius: 12px; 
       vertical-align: top; 
+      overflow: hidden; 
       cursor: pointer;
-      transition: transform 0.1s;
-      background: #fff; /* Por defecto */
-      border: 1px solid transparent;
-      overflow: hidden; /* Asegura que la imagen no se salga en las esquinas redondeadas */
+      transition: transform 0.2s, box-shadow 0.2s;
     }
-    .month-table td:active { transform: scale(0.97); }
+    .month-table td:hover {
+      transform: scale(0.98);
+      box-shadow: inset 0 0 0 2px var(--accent-color);
+    }
 
-    /* FONDOS CUSTODIA */
-    .day-mother { background: var(--mother-color); }
-    .day-father { background: var(--father-color); }
+    .day-mother { background:var(--mother-color); }
+    .day-father { background:var(--father-color); }
     
-    /* AUMENTADO: Número del día */
     .day-number { 
-      position: absolute; top: 6px; left: 8px; 
-      font-size: 1.1rem; /* Más grande y legible */
-      font-weight: 700; color: #374151; z-index: 2; 
+      position: absolute; top: 4px; left: 6px; 
+      font-size: 0.9rem; font-weight: 700; color: #1f2937; z-index: 2; 
     }
     
-    /* ICONO CUSTODIA (FONDO COMPLETO) */
-    .owner-icon {
-      position: absolute; inset: 0;
-      /* Flexbox para asegurar centrado absoluto del contenido */
-      display: flex; align-items: center; justify-content: center;
-      pointer-events: none; z-index: 1;
-      opacity: 0.15; /* MARCA DE AGUA POR DEFECTO */
-      transition: opacity 0.3s ease;
+    /* MODIFICACIÓN PARA ICONOS PNG EN ASSETS */
+    .owner-icon-img {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      width: 50px; height: 50px; opacity: 0.15; pointer-events: none; z-index: 1; user-select: none;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      object-fit: contain;
     }
-    /* IMAGEN OCUPA TODO EL ESPACIO PERO CENTRADA */
-    .owner-icon img { 
-      width: 100%; height: 100%; 
-      object-fit: cover; /* Rellena todo el espacio */
-      object-position: center; /* CENTRA la imagen (foco en el centro) */
-      display: block;
-    } 
+
+    .day-overridden::after { content:"⇄"; position:absolute; bottom:2px; left:50%; transform:translateX(-50%); font-size:0.8rem; color:var(--accent-color); opacity:0.9; z-index: 3; }
     
-    /* NUEVO: ESTILO PARA LA IMAGEN EN EL MODAL/DETAILS */
-    .custody-icon-img {
-        width: 100%; height: 100%;
-        object-fit: cover;
-        object-position: center;
-        display: block;
+    .day-cell.is-today .owner-icon-img {
+      opacity: 0.8 !important;
+      transform: translate(-50%, -50%) scale(1.1);
     }
 
-    /* COLORES ESPECÍFICOS ICONOS (YA NO NECESARIOS CON PNG, PERO SE MANTIENEN PARA REFERENCIA) */
-    .icon-mother { color: var(--mother-icon-color); }
-    .icon-father { color: var(--father-icon-color); }
-
-    /* ESTILO DÍA ACTUAL (HOY) */
-    .day-cell.is-today {
-      box-shadow: inset 0 0 0 2px var(--accent-color); /* Borde sutil */
-    }
-    /* EN EL DÍA DE HOY: ICONO SÓLIDO */
-    .day-cell.is-today .owner-icon {
-      opacity: 1 !important; /* Totalmente visible */
-    }
-    .day-cell.is-today .owner-icon img {
-       /* filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); Opcional: sombra si se desea */
-    }
-    /* EN EL DÍA DE HOY: NÚMERO RESALTADO */
-    .day-cell.is-today .day-number {
-        color: #fff;
-        background: var(--accent-color);
-        border-radius: 50%;
-        width: 28px; height: 28px;
-        display: flex; align-items: center; justify-content: center;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    }
-
-    /* BOLAS DE EVENTOS (PEGATINAS) */
+    /* ESTILO PARA PEGATINAS (LUCIDE) */
     .event-marker {
       position: absolute;
-      width: 22px; height: 22px;
+      width: 26px; height: 26px;
       display: flex; align-items: center; justify-content: center;
-      border-radius: 50%; color: #fff; 
-      box-shadow: 0 2px 4px rgba(0,0,0,0.15); border: 2px solid #fff;
+      border-radius: 50%; 
+      color: #fff;
+      font-size: 14px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
       z-index: 5;
+      border: 2px solid white;
     }
-    .event-marker svg { width: 12px; height: 12px; }
+    .event-marker svg { width: 14px; height: 14px; }
     
-    /* Posiciones esquinas */
     .pos-0 { top: 4px; right: 4px; }
     .pos-1 { bottom: 4px; left: 4px; }
     .pos-2 { bottom: 4px; right: 4px; }
 
-    /* COLORES EVENTOS */
     .evt-medico { background: #ef4444; }
     .evt-dentista { background: #0ea5e9; }
     .evt-escuela { background: #f97316; }
@@ -230,155 +215,210 @@
     .evt-general { background: #64748b; }
     .evt-vacaciones { background: #06b6d4; }
 
-    /* FORMULARIOS */
-    .field-group { margin-bottom:15px; }
-    .field-group label { display:block; margin-bottom:6px; font-size:0.85rem; font-weight:600; color:#4b5563; }
-    .field-group input, .field-group textarea { width:100%; padding:10px; border-radius:10px; border:1px solid #d1d5db; font-size:0.95rem; }
-    .primary-btn { 
-      background: var(--accent-color); color: #fff; border: none; 
-      padding: 12px; border-radius: 12px; width: 100%; font-weight: 600; cursor: pointer;
+    @media (max-width: 768px) {
+      .month-table td { height: 65px !important; }
+      .day-number { font-size: 0.8rem; }
+      .owner-icon-img { width: 35px; height: 35px; }
+      .event-marker { width: 20px; height: 20px; }
+      .event-marker svg { width: 11px; height: 11px; }
     }
-    
-    /* LISTAS */
-    .request-item { background: #f9fafb; padding: 12px; border-radius: 12px; margin-bottom: 8px; font-size: 0.9rem; }
-    
+
     /* MODAL */
     .modal-overlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(2px);
-      display: flex; align-items: center; justify-content: center; z-index: 10000;
-      opacity: 0; pointer-events: none; transition: opacity 0.2s;
+      position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 10000; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+      backdrop-filter: blur(4px);
     }
     .modal-overlay.open { opacity: 1; pointer-events: auto; }
     .modal-card {
-      background: #fff; width: 90%; max-width: 400px; border-radius: 24px; padding: 24px;
-      transform: scale(0.95); transition: transform 0.2s; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+      background: #fff; width: 90%; max-width: 400px;
+      border-radius: 24px; padding: 24px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      transform: scale(0.95); transition: transform 0.3s;
     }
     .modal-overlay.open .modal-card { transform: scale(1); }
-    .icon-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 20px; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .modal-title { font-size: 1.25rem; font-weight: 700; color: #1f2937; }
+    .close-modal { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #9ca3af; }
+    
+    .icon-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 20px; }
     .icon-btn {
-      aspect-ratio: 1; border-radius: 16px; background: #f3f4f6; border: 2px solid transparent;
-      display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer;
+      aspect-ratio: 1; border-radius: 12px; border: 2px solid transparent;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      background: #f3f4f6; cursor: pointer; transition: all 0.2s; color: #6b7280; padding: 4px;
     }
-    .icon-btn.selected { background: var(--accent-soft); border-color: var(--accent-color); color: var(--accent-color); }
-    .icon-label { font-size: 0.65rem; font-weight: 700; margin-top: 4px; text-transform: uppercase; }
+    .icon-btn:hover { background: #e5e7eb; transform: translateY(-2px); }
+    .icon-btn.selected { border-color: var(--accent-color); background: var(--accent-soft); color: var(--accent-color); }
+    .icon-btn svg { margin-bottom: 2px; width: 18px; height: 18px; }
+    .icon-label { font-size: 0.55rem; font-weight: 700; text-transform: uppercase; text-align: center; margin-top: 2px; }
 
-    /* MÓVIL OPTIMIZACIÓN */
-    @media (max-width: 768px) {
-      .month-table td { height: 75px; }
-      .day-number { font-size: 1rem; }
-      /* Ya no necesitamos ajustar tamaño de img específicamente aquí porque es 100% cover */
-    }
+    /* REQUESTS */
+    .requests-list { max-height:300px; overflow:auto; border-radius:12px; border:1px solid #e5e7eb; padding:8px; }
+    .request-item { border-radius:10px; border:1px solid #e5e7eb; padding:10px; margin-bottom:8px; font-size:0.85rem; background: #f9fafb; }
+    .req-actions { display: flex; gap: 8px; margin-top: 8px; }
+    .btn-action { flex: 1; padding: 6px; border-radius: 6px; border: none; font-weight: 600; cursor: pointer; font-size: 0.8rem; }
+    .btn-accept { background: #dcfce7; color: #166534; }
+    .btn-reject { background: #fee2e2; color: #b91c1c; }
   </style>
 </head>
 <body>
 
 <div class="toast-container" id="toast-container"></div>
 
-<!-- MODAL -->
+<!-- MODAL PARA AÑADIR NOTAS -->
 <div class="modal-overlay" id="day-modal">
   <div class="modal-card">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-      <h3 style="margin:0; font-size:1.2rem;" id="modal-date-title">Fecha</h3>
-      <button onclick="closeModal()" style="background:none; border:none; font-size:1.5rem; color:#9ca3af;">&times;</button>
+    <div class="modal-header">
+      <div class="modal-title" id="modal-date-title">Detalles del día</div>
+      <button class="close-modal" onclick="closeModal()">×</button>
     </div>
     
-    <!-- MODIFICADO: Contenedor de icono en modal -->
-    <div style="display:flex; align-items:center; gap:12px; padding:12px; background:#f9fafb; border-radius:12px; margin-bottom:20px;">
-      <div id="modal-custody-icon" style="width:50px; height:50px; border-radius:50%; overflow:hidden; border:2px solid #e5e7eb; background:#fff;"></div>
+    <div style="margin-bottom: 20px; padding: 12px; background: #f3f4f6; border-radius: 12px; display: flex; align-items: center; gap: 10px;">
+      <img id="modal-custody-img" src="" style="width: 40px; height: 40px; object-fit: contain;">
       <div>
-        <div style="font-size:0.75rem; color:#6b7280; text-transform:uppercase; font-weight:700;">Custodia</div>
-        <div id="modal-custody-text" style="font-weight:700; font-size:1rem;"></div>
+        <div style="font-size: 0.75rem; color: #6b7280; font-weight: 600; text-transform: uppercase;">Custodia</div>
+        <div id="modal-custody-text" style="font-weight: 700; color: #374151;"></div>
       </div>
     </div>
 
-    <input type="text" id="event-title" placeholder="Añadir nota o evento..." class="field-group" style="width:100%; padding:12px; margin-bottom:15px; border-radius:12px; border:1px solid #e5e7eb;">
+    <div style="margin-bottom: 10px; font-weight: 600; font-size: 0.9rem;">¿Qué actividad es?</div>
+    <input type="text" id="event-title" placeholder="Ej. Revisión pediatra..." style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #d1d5db; margin-bottom: 12px;">
     
     <div class="icon-grid">
-      <div class="icon-btn" onclick="selectIcon('medico', this)"><i data-lucide="stethoscope" class="evt-medico" style="background:transparent; color:#ef4444;"></i><span class="icon-label">Médico</span></div>
-      <div class="icon-btn" onclick="selectIcon('dentista', this)"><i data-lucide="smile" class="evt-dentista" style="background:transparent; color:#0ea5e9;"></i><span class="icon-label">Dentista</span></div>
-      <div class="icon-btn" onclick="selectIcon('escuela', this)"><i data-lucide="backpack" class="evt-escuela" style="background:transparent; color:#f97316;"></i><span class="icon-label">Escuela</span></div>
-      <div class="icon-btn" onclick="selectIcon('deporte', this)"><i data-lucide="trophy" class="evt-deporte" style="background:transparent; color:#8b5cf6;"></i><span class="icon-label">Deporte</span></div>
-      <div class="icon-btn" onclick="selectIcon('cumple', this)"><i data-lucide="cake" class="evt-cumple" style="background:transparent; color:#eab308;"></i><span class="icon-label">Cumple</span></div>
-      <div class="icon-btn" onclick="selectIcon('parque', this)"><i data-lucide="tree-deciduous" class="evt-parque" style="background:transparent; color:#84cc16;"></i><span class="icon-label">Parque</span></div>
-      <div class="icon-btn" onclick="selectIcon('general', this)"><i data-lucide="star" class="evt-general" style="background:transparent; color:#64748b;"></i><span class="icon-label">General</span></div>
-      <div class="icon-btn" onclick="selectIcon('vacaciones', this)"><i data-lucide="palmtree" class="evt-vacaciones" style="background:transparent; color:#06b6d4;"></i><span class="icon-label">Playa</span></div>
+      <button class="icon-btn" onclick="selectIcon('medico', this)">
+        <i data-lucide="stethoscope" style="color: #ef4444;"></i>
+        <span class="icon-label">Médico</span>
+      </button>
+      <button class="icon-btn" onclick="selectIcon('dentista', this)">
+        <i data-lucide="smile" style="color: #0ea5e9;"></i>
+        <span class="icon-label">Dentista</span>
+      </button>
+      <button class="icon-btn" onclick="selectIcon('escuela', this)">
+        <i data-lucide="backpack" style="color: #f97316;"></i>
+        <span class="icon-label">Escuela</span>
+      </button>
+      <button class="icon-btn" onclick="selectIcon('deporte', this)">
+        <i data-lucide="trophy" style="color: #8b5cf6;"></i>
+        <span class="icon-label">Deporte</span>
+      </button>
+      <button class="icon-btn" onclick="selectIcon('cumple', this)">
+        <i data-lucide="cake" style="color: #eab308;"></i>
+        <span class="icon-label">Cumple</span>
+      </button>
+      <button class="icon-btn" onclick="selectIcon('parque', this)">
+        <i data-lucide="tree-deciduous" style="color: #84cc16;"></i>
+        <span class="icon-label">Parque</span>
+      </button>
+      <button class="icon-btn" onclick="selectIcon('general', this)">
+        <i data-lucide="star" style="color: #64748b;"></i>
+        <span class="icon-label">General</span>
+      </button>
+      <button class="icon-btn" onclick="selectIcon('vacaciones', this)">
+        <i data-lucide="palmtree" style="color: #06b6d4;"></i>
+        <span class="icon-label">Vacaciones</span>
+      </button>
     </div>
 
-    <button onclick="saveEvent()" class="primary-btn">Guardar</button>
-    <div id="modal-event-list" style="margin-top:15px; max-height:200px; overflow-y:auto;"></div>
+    <button onclick="saveEvent()" class="primary-btn" style="width: 100%;">Guardar Nota</button>
+    <div id="modal-event-list" style="margin-top: 16px; max-height: 150px; overflow-y: auto;"></div>
   </div>
 </div>
 
-<!-- LOGIN -->
 <div id="login-view" class="login-wrapper">
   <div class="login-card">
-    <div class="login-title">Custodia Familiar</div>
-    <div class="login-subtitle">Organiza tu calendario compartido</div>
+    <div class="login-title">📅 Custodia Familiar</div>
+    <p class="login-subtitle">Introduce tu correo y contraseña para acceder.</p>
     <form id="login-form">
       <div class="login-field">
-        <input type="email" id="login-email" required placeholder="Correo electrónico">
+        <label for="login-email">Correo electrónico</label>
+        <input type="email" id="login-email" required autocomplete="email">
       </div>
       <div class="login-field">
-        <input type="password" id="login-password" required placeholder="Contraseña">
+        <label for="login-password">Contraseña</label>
+        <input type="password" id="login-password" required autocomplete="current-password">
       </div>
-      <button type="submit" class="login-btn" id="login-submit-btn">Entrar</button>
-      <div id="login-error" style="color:#ef4444; text-align:center; margin-top:10px; font-size:0.9rem;"></div>
+      <button type="submit" class="login-btn primary-btn" id="login-submit-btn">Entrar</button>
+      <p id="login-error" class="login-error"></p>
     </form>
   </div>
 </div>
 
-<!-- APP -->
 <div id="app-root" class="app hidden">
   <header class="topbar">
-    <div style="display:flex; align-items:center; gap:10px;">
-      <div style="font-size:1.5rem;">📅</div>
+    <div class="topbar-left" style="display:flex;align-items:center;gap:10px;">
+      <div class="logo-icon">📅</div>
       <div>
-        <div class="app-name">Custodia</div>
-        <div class="status-pill" id="status-pill"><span class="status-dot"></span> <span id="status-text">Conectando</span></div>
+        <div class="app-name">Custodia Familiar</div>
+        <div class="status-pill status-connecting" id="status-pill">
+          <span class="status-dot"></span>
+          <span id="status-text">Conectando...</span>
+        </div>
       </div>
     </div>
     <div class="topbar-right">
-      <select id="year-select" style="padding:4px 8px; border-radius:8px; border:1px solid #e5e7eb;"></select>
-      <button id="logout-btn" class="logout-btn">Salir</button>
+      <select id="year-select" class="year-select"></select>
+      <div class="user-info">
+        <span class="user-role-label" id="user-role-label">Usuario</span>
+        <button type="button" id="logout-btn" class="logout-btn">Salir</button>
+      </div>
     </div>
   </header>
 
   <div class="layout">
-    <section class="calendar-wrapper" id="calendar-wrapper-swipe"> <!-- ID añadido para el swipe -->
+    <section class="calendar-wrapper">
       <div class="calendar-header">
-        <button id="prev-period" class="nav-arrow"><i data-lucide="chevron-left"></i></button>
-        <div class="calendar-title" id="calendar-title"></div>
-        <button id="next-period" class="nav-arrow"><i data-lucide="chevron-right"></i></button>
+        <button id="prev-period" class="nav-arrow">‹</button>
+        <div class="month-nav">
+          <div class="calendar-title" id="calendar-title"></div>
+        </div>
+        <button id="next-period" class="nav-arrow">›</button>
+      </div>
+      <div class="calendar-subheader">
+        <div class="legend">
+          <span class="legend-item"><img src="assets/madre.png" style="width:16px; height:16px;"> Madre</span>
+          <span class="legend-item"><img src="assets/padre.png" style="width:16px; height:16px;"> Padre</span>
+        </div>
       </div>
       <div id="calendar-grid" class="calendar-grid"></div>
     </section>
 
     <section class="side-panel">
       <div class="card">
-        <div class="panel-title">Solicitar Cambio</div>
+        <div class="panel-title">➕ Nueva solicitud de cambio</div>
         <form id="request-form">
-          <div style="display:flex; gap:10px; margin-bottom:10px;">
-            <input type="date" id="start-date" required style="flex:1; padding:10px; border-radius:8px; border:1px solid #e5e7eb;">
-            <input type="date" id="end-date" required style="flex:1; padding:10px; border-radius:8px; border:1px solid #e5e7eb;">
+          <div class="field-group">
+            <label>Solicitante: <span id="whoami-label" style="font-weight:600;">...</span></label>
           </div>
-          <textarea id="reason" placeholder="Motivo (opcional)" style="width:100%; padding:10px; border-radius:8px; border:1px solid #e5e7eb; margin-bottom:10px;"></textarea>
-          <button type="submit" class="primary-btn">Enviar</button>
+          <div class="field-group">
+            <label>Fechas</label>
+            <div style="display:flex; gap:10px;">
+              <input type="date" id="start-date" required>
+              <input type="date" id="end-date" required>
+            </div>
+          </div>
+          <div class="field-group">
+            <label for="reason">Motivo</label>
+            <textarea id="reason" placeholder="Ej: Viaje de trabajo..." required></textarea>
+          </div>
+          <button type="submit" class="primary-btn">Enviar Solicitud</button>
         </form>
       </div>
       <div class="card">
-        <div class="panel-title">Pendientes</div>
-        <div id="pending-requests" style="font-size:0.9rem; color:#6b7280; font-style:italic;">No hay solicitudes</div>
+        <h3 class="panel-title active">Pendientes</h3>
+        <div class="requests-list" id="pending-requests"></div>
       </div>
     </section>
   </div>
 </div>
 
+<!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 
 <script>
-  // CONFIGURACIÓN FIREBASE
+  // CONFIGURACIÓN FIREBASE (Mantener tus datos)
   const firebaseConfig = {
     apiKey: "AIzaSyAwgk4_l0zvaCUCgm1CjqqqXjJHr5KPBjc",
     authDomain: "custodia-familiar.firebaseapp.com",
@@ -391,283 +431,229 @@
   const db = firebase.firestore();
   const auth = firebase.auth();
 
-  // IMÁGENES PNG (Desde assets) - Sin estilos inline, controlados por CSS
-  const DAD_ICON_IMG = `<img src="assets/padre.png" alt="Padre" class="custody-icon-img">`;
-  const MOM_ICON_IMG = `<img src="assets/madre.png" alt="Madre" class="custody-icon-img">`;
-  
-  // VARIABLES DE ESTADO
-  let todayInit = new Date();
-  let currentYear = todayInit.getFullYear();
-  let currentMonth = todayInit.getMonth();
-  if (currentYear < 2025) currentYear = 2025;
-  
-  let overrides = {};
-  let eventsData = {};
+  // FECHA ACTUAL PARA EL ARRANQUE
+  const now = new Date();
+  let currentYear = now.getFullYear();
+  let currentMonth = now.getMonth();
+
+  const MIN_YEAR = 2025;
+  const MAX_YEAR = 2027;
+  const BASE_MONDAY = new Date(2026, 0, 5, 12, 0, 0); 
+
   let currentUser = null;
   let currentRole = null;
+  let overrides = {};
+  let eventsData = {};
   let selectedDateKey = null;
   let selectedIconType = 'medico';
 
   const monthNames = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
   const weekDayNames = ["Lun","Mar","Mié","Jue","Vie","Sáb","Dom"];
-  const BASE_MONDAY = new Date(2026, 0, 5, 12, 0, 0); 
-  
-  // FUNCIONES AUXILIARES
-  const formatDateKey = (y, m, d) => `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-  const showToast = (msg) => {
-    const t = document.createElement('div'); t.className='toast'; t.textContent=msg;
-    document.getElementById('toast-container').appendChild(t);
-    setTimeout(()=>t.classList.add('visible'),10);
-    setTimeout(()=>{t.classList.remove('visible');setTimeout(()=>t.remove(),300)},3000);
+
+  const ICON_MAP = {
+    'medico': 'stethoscope', 'dentista': 'smile', 'escuela': 'backpack', 
+    'deporte': 'trophy', 'cumple': 'cake', 'parque': 'tree-deciduous', 
+    'general': 'star', 'vacaciones': 'palmtree'
   };
 
-  // CÁLCULO CUSTODIA BASE
-  function getBaseOwner(year, month, day) {
-    const date = new Date(year, month, day, 12, 0, 0);
-    if(date.getFullYear() < 2025 || date.getFullYear() > 2027) return null;
-    const diffDays = Math.round((date - BASE_MONDAY)/(1000*60*60*24));
-    return (Math.floor(diffDays/7) % 2 === 0) ? "padre" : "madre";
+  function showToast(msg, type = 'success') {
+    const container = document.getElementById('toast-container');
+    const el = document.createElement('div');
+    el.className = `toast ${type}`;
+    el.innerHTML = type === 'success' ? `✅ ${msg}` : `⚠️ ${msg}`;
+    container.appendChild(el);
+    requestAnimationFrame(() => el.classList.add('visible'));
+    setTimeout(() => { el.classList.remove('visible'); setTimeout(() => el.remove(), 300); }, 4000);
   }
 
-  // RENDERIZADO CALENDARIO
+  function getBaseOwner(year, monthIndex, day) {
+    const date = new Date(year, monthIndex, day, 12, 0, 0);
+    const diffMs = date - BASE_MONDAY;
+    const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
+    const weekIndex = Math.floor(diffDays / 7);
+    return (Math.abs(weekIndex) % 2 === 0) ? "padre" : "madre"; 
+  }
+
   function renderCalendar() {
     const grid = document.getElementById("calendar-grid");
-    const title = document.getElementById("calendar-title");
-    grid.innerHTML = "";
-    title.textContent = `${monthNames[currentMonth]} ${currentYear}`;
-    
-    // Grid Setup
-    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-    const firstDay = new Date(currentYear, currentMonth, 1).getDay();
-    const startOffset = (firstDay === 0) ? 6 : firstDay - 1;
-    
-    // Tabla
-    const table = document.createElement("table");
-    table.className = "month-table";
-    
-    // Cabecera Días
-    const thead = document.createElement("tr");
-    weekDayNames.forEach(d => {
-      const th = document.createElement("th"); th.textContent = d; thead.appendChild(th);
-    });
-    table.appendChild(thead);
+    const titleEl = document.getElementById("calendar-title");
+    if (!grid) return;
 
-    // Días
-    let dayCount = 1;
-    for (let r=0; r<6; r++) {
-      const tr = document.createElement("tr");
-      for (let c=0; c<7; c++) {
-        const td = document.createElement("td");
-        if ((r===0 && c<startOffset) || dayCount > daysInMonth) {
-          td.style.background = "transparent"; td.style.cursor="default";
-        } else {
-          const dateKey = formatDateKey(currentYear, currentMonth, dayCount);
-          const owner = overrides[dateKey] || getBaseOwner(currentYear, currentMonth, dayCount);
-          const isToday = (dateKey === formatDateKey(todayInit.getFullYear(), todayInit.getMonth(), todayInit.getDate()));
-          
-          td.className = `day-cell ${owner === 'madre' ? 'day-mother' : 'day-father'}`;
-          if(isToday) td.classList.add('is-today');
-          td.onclick = () => openDayModal(dateKey, owner);
+    grid.classList.add('fading');
+    setTimeout(() => {
+      grid.innerHTML = "";
+      titleEl.innerHTML = `${monthNames[currentMonth]} <span class="year">${currentYear}</span>`;
 
-          // Número Día
-          const num = document.createElement("span"); 
-          num.className = "day-number"; num.textContent = dayCount;
-          td.appendChild(num);
+      const monthDiv = document.createElement("div");
+      monthDiv.className = "month";
+      const table = document.createElement("table");
+      table.className = "month-table";
+      const thead = document.createElement("thead");
+      const trHead = document.createElement("tr");
+      weekDayNames.forEach(d => { const th = document.createElement("th"); th.textContent = d.charAt(0); trHead.appendChild(th); });
+      thead.appendChild(trHead);
+      table.appendChild(thead);
 
-          // Icono Fondo (PNG)
-          const icon = document.createElement("div");
-          icon.className = `owner-icon`; // Sin clases de color extra, ya que es PNG
-          icon.innerHTML = owner === 'madre' ? MOM_ICON_IMG : DAD_ICON_IMG;
-          td.appendChild(icon);
+      const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+      const firstDayInstance = new Date(currentYear, currentMonth, 1);
+      let startDay = firstDayInstance.getDay();
+      startDay = (startDay === 0) ? 6 : startDay - 1;
 
-          // Eventos
-          const evts = (eventsData[dateKey] || []).slice(0,3);
-          evts.forEach((evt, i) => {
-            const badge = document.createElement("div");
-            badge.className = `event-marker evt-${evt.type} pos-${i}`;
-            const lucideIcon = document.createElement("i");
-            lucideIcon.setAttribute("data-lucide", getIconName(evt.type));
-            badge.appendChild(lucideIcon);
-            td.appendChild(badge);
-          });
-          
-          dayCount++;
+      const tbody = document.createElement("tbody");
+      let dayCounter = 1;
+      let finished = false;
+      const todayKey = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+
+      while(!finished) {
+        const tr = document.createElement("tr");
+        for(let i = 0; i < 7; i++) {
+          const td = document.createElement("td");
+          if(dayCounter <= daysInMonth && (dayCounter > 1 || i >= startDay)) {
+            const dateKey = `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}-${String(dayCounter).padStart(2, "0")}`;
+            const base = getBaseOwner(currentYear, currentMonth, dayCounter);
+            const override = overrides[dateKey];
+            const final = override || base;
+
+            td.className = "day-cell";
+            if(final === "padre") td.classList.add("day-father");
+            if(final === "madre") td.classList.add("day-mother");
+            if(override) td.classList.add("day-overridden");
+            if(dateKey === todayKey) td.classList.add("is-today");
+            
+            td.onclick = () => openDayModal(dateKey, final);
+
+            const spanNum = document.createElement("span");
+            spanNum.className = "day-number";
+            spanNum.textContent = dayCounter;
+            td.appendChild(spanNum);
+            
+            const ownerImg = document.createElement("img");
+            ownerImg.className = "owner-icon-img";
+            ownerImg.src = `assets/${final}.png`;
+            td.appendChild(ownerImg);
+
+            const dayEvents = eventsData[dateKey] || [];
+            dayEvents.slice(0, 3).forEach((evt, idx) => {
+              const badge = document.createElement("div");
+              badge.className = `event-marker evt-${evt.type} pos-${idx}`;
+              badge.innerHTML = `<i data-lucide="${ICON_MAP[evt.type]}"></i>`;
+              td.appendChild(badge);
+            });
+
+            dayCounter++;
+          }
+          tr.appendChild(td);
         }
-        tr.appendChild(td);
+        tbody.appendChild(tr);
+        if(dayCounter > daysInMonth) finished = true;
       }
-      table.appendChild(tr);
-      if (dayCount > daysInMonth) break;
-    }
-    grid.appendChild(table);
-    lucide.createIcons();
-    setTimeout(()=>document.querySelectorAll('.day-cell').forEach(c=>c.classList.add('animated')), 50);
+      table.appendChild(tbody);
+      monthDiv.appendChild(table);
+      grid.appendChild(monthDiv);
+
+      lucide.createIcons();
+      grid.classList.remove('fading');
+      grid.querySelectorAll('.day-cell').forEach((c, i) => setTimeout(() => c.classList.add('animated'), i * 10));
+    }, 250);
   }
 
-  function getIconName(type) {
-    const map = { 'medico':'stethoscope', 'dentista':'smile', 'escuela':'backpack', 'deporte':'trophy', 'cumple':'cake', 'parque':'tree-deciduous', 'general':'star', 'vacaciones':'palmtree' };
-    return map[type] || 'circle';
-  }
-
-  // MODAL
   function openDayModal(dateKey, owner) {
     selectedDateKey = dateKey;
-    document.getElementById("day-modal").classList.add("open");
-    document.getElementById("modal-date-title").textContent = new Date(dateKey).toLocaleDateString('es-ES', {weekday:'long', day:'numeric', month:'long'});
-    
-    const iconDiv = document.getElementById("modal-custody-icon");
-    iconDiv.innerHTML = owner==='madre'? MOM_ICON_IMG : DAD_ICON_IMG;
-    // Quitamos la lógica de clases de color para los iconos SVG, mantenemos texto
-    document.getElementById("modal-custody-text").textContent = owner==='madre'? 'Madre' : 'Padre';
-    document.getElementById("modal-custody-text").style.color = owner==='madre'? 'var(--mother-icon-color)' : 'var(--father-icon-color)';
-    
-    renderEventsList();
+    const modal = document.getElementById('day-modal');
+    document.getElementById('modal-date-title').textContent = dateKey;
+    document.getElementById('modal-custody-img').src = `assets/${owner}.png`;
+    document.getElementById('modal-custody-text').textContent = owner.toUpperCase();
+    document.getElementById('modal-custody-text').style.color = owner === 'madre' ? '#db2777' : '#2563eb';
+    document.getElementById('event-title').value = '';
+    renderModalEvents();
+    modal.classList.add('open');
   }
 
-  function renderEventsList() {
-    const list = document.getElementById("modal-event-list");
-    list.innerHTML = "";
+  function closeModal() { document.getElementById('day-modal').classList.remove('open'); }
+
+  function selectIcon(type, btn) {
+    selectedIconType = type;
+    document.querySelectorAll('.icon-btn').forEach(b => b.classList.remove('selected'));
+    if(btn) btn.classList.add('selected');
+  }
+
+  function renderModalEvents() {
+    const list = document.getElementById('modal-event-list');
+    list.innerHTML = '';
     const evts = eventsData[selectedDateKey] || [];
-    
-    if(evts.length === 0) {
-      list.innerHTML = '<div style="text-align:center; padding:20px; color:#9ca3af; font-style:italic;">No hay notas para este día</div>';
-      return;
-    }
-
-    const colors = { 
-      'medico': '#ef4444', 'dentista': '#0ea5e9', 'escuela': '#f97316', 
-      'deporte': '#8b5cf6', 'cumple': '#eab308', 'parque': '#84cc16', 
-      'general': '#64748b', 'vacaciones': '#06b6d4' 
-    };
-
     evts.forEach(evt => {
-      const item = document.createElement("div");
-      item.style.cssText = "display:flex; justify-content:space-between; align-items:center; padding:12px 16px; background:#fff; margin-bottom:10px; border-radius:16px; box-shadow:0 2px 5px rgba(0,0,0,0.05); border:1px solid #f3f4f6;";
-      
-      const iconColor = colors[evt.type] || '#666';
-      const iconName = getIconName(evt.type);
-
-      item.innerHTML = `
-        <div style="display:flex; align-items:center; gap:14px; flex:1; overflow:hidden;">
-          <div style="width:40px; height:40px; border-radius:12px; background:${iconColor}20; color:${iconColor}; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-            <i data-lucide="${iconName}" style="width:24px; height:24px;"></i>
-          </div>
-          <span style="font-size:1.15rem; font-weight:600; color:#1f2937; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${evt.title}</span>
-        </div>
-        <button onclick="deleteEvent('${evt.id}')" style="border:none; background:none; color:#ef4444; cursor:pointer; padding:8px; margin-left:8px;">
-          <i data-lucide="trash-2" style="width:22px; height:22px;"></i>
-        </button>
-      `;
+      const item = document.createElement('div');
+      item.style = "display:flex; align-items:center; justify-content:space-between; padding:8px; background:#f9fafb; border-radius:8px; margin-bottom:8px;";
+      item.innerHTML = `<span>${evt.title}</span><button onclick="deleteEvent('${evt.id}')" style="border:none; background:none; color:red; cursor:pointer;">✖</button>`;
       list.appendChild(item);
     });
-    lucide.createIcons();
   }
 
-  function closeModal() { document.getElementById("day-modal").classList.remove("open"); }
-  function selectIcon(t,el) { selectedIconType=t; document.querySelectorAll('.icon-btn').forEach(b=>b.classList.remove('selected')); el.classList.add('selected'); }
-
-  // LOGICA DATABASE
   async function saveEvent() {
-    const title = document.getElementById("event-title").value;
-    if(!title) return;
-    await db.collection("events").add({ date: selectedDateKey, title, type: selectedIconType, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
-    document.getElementById("event-title").value="";
-    renderEventsList(); showToast("Evento guardado");
+    const title = document.getElementById('event-title').value.trim();
+    if(!title) return showToast("Escribe un título", "error");
+    try {
+      await db.collection("events").add({ date: selectedDateKey, title, type: selectedIconType, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+      showToast("Nota añadida");
+      closeModal();
+    } catch(e) { showToast("Error", "error"); }
   }
-  
+
   async function deleteEvent(id) {
-    if(confirm("¿Borrar?")) { await db.collection("events").doc(id).delete(); renderEventsList(); }
+    try { await db.collection("events").doc(id).delete(); showToast("Borrado"); renderModalEvents(); } catch(e) {}
   }
 
-  // --- SWIPE LOGIC RESTORED (Revisado para Móvil) ---
-  const swipeElement = document.getElementById("calendar-wrapper-swipe");
-  let touchStartX = 0;
-  let touchStartY = 0;
-  
-  if (swipeElement) {
-    swipeElement.addEventListener('touchstart', e => {
-      touchStartX = e.changedTouches[0].screenX;
-      touchStartY = e.changedTouches[0].screenY;
-    }, {passive: true});
-
-    swipeElement.addEventListener('touchend', e => {
-      const touchEndX = e.changedTouches[0].screenX;
-      const touchEndY = e.changedTouches[0].screenY;
-      handleSwipe(touchStartX, touchStartY, touchEndX, touchEndY);
-    }, {passive: true});
-  }
-
-  function handleSwipe(startX, startY, endX, endY) {
-    const xDiff = startX - endX;
-    const yDiff = startY - endY;
-    
-    // Umbral de 50px y movimiento horizontal claro (X > Y)
-    if (Math.abs(xDiff) > Math.abs(yDiff) && Math.abs(xDiff) > 50) {
-      if (xDiff > 0) {
-        // Deslizar izquierda -> Siguiente Mes
-        document.getElementById("next-period").click();
-      } else {
-        // Deslizar derecha -> Mes Anterior
-        document.getElementById("prev-period").click();
-      }
-    }
-  }
-
-  // AUTH STATE
+  // AUTH & LISTENERS
   auth.onAuthStateChanged(async (user) => {
-    if(user) {
+    if (user) {
       currentUser = user;
-      document.getElementById("login-view").classList.add("hidden");
-      document.getElementById("app-root").classList.remove("hidden");
-      
-      const uDoc = await db.collection("users").doc(user.uid).get();
-      currentRole = uDoc.exists ? uDoc.data().role : null;
-      
-      // Listeners
-      db.collection("overrides").onSnapshot(s => { overrides={}; s.forEach(d=>overrides[d.id]=d.data().owner); renderCalendar(); });
-      db.collection("events").orderBy("createdAt").onSnapshot(s => { 
-        eventsData={}; s.forEach(d=>{ const v=d.data(); if(!eventsData[v.date]) eventsData[v.date]=[]; eventsData[v.date].push({id:d.id, ...v}); });
-        renderCalendar();
-      });
-      db.collection("requests").orderBy("createdAt", "desc").onSnapshot(s => {
-        const el = document.getElementById("pending-requests"); el.innerHTML="";
-        let count=0;
-        s.forEach(d => {
-          const r = d.data();
-          if(r.status === "pendiente") {
-             count++;
-             const div = document.createElement("div"); div.className="request-item";
-             div.innerHTML = `<strong>${r.startDate}</strong>: ${r.reason} (${r.requesterRole})`;
-             // Aquí irían botones aceptar/rechazar
-             el.appendChild(div);
-          }
-        });
-        if(count===0) el.innerHTML = "<div style='color:#9ca3af;font-style:italic;'>No hay solicitudes</div>";
-      });
-      
-      document.getElementById("status-pill").className="status-pill online";
-      document.getElementById("status-text").textContent="En línea";
+      const snap = await db.collection("users").doc(user.uid).get();
+      if (snap.exists) {
+        currentRole = snap.data().role;
+        document.getElementById("user-role-label").textContent = currentRole.toUpperCase();
+        document.getElementById("whoami-label").textContent = currentRole.toUpperCase();
+        document.getElementById("login-view").classList.add("hidden");
+        document.getElementById("app-root").classList.remove("hidden");
+        initDataListeners();
+      }
     } else {
       document.getElementById("login-view").classList.remove("hidden");
       document.getElementById("app-root").classList.add("hidden");
     }
   });
 
-  // BOTONES
-  document.getElementById("login-form").addEventListener("submit", e => {
-    e.preventDefault();
-    auth.signInWithEmailAndPassword(document.getElementById("login-email").value, document.getElementById("login-password").value)
-    .catch(e => document.getElementById("login-error").textContent = "Error de acceso");
-  });
-  document.getElementById("logout-btn").click = () => auth.signOut();
-  document.getElementById("prev-period").onclick = () => { currentMonth--; if(currentMonth<0){currentMonth=11;currentYear--}; renderCalendar(); };
-  document.getElementById("next-period").onclick = () => { currentMonth++; if(currentMonth>11){currentMonth=0;currentYear++}; renderCalendar(); };
-  
-  // INIT
-  const ys = document.getElementById("year-select");
-  [2025,2026,2027].forEach(y => { const o=document.createElement("option"); o.value=y; o.textContent=y; if(y===currentYear) o.selected=true; ys.appendChild(o); });
-  ys.addEventListener("change", e => { currentYear=parseInt(e.target.value); renderCalendar(); });
+  function initDataListeners() {
+    db.collection("overrides").onSnapshot(snap => {
+      overrides = {}; snap.forEach(doc => overrides[doc.id] = doc.data().owner);
+      renderCalendar();
+    });
+    db.collection("events").onSnapshot(snap => {
+      eventsData = {}; snap.forEach(doc => {
+        const d = doc.data(); if(!eventsData[d.date]) eventsData[d.date] = [];
+        eventsData[d.date].push({ id: doc.id, ...d });
+      });
+      renderCalendar();
+    });
+    document.getElementById("status-pill").className = "status-pill status-online";
+    document.getElementById("status-text").textContent = "En línea";
+  }
 
-  renderCalendar();
+  document.getElementById("login-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    auth.signInWithEmailAndPassword(document.getElementById("login-email").value, document.getElementById("login-password").value);
+  });
+  document.getElementById("logout-btn").onclick = () => auth.signOut();
+  document.getElementById("prev-period").onclick = () => { currentMonth--; if(currentMonth < 0){ currentMonth=11; currentYear--; } renderCalendar(); };
+  document.getElementById("next-period").onclick = () => { currentMonth++; if(currentMonth > 11){ currentMonth=0; currentYear++; } renderCalendar(); };
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const ys = document.getElementById("year-select");
+    [2025, 2026, 2027].forEach(y => {
+      const o = document.createElement("option"); o.value = y; o.textContent = y;
+      if(y === currentYear) o.selected = true; ys.appendChild(o);
+    });
+    renderCalendar();
+  });
 </script>
 </body>
 </html>

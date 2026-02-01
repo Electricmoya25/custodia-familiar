@@ -7,40 +7,226 @@
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' x='0.1em' font-size='80'%3EF👨‍👩‍👧‍👦%3C/text%3E%3C/svg%3E">
     <script src="https://unpkg.com/lucide@latest"></script>
 
-    <!-- Firebase Scripts -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap');
 
-        :root {
-            --father-primary: #0ea5e9;
-            --mother-primary: #f472b6;
-            --text-main: #0f172a;
-        }
-
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
-            margin: 0; font-family: 'Google Sans', 'Inter', system-ui, sans-serif;
+            font-family: 'Google Sans', 'Inter', system-ui, sans-serif;
             background: radial-gradient(circle at 0% 0%, rgba(236, 72, 153, 0.18), transparent 55%),
                         radial-gradient(circle at 100% 100%, rgba(56, 189, 248, 0.2), transparent 55%), #020617;
-            color: var(--text-main); padding-bottom: 80px; overscroll-behavior-y: none; letter-spacing: -0.01em;
+            color: #0f172a;
+            overscroll-behavior-y: none;
+            letter-spacing: -0.01em;
         }
 
         .hidden { display: none !important; }
 
-        /* --- VISTAS --- */
+        /* --- LOGIN --- */
+        .login-wrapper {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(30px);
+            border-radius: 24px;
+            padding: 40px;
+            max-width: 400px;
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .login-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .login-subtitle {
+            color: rgba(255, 255, 255, 0.6);
+            text-align: center;
+            margin-bottom: 32px;
+            font-size: 14px;
+        }
+
+        .login-field {
+            margin-bottom: 20px;
+        }
+
+        .login-field label {
+            display: block;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .login-field input, .login-field select {
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .login-field input:focus, .login-field select:focus {
+            outline: none;
+            border-color: #60a5fa;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .login-field option {
+            background: #1e293b;
+            color: white;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(135deg, #60a5fa, #3b82f6);
+            color: white;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+        }
+
+        .secondary-btn {
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: transparent;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 500;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .secondary-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        #login-error-msg {
+            color: #ef4444;
+            font-size: 13px;
+            margin-top: 12px;
+            text-align: center;
+        }
+
+        /* --- MODAL OVERLAY --- */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .modal-overlay.open {
+            display: flex;
+        }
+
+        .modal-card {
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.98), rgba(30, 41, 59, 0.98));
+            backdrop-filter: blur(30px);
+            border-radius: 24px;
+            padding: 32px;
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        /* --- APP --- */
+        .app {
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        .topbar {
+            padding: max(20px, env(safe-area-inset-top) + 10px) 20px 20px;
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.12), rgba(236, 72, 153, 0.12));
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-icon {
+            font-size: 32px;
+        }
+
+        .app-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: white;
+        }
+
+        #user-role-label {
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        #user-role-label.madre {
+            background: rgba(244, 114, 182, 0.2);
+            color: #f472b6;
+            border: 1px solid rgba(244, 114, 182, 0.3);
+        }
+
+        #user-role-label.padre {
+            background: rgba(14, 165, 233, 0.2);
+            color: #0ea5e9;
+            border: 1px solid rgba(14, 165, 233, 0.3);
+        }
+
+        /* --- VIEWS --- */
         .view {
             display: none;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
         }
+
         .view.active {
             display: block;
         }
 
-        /* --- NAVEGACIÓN INFERIOR --- */
+        /* --- BOTTOM NAV --- */
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -85,420 +271,193 @@
             font-weight: 500;
         }
 
-        /* --- CALENDARIO & SWIPE --- */
-        .calendar-grid {
-            opacity: 1; transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-            touch-action: pan-y;
-            user-select: none;
-        }
-        .calendar-grid.fading { opacity: 0; transform: scale(0.97); }
-
-        .day-cell {
-            opacity: 0; transform: translateY(10px) scale(0.96);
-            transition: all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        .day-cell.animated { opacity: 1; transform: translateY(0) scale(1); }
-
-        /* --- TOAST --- */
-        .toast-container {
-            position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999;
-            display: flex; flex-direction: column; gap: 12px; pointer-events: none; width: 90%; max-width: 400px;
-        }
-        .toast {
-            background: rgba(15, 23, 42, 0.96); backdrop-filter: blur(30px); color: white;
-            padding: 16px 20px; border-radius: 16px; display: flex; align-items: center; gap: 12px;
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1);
-            animation: slideInDown 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            pointer-events: auto;
-        }
-        @keyframes slideInDown {
-            from { opacity: 0; transform: translateY(-30px) scale(0.9); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        .toast-icon { flex-shrink: 0; }
-        .toast-content { flex: 1; font-size: 14px; font-weight: 500; }
-
-        /* --- HEADER --- */
-        header {
-            padding: max(20px, env(safe-area-inset-top) + 10px) 20px 20px;
-            background: linear-gradient(135deg, rgba(6, 182, 212, 0.12), rgba(236, 72, 153, 0.12));
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            position: sticky; top: 0; z-index: 100;
-        }
-        .header-content {
-            display: flex; align-items: center; justify-content: space-between; max-width: 500px; margin: 0 auto;
-        }
-        .header-title {
-            display: flex; align-items: center; gap: 12px;
-        }
-        .header-title h1 {
-            margin: 0; font-size: 24px; font-weight: 700; color: white;
-            background: linear-gradient(135deg, var(--father-primary), var(--mother-primary));
-            -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
-        }
-        .role-toggle {
-            background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border-radius: 30px; padding: 6px;
-            display: inline-flex; gap: 6px; border: 1px solid rgba(255, 255, 255, 0.15);
-        }
-        .role-btn {
-            padding: 10px 20px; border-radius: 24px; border: none; cursor: pointer;
-            font-weight: 600; font-size: 13px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            background: transparent; color: rgba(255, 255, 255, 0.6);
-        }
-        .role-btn.active {
-            background: white; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        }
-        .role-btn.father.active { color: var(--father-primary); }
-        .role-btn.mother.active { color: var(--mother-primary); }
-
         /* --- CALENDAR --- */
-        .calendar {
-            max-width: 500px; margin: 0 auto; padding: 20px;
-        }
-        .calendar-header {
-            display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
-            padding: 16px 20px; background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px);
-            border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-        .month-year {
-            font-size: 20px; font-weight: 700; color: white;
-            display: flex; align-items: center; gap: 10px;
-        }
-        .nav-buttons {
-            display: flex; gap: 8px;
-        }
-        .nav-btn {
-            background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 12px; padding: 10px; cursor: pointer; transition: all 0.3s ease;
-            display: flex; align-items: center; justify-content: center; color: rgba(255, 255, 255, 0.7);
-        }
-        .nav-btn:hover { background: rgba(255, 255, 255, 0.15); transform: scale(1.05); }
-        .nav-btn:active { transform: scale(0.95); }
-
-        .weekdays {
-            display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-bottom: 12px;
-        }
-        .weekday {
-            text-align: center; font-size: 12px; font-weight: 600; color: rgba(255, 255, 255, 0.5);
-            padding: 8px 0; text-transform: uppercase; letter-spacing: 0.5px;
-        }
-
-        .calendar-grid {
-            display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px;
-        }
-        .day-cell {
-            aspect-ratio: 1; border-radius: 14px; display: flex; flex-direction: column;
-            align-items: center; justify-content: center; cursor: pointer; position: relative;
-            background: rgba(255, 255, 255, 0.03); border: 1.5px solid rgba(255, 255, 255, 0.06);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .day-cell:hover { transform: scale(1.08); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3); }
-        .day-cell.empty { background: transparent; border: none; cursor: default; }
-        .day-cell.empty:hover { transform: none; box-shadow: none; }
-        .day-cell.other-month { opacity: 0.3; }
-        .day-cell.today {
-            border-color: #fbbf24; box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.2), 0 4px 12px rgba(251, 191, 36, 0.3);
-        }
-
-        .day-number {
-            font-size: 14px; font-weight: 600; margin-bottom: 2px; z-index: 1; color: white;
-        }
-        .day-dot {
-            width: 6px; height: 6px; border-radius: 50%; z-index: 1;
-        }
-        .day-cell.father { background: linear-gradient(135deg, rgba(14, 165, 233, 0.25), rgba(6, 182, 212, 0.15)); border-color: rgba(14, 165, 233, 0.4); }
-        .day-cell.mother { background: linear-gradient(135deg, rgba(244, 114, 182, 0.25), rgba(236, 72, 153, 0.15)); border-color: rgba(244, 114, 182, 0.4); }
-        .day-cell.father .day-dot { background: var(--father-primary); box-shadow: 0 0 8px var(--father-primary); }
-        .day-cell.mother .day-dot { background: var(--mother-primary); box-shadow: 0 0 8px var(--mother-primary); }
-
-        .day-cell.pending-father { background: linear-gradient(135deg, rgba(14, 165, 233, 0.15), rgba(6, 182, 212, 0.08)); border: 1.5px dashed rgba(14, 165, 233, 0.5); }
-        .day-cell.pending-mother { background: linear-gradient(135deg, rgba(244, 114, 182, 0.15), rgba(236, 72, 153, 0.08)); border: 1.5px dashed rgba(244, 114, 182, 0.5); }
-        .day-cell.pending-father::after, .day-cell.pending-mother::after {
-            content: '?'; position: absolute; top: 4px; right: 6px; font-size: 10px; font-weight: 700;
-            background: rgba(251, 191, 36, 0.9); color: #0f172a; width: 16px; height: 16px;
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-        }
-
-        /* --- MODAL --- */
-        .modal-overlay {
-            position: fixed; inset: 0; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(8px);
-            display: flex; align-items: flex-end; justify-content: center; z-index: 999;
-            animation: fadeIn 0.3s ease;
-        }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .modal {
-            background: linear-gradient(135deg, rgba(15, 23, 42, 0.98), rgba(30, 41, 59, 0.98));
-            backdrop-filter: blur(30px); border-radius: 24px 24px 0 0; padding: 24px;
-            width: 100%; max-width: 500px; max-height: 80vh; overflow-y: auto;
-            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5); border: 1px solid rgba(255, 255, 255, 0.1);
-            animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        .modal-header {
-            display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
-        }
-        .modal-title {
-            font-size: 20px; font-weight: 700; color: white;
-            display: flex; align-items: center; gap: 10px;
-        }
-        .close-btn {
-            background: rgba(255, 255, 255, 0.1); border: none; border-radius: 50%;
-            width: 36px; height: 36px; cursor: pointer; display: flex; align-items: center; justify-content: center;
-            transition: all 0.3s ease; color: rgba(255, 255, 255, 0.7);
-        }
-        .close-btn:hover { background: rgba(255, 255, 255, 0.15); transform: rotate(90deg); }
-
-        .event-info {
-            background: rgba(255, 255, 255, 0.05); border-radius: 16px; padding: 16px; margin-bottom: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-        .event-info p {
-            margin: 8px 0; font-size: 14px; color: rgba(255, 255, 255, 0.8);
-            display: flex; align-items: center; gap: 10px;
-        }
-        .event-info strong { color: white; font-weight: 600; }
-
-        .action-buttons {
-            display: flex; gap: 12px; margin-top: 20px;
-        }
-        .btn {
-            flex: 1; padding: 14px; border-radius: 12px; border: none; font-weight: 600;
-            font-size: 15px; cursor: pointer; transition: all 0.3s ease;
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-        }
-        .btn-primary {
-            background: linear-gradient(135deg, #60a5fa, #3b82f6);
-            color: white; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-        }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4); }
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.1); color: white;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-        }
-        .btn-secondary:hover { background: rgba(255, 255, 255, 0.15); }
-        .btn-danger {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-            color: white; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
-        }
-        .btn-danger:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4); }
-
-        .form-group {
-            margin-bottom: 16px;
-        }
-        .form-group label {
-            display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px; color: rgba(255, 255, 255, 0.9);
-        }
-        .form-group select, .form-group input {
-            width: 100%; padding: 12px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.15);
-            background: rgba(255, 255, 255, 0.05); color: white; font-size: 14px;
-            transition: all 0.3s ease;
-        }
-        .form-group select:focus, .form-group input:focus {
-            outline: none; border-color: #60a5fa; background: rgba(255, 255, 255, 0.08);
-        }
-        .form-group option {
-            background: #1e293b; color: white;
-        }
-
-        /* --- REQUESTS VIEW --- */
-        .requests-container {
-            max-width: 500px;
+        .calendar-wrapper {
+            max-width: 600px;
             margin: 0 auto;
-            padding: 20px;
         }
 
-        .requests-header {
-            margin-bottom: 24px;
-        }
-
-        .requests-header h2 {
-            font-size: 24px;
-            font-weight: 700;
-            color: white;
-            margin: 0 0 8px 0;
-        }
-
-        .requests-header p {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 14px;
-            margin: 0;
-        }
-
-        .requests-list {
+        .calendar-header {
             display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .request-card {
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 16px 20px;
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(10px);
             border-radius: 16px;
-            padding: 16px;
             border: 1px solid rgba(255, 255, 255, 0.08);
-            transition: all 0.3s ease;
         }
 
-        .request-card:hover {
-            background: rgba(255, 255, 255, 0.08);
-            transform: translateY(-2px);
-        }
-
-        .request-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 12px;
-        }
-
-        .request-date {
-            font-size: 16px;
-            font-weight: 600;
+        .calendar-title {
+            font-size: 20px;
+            font-weight: 700;
             color: white;
         }
 
-        .request-status {
-            padding: 4px 12px;
+        .nav-arrow {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             border-radius: 12px;
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .request-status.pending {
-            background: rgba(251, 191, 36, 0.2);
-            color: #fbbf24;
-            border: 1px solid rgba(251, 191, 36, 0.3);
-        }
-
-        .request-status.accepted {
-            background: rgba(34, 197, 94, 0.2);
-            color: #22c55e;
-            border: 1px solid rgba(34, 197, 94, 0.3);
-        }
-
-        .request-status.rejected {
-            background: rgba(239, 68, 68, 0.2);
-            color: #ef4444;
-            border: 1px solid rgba(239, 68, 68, 0.3);
-        }
-
-        .request-info {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-bottom: 12px;
-        }
-
-        .request-info-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 14px;
-            color: rgba(255, 255, 255, 0.8);
-        }
-
-        .request-info-item svg {
-            width: 16px;
-            height: 16px;
-            opacity: 0.6;
-        }
-
-        .request-actions {
-            display: flex;
-            gap: 8px;
-            margin-top: 12px;
-        }
-
-        .request-btn {
-            flex: 1;
             padding: 10px;
-            border-radius: 10px;
-            border: none;
-            font-weight: 600;
-            font-size: 13px;
             cursor: pointer;
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
+            color: rgba(255, 255, 255, 0.7);
         }
 
-        .request-btn svg {
-            width: 16px;
-            height: 16px;
+        .nav-arrow:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: scale(1.05);
         }
 
-        .request-btn.accept {
-            background: linear-gradient(135deg, #22c55e, #16a34a);
-            color: white;
+        .calendar-grid {
+            opacity: 1;
+            transition: opacity 0.3s ease;
         }
 
-        .request-btn.reject {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-            color: white;
+        .calendar-grid.fading {
+            opacity: 0;
         }
 
-        .request-btn.cancel {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.15);
+        .month-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 8px;
         }
 
-        .request-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        }
-
-        .no-requests {
-            text-align: center;
-            padding: 60px 20px;
+        .month-table th {
             color: rgba(255, 255, 255, 0.5);
+            font-size: 12px;
+            font-weight: 600;
+            padding: 8px 0;
+            text-transform: uppercase;
         }
 
-        .no-requests svg {
-            width: 64px;
-            height: 64px;
-            margin-bottom: 16px;
-            opacity: 0.3;
+        .day-cell {
+            aspect-ratio: 1;
+            border-radius: 14px;
+            padding: 8px;
+            cursor: pointer;
+            position: relative;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1.5px solid rgba(255, 255, 255, 0.06);
+            transition: all 0.3s ease;
+            text-align: center;
+            vertical-align: top;
         }
 
-        .no-requests p {
-            font-size: 16px;
-            margin: 0;
+        .day-cell:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .day-cell.day-padre {
+            background: linear-gradient(135deg, rgba(14, 165, 233, 0.25), rgba(6, 182, 212, 0.15));
+            border-color: rgba(14, 165, 233, 0.4);
+        }
+
+        .day-cell.day-madre {
+            background: linear-gradient(135deg, rgba(244, 114, 182, 0.25), rgba(236, 72, 153, 0.15));
+            border-color: rgba(244, 114, 182, 0.4);
+        }
+
+        .day-cell.day-overridden {
+            box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.3);
+        }
+
+        .day-number {
+            font-size: 14px;
+            font-weight: 600;
+            color: white;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .owner-icon-img {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            object-fit: contain;
+            margin: 4px auto;
+            display: block;
+        }
+
+        .event-marker {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .event-marker.pos-0 { top: 4px; right: 4px; }
+        .event-marker.pos-1 { top: 4px; right: 28px; }
+        .event-marker.pos-2 { top: 4px; right: 52px; }
+
+        .evt-medico { background: #3b82f6; }
+        .evt-dentista { background: #06b6d4; }
+        .evt-escuela { background: #8b5cf6; }
+        .evt-deporte { background: #f59e0b; }
+        .evt-cumple { background: #ec4899; }
+        .evt-parque { background: #10b981; }
+        .evt-general { background: #6366f1; }
+        .evt-vacaciones { background: #14b8a6; }
+
+        /* --- REQUESTS VIEW --- */
+        .requests-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-subtitle {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            margin-bottom: 20px;
+        }
+
+        .request-item {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            transition: all 0.3s ease;
+        }
+
+        .request-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateY(-2px);
         }
 
         /* --- EVENTS VIEW --- */
         .events-container {
-            max-width: 500px;
+            max-width: 800px;
             margin: 0 auto;
-            padding: 20px;
-        }
-
-        .events-header {
-            margin-bottom: 24px;
-        }
-
-        .events-header h2 {
-            font-size: 24px;
-            font-weight: 700;
-            color: white;
-            margin: 0 0 8px 0;
-        }
-
-        .events-header p {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 14px;
-            margin: 0;
-        }
-
-        .events-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
         }
 
         .event-card {
@@ -507,8 +466,9 @@
             border-radius: 16px;
             padding: 16px;
             border: 1px solid rgba(255, 255, 255, 0.08);
-            transition: all 0.3s ease;
+            margin-bottom: 12px;
             cursor: pointer;
+            transition: all 0.3s ease;
         }
 
         .event-card:hover {
@@ -516,205 +476,345 @@
             transform: translateY(-2px);
         }
 
-        .event-card.father-event {
-            border-left: 4px solid var(--father-primary);
-            background: linear-gradient(90deg, rgba(14, 165, 233, 0.1), rgba(255, 255, 255, 0.05));
+        .event-card.padre-event {
+            border-left: 4px solid #0ea5e9;
         }
 
-        .event-card.mother-event {
-            border-left: 4px solid var(--mother-primary);
-            background: linear-gradient(90deg, rgba(244, 114, 182, 0.1), rgba(255, 255, 255, 0.05));
+        .event-card.madre-event {
+            border-left: 4px solid #f472b6;
         }
 
-        .event-card-header {
+        /* --- TOAST --- */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
+            flex-direction: column;
+            gap: 12px;
+            pointer-events: none;
+            width: 90%;
+            max-width: 400px;
         }
 
-        .event-date-display {
-            font-size: 16px;
-            font-weight: 600;
+        .toast {
+            background: rgba(15, 23, 42, 0.96);
+            backdrop-filter: blur(30px);
+            color: white;
+            padding: 16px 20px;
+            border-radius: 16px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+            font-size: 14px;
+            font-weight: 500;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.3s ease;
+            pointer-events: auto;
+        }
+
+        .toast.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .toast.success { border-left: 4px solid #22c55e; }
+        .toast.error { border-left: 4px solid #ef4444; }
+
+        /* --- MODAL DAY --- */
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin: 16px 0;
+        }
+
+        .icon-btn {
+            padding: 12px;
+            border-radius: 12px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             color: white;
         }
 
-        .event-custodian {
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+        .icon-btn:hover {
+            transform: scale(1.05);
         }
 
-        .event-custodian.father {
-            background: rgba(14, 165, 233, 0.2);
-            color: var(--father-primary);
-            border: 1px solid rgba(14, 165, 233, 0.3);
+        .icon-btn.selected {
+            border-color: white;
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
         }
 
-        .event-custodian.mother {
-            background: rgba(244, 114, 182, 0.2);
-            color: var(--mother-primary);
-            border: 1px solid rgba(244, 114, 182, 0.3);
-        }
-
-        .event-details {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .event-detail-item {
+        .close-modal {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 20px;
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 14px;
-            color: rgba(255, 255, 255, 0.8);
+            justify-content: center;
+            transition: all 0.3s ease;
         }
 
-        .event-detail-item svg {
-            width: 16px;
-            height: 16px;
-            opacity: 0.6;
+        .close-modal:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: rotate(90deg);
         }
 
-        .no-events {
-            text-align: center;
-            padding: 60px 20px;
-            color: rgba(255, 255, 255, 0.5);
-        }
-
-        .no-events svg {
-            width: 64px;
-            height: 64px;
+        .modal-title {
+            font-weight: 700;
+            color: #e5e7eb;
             margin-bottom: 16px;
-            opacity: 0.3;
-        }
-
-        .no-events p {
-            font-size: 16px;
-            margin: 0;
+            font-size: 18px;
         }
     </style>
 </head>
 <body>
+    <div class="toast-container" id="toast-container"></div>
 
-<div class="toast-container" id="toastContainer"></div>
-
-<header>
-    <div class="header-content">
-        <div class="header-title">
-            <h1>👨‍👩‍👧‍👦 Custodia</h1>
-        </div>
-        <div class="role-toggle">
-            <button class="role-btn father active" onclick="switchRole('father')">👨 Padre</button>
-            <button class="role-btn mother" onclick="switchRole('mother')">👩 Madre</button>
-        </div>
-    </div>
-</header>
-
-<!-- VISTA HOME (Calendario) -->
-<div class="view active" id="homeView">
-    <div class="calendar">
-        <div class="calendar-header">
-            <div class="month-year">
-                <span id="monthYear"></span>
+    <!-- ONBOARDING MODAL -->
+    <div class="modal-overlay" id="onboarding-modal">
+        <div class="modal-card">
+            <div style="text-align:center; margin-bottom:20px;">
+                <div style="font-size:3rem;">👋</div>
+                <h2 style="color:#e5e7eb; margin:10px 0 5px;">¡Bienvenido/a!</h2>
+                <p style="color:#94a3b8; font-size:0.9rem;">Para configurar el calendario, necesitamos unos datos.</p>
             </div>
-            <div class="nav-buttons">
-                <button class="nav-btn" onclick="changeMonth(-1)"><i data-lucide="chevron-left"></i></button>
-                <button class="nav-btn" onclick="goToToday()"><i data-lucide="calendar"></i></button>
-                <button class="nav-btn" onclick="changeMonth(1)"><i data-lucide="chevron-right"></i></button>
+            <form id="onboarding-form">
+                <div class="login-field">
+                    <label>¿Quién eres?</label>
+                    <select id="onboard-role" required>
+                        <option value="" disabled selected>Selecciona tu rol...</option>
+                        <option value="madre">Soy la Madre</option>
+                        <option value="padre">Soy el Padre</option>
+                    </select>
+                </div>
+                <div class="login-field">
+                    <label>Nombre del niño/a</label>
+                    <input type="text" id="onboard-child-name" required placeholder="Ej. Lucas">
+                </div>
+                <button type="submit" class="login-btn">Guardar y Entrar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- DAY MODAL -->
+    <div class="modal-overlay" id="day-modal">
+        <div class="modal-card">
+            <button class="close-modal" onclick="closeModal()">×</button>
+            <div class="modal-title" id="modal-date-title">Detalles</div>
+            <div style="margin:8px 0 14px; padding:10px; background:rgba(15,23,42,0.92); border-radius:16px; display:flex; align-items:center; gap:10px; border:1px solid rgba(148,163,184,0.5);">
+                <img id="modal-custody-img" src="" style="width:34px; height:34px; border-radius:999px; object-fit:contain;">
+                <div>
+                    <div style="font-size:0.7rem; color:#9ca3af; text-transform:uppercase; font-weight:600;">Custodia actual</div>
+                    <div id="modal-custody-text" style="font-weight:700; font-size:0.9rem; color:#e5e7eb; text-transform:uppercase;"></div>
+                </div>
+            </div>
+            <input type="text" id="event-title" placeholder="Ej. Fiesta de disfraces…" style="width:100%; padding:12px; border-radius:14px; background:rgba(15,23,42,0.95); border:1px solid rgba(148,163,184,0.55); color:white; margin-top:6px;" />
+            <div class="icon-grid">
+                <button class="icon-btn evt-medico" onclick="selectIcon('medico', this)"><i data-lucide="stethoscope"></i></button>
+                <button class="icon-btn evt-dentista" onclick="selectIcon('dentista', this)"><i data-lucide="smile"></i></button>
+                <button class="icon-btn evt-escuela" onclick="selectIcon('escuela', this)"><i data-lucide="backpack"></i></button>
+                <button class="icon-btn evt-deporte" onclick="selectIcon('deporte', this)"><i data-lucide="trophy"></i></button>
+                <button class="icon-btn evt-cumple" onclick="selectIcon('cumple', this)"><i data-lucide="cake"></i></button>
+                <button class="icon-btn evt-parque" onclick="selectIcon('parque', this)"><i data-lucide="tree-deciduous"></i></button>
+                <button class="icon-btn evt-general" onclick="selectIcon('general', this)"><i data-lucide="star"></i></button>
+                <button class="icon-btn evt-vacaciones" onclick="selectIcon('vacaciones', this)"><i data-lucide="palmtree"></i></button>
+            </div>
+            <button onclick="saveEvent()" class="login-btn" style="margin-top:8px;">Guardar actividad</button>
+            <div id="modal-event-list" style="margin-top:10px; max-height:180px; overflow-y:auto;"></div>
+        </div>
+    </div>
+
+    <!-- LOGIN VIEW -->
+    <div id="login-view" class="login-wrapper">
+        <div class="login-card">
+            <div class="login-title">Calendario</div>
+            <p class="login-subtitle">Coordina la custodia familiar de forma visual.</p>
+            <form id="login-form">
+                <div class="login-field">
+                    <label>Correo electrónico</label>
+                    <input type="email" id="login-email" required placeholder="tu@email.com">
+                </div>
+                <div class="login-field">
+                    <label>Contraseña</label>
+                    <input type="password" id="login-password" required placeholder="••••••••">
+                </div>
+                <button type="submit" class="login-btn" id="login-submit-btn">Entrar</button>
+            </form>
+            <button type="button" class="secondary-btn" id="toggle-auth-mode">¿No tienes cuenta? Regístrate</button>
+            <div id="login-error-msg"></div>
+        </div>
+    </div>
+
+    <!-- APP ROOT -->
+    <div id="app-root" class="app hidden">
+        <div class="topbar">
+            <div style="display:flex; align-items:center; gap:10px;">
+                <div class="logo-icon">👨‍👩‍👧‍👦</div>
+                <div>
+                    <div class="app-name">Custodia Familiar</div>
+                    <div id="child-name-display" style="font-size:0.75rem; color:#94a3b8; font-weight:500;"></div>
+                </div>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px;">
+                <span id="user-role-label"></span>
+                <select id="year-select" style="background:rgba(15,23,42,0.95); border:1px solid rgba(148,163,184,0.55); color:#e5e7eb; padding:6px; border-radius:999px;"></select>
+                <button type="button" id="logout-btn" style="background:none; border:none; color:#9ca3af; cursor:pointer;"><i data-lucide="log-out" style="width:18px;"></i></button>
             </div>
         </div>
 
-        <div class="weekdays">
-            <div class="weekday">Lun</div>
-            <div class="weekday">Mar</div>
-            <div class="weekday">Mié</div>
-            <div class="weekday">Jue</div>
-            <div class="weekday">Vie</div>
-            <div class="weekday">Sáb</div>
-            <div class="weekday">Dom</div>
+        <!-- VISTA HOME (Calendario) -->
+        <div class="view active" id="homeView">
+            <div class="calendar-wrapper">
+                <div class="calendar-header">
+                    <button id="prev-period" class="nav-arrow"><i data-lucide="chevron-left"></i></button>
+                    <div class="calendar-title" id="calendar-title"></div>
+                    <button id="next-period" class="nav-arrow"><i data-lucide="chevron-right"></i></button>
+                </div>
+                <div id="calendar-grid" class="calendar-grid"></div>
+            </div>
         </div>
 
-        <div class="calendar-grid" id="calendarGrid"></div>
-    </div>
-</div>
+        <!-- VISTA SOLICITUDES -->
+        <div class="view" id="requestsView">
+            <div class="requests-container">
+                <h2 class="section-title">
+                    <i data-lucide="inbox"></i>
+                    Solicitudes de Cambio
+                </h2>
+                <p class="section-subtitle">Gestiona las solicitudes de cambio de custodia</p>
 
-<!-- VISTA SOLICITUDES -->
-<div class="view" id="requestsView">
-    <div class="requests-container">
-        <div class="requests-header">
-            <h2>Solicitudes</h2>
-            <p>Gestiona las solicitudes de cambio de custodia</p>
+                <div class="card">
+                    <div style="font-size:0.95rem; font-weight:700; color:#e5e7eb; margin-bottom:12px; display:flex; align-items:center; gap:6px;">
+                        <i data-lucide="send" style="width:16px;"></i> Nueva Solicitud
+                    </div>
+                    <form id="request-form">
+                        <div style="font-size:0.72rem; color:#9ca3af; margin-bottom:8px;">Usuario: <span id="whoami-label">...</span></div>
+                        <div style="display:flex; gap:10px; margin-bottom:10px;">
+                            <div class="login-field" style="flex:1; margin-bottom:0;">
+                                <label>Desde</label>
+                                <input type="date" id="start-date" required>
+                            </div>
+                            <div class="login-field" style="flex:1; margin-bottom:0;">
+                                <label>Hasta</label>
+                                <input type="date" id="end-date" required>
+                            </div>
+                        </div>
+                        <div class="login-field">
+                            <label>Motivo del cambio</label>
+                            <textarea id="reason" placeholder="Explica el motivo..." required style="width:100%; height:80px; resize:none; padding:12px; border-radius:12px; border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.05); color:white;"></textarea>
+                        </div>
+                        <button type="submit" class="login-btn">Enviar solicitud</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h3 style="font-size:0.95rem; font-weight:700; color:#e5e7eb; margin-bottom:12px; display:flex; align-items:center; gap:6px;">
+                        <i data-lucide="clock" style="width:16px;"></i> Cambios Pendientes
+                    </h3>
+                    <div id="pending-requests"></div>
+                </div>
+            </div>
         </div>
-        <div class="requests-list" id="requestsList"></div>
-    </div>
-</div>
 
-<!-- VISTA EVENTOS -->
-<div class="view" id="eventsView">
-    <div class="events-container">
-        <div class="events-header">
-            <h2>Eventos Programados</h2>
-            <p>Listado de días de custodia confirmados</p>
+        <!-- VISTA EVENTOS -->
+        <div class="view" id="eventsView">
+            <div class="events-container">
+                <h2 class="section-title">
+                    <i data-lucide="calendar-check"></i>
+                    Eventos Programados
+                </h2>
+                <p class="section-subtitle">Todas las actividades registradas en el calendario</p>
+                <div id="events-list"></div>
+            </div>
         </div>
-        <div class="events-list" id="eventsList"></div>
+
+        <!-- NAVEGACIÓN INFERIOR -->
+        <div class="bottom-nav">
+            <div class="nav-item active" onclick="switchView('home')">
+                <i data-lucide="calendar"></i>
+                <span>Calendario</span>
+            </div>
+            <div class="nav-item" onclick="switchView('requests')">
+                <i data-lucide="inbox"></i>
+                <span>Solicitudes</span>
+            </div>
+            <div class="nav-item" onclick="switchView('events')">
+                <i data-lucide="list"></i>
+                <span>Eventos</span>
+            </div>
+        </div>
     </div>
-</div>
 
-<!-- NAVEGACIÓN INFERIOR -->
-<div class="bottom-nav">
-    <div class="nav-item active" onclick="switchView('home')">
-        <i data-lucide="calendar"></i>
-        <span>Calendario</span>
-    </div>
-    <div class="nav-item" onclick="switchView('requests')">
-        <i data-lucide="inbox"></i>
-        <span>Solicitudes</span>
-    </div>
-    <div class="nav-item" onclick="switchView('events')">
-        <i data-lucide="list"></i>
-        <span>Eventos</span>
-    </div>
-</div>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 
-<!-- MODAL -->
-<div class="modal-overlay hidden" id="modalOverlay" onclick="closeModal(event)">
-    <div class="modal" onclick="event.stopPropagation()" id="modalContent"></div>
-</div>
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAwgk4_l0zvaCUCgm1CjqqqXjJHr5KPBjc",
+            authDomain: "custodia-familiar.firebaseapp.com",
+            projectId: "custodia-familiar",
+            storageBucket: "custodia-familiar.firebasestorage.app",
+            messagingSenderId: "1038952432258",
+            appId: "1:1038952432258:web:7608d6a48d8ad8308a6a9b"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
 
-<script>
-// Firebase Configuration
-const firebaseConfig = {
-    apiKey: "AIzaSyAwgk4_l0zvaCUCgm1CjqqqXjJHr5KPBjc",
-    authDomain: "custodia-familiar.firebaseapp.com",
-    projectId: "custodia-familiar",
-    storageBucket: "custodia-familiar.firebasestorage.app",
-    messagingSenderId: "1038952432258",
-    appId: "1:1038952432258:web:7608d6a48d8ad8308a6a9b"
-  };
+        const now = new Date();
+        let currentYear = now.getFullYear();
+        let currentMonth = now.getMonth();
+        const BASE_MONDAY = new Date(2026, 0, 5, 12, 0, 0);
 
-firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
-  const auth = firebase.auth();
+        let currentUser = null;
+        let currentRole = null;
+        let currentChildName = "";
+        let overrides = {};
+        let eventsData = {};
+        let pendingRequests = [];
+        let selectedDateKey = null;
+        let selectedIconType = "medico";
+        let listenersAttached = false;
+        let isRegistering = false;
 
-let currentMonth = new Date().getMonth();
-let currentYear = new Date().getFullYear();
-let currentRole = 'father';
-let currentUser = null;
-let currentUserData = null;
-let custodyData = {};
-let pendingRequests = [];
-let swipeStartX = 0;
-let swipeEndX = 0;
+        let touchStartX = 0;
+        let touchEndX = 0;
 
-const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-                    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+        const monthNames = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+        const weekDayNames = ["L","M","X","J","V","S","D"];
+        const ICON_MAP = {
+            medico: "stethoscope", dentista: "smile", escuela: "backpack",
+            deporte: "trophy", cumple: "cake", parque: "tree-deciduous",
+            general: "star", vacaciones: "palmtree"
+        };
 
-// --- TELEGRAM ---
+        function showToast(msg, type = "success") {
+            const container = document.getElementById("toast-container");
+            const el = document.createElement("div");
+            el.className = "toast " + type;
+            el.innerHTML = type === "success" ? `✅ ${msg}` : `⚠️ ${msg}`;
+            container.appendChild(el);
+            requestAnimationFrame(() => el.classList.add("visible"));
+            setTimeout(() => { el.classList.remove("visible"); setTimeout(() => el.remove(), 200); }, 3000);
+        }
+
         function sendTelegramMessage(text) {
             const url = "https://sendtelegram-jd4jwaesba-uc.a.run.app";
             fetch(url, {
@@ -724,561 +824,455 @@ const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
             }).catch(err => console.error("Error Telegram", err));
         }
 
-// Cargar datos desde Firestore
-async function loadDataFromFirestore() {
-    if (!currentUser) return;
-
-    try {
-        const userDoc = await db.collection("users").doc(currentUser.uid).get();
-        if (userDoc.exists) {
-            currentUserData = userDoc.data();
-            custodyData = currentUserData.custodyData || {};
-            pendingRequests = currentUserData.pendingRequests || [];
-            renderCalendar();
+        function formatearFecha(dateStr) {
+            if (!dateStr) return "";
+            const [y, m, d] = dateStr.split("-");
+            return `${d}/${m}/${y}`;
         }
-    } catch (error) {
-        console.error("Error loading data:", error);
-    }
-}
 
-// Guardar datos en Firestore
-async function saveDataToFirestore() {
-    if (!currentUser) return;
-
-    try {
-        await db.collection("users").doc(currentUser.uid).update({
-            custodyData: custodyData,
-            pendingRequests: pendingRequests,
-            lastModified: firebase.firestore.FieldValue.serverTimestamp()
-        });
-    } catch (error) {
-        console.error("Error saving data:", error);
-    }
-}
-
-// NAVEGACIÓN ENTRE VISTAS
-function switchView(viewName) {
-    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-
-    if (viewName === 'home') {
-        document.getElementById('homeView').classList.add('active');
-        document.querySelectorAll('.nav-item')[0].classList.add('active');
-    } else if (viewName === 'requests') {
-        document.getElementById('requestsView').classList.add('active');
-        document.querySelectorAll('.nav-item')[1].classList.add('active');
-        renderRequests();
-    } else if (viewName === 'events') {
-        document.getElementById('eventsView').classList.add('active');
-        document.querySelectorAll('.nav-item')[2].classList.add('active');
-        renderEvents();
-    }
-}
-
-// RENDERIZAR SOLICITUDES
-function renderRequests() {
-    const requestsList = document.getElementById('requestsList');
-    const requests = pendingRequests;
-
-    if (requests.length === 0) {
-        requestsList.innerHTML = `
-            <div class="no-requests">
-                <i data-lucide="inbox"></i>
-                <p>No hay solicitudes pendientes</p>
-            </div>
-        `;
-        lucide.createIcons();
-        return;
-    }
-
-    requestsList.innerHTML = requests.map((req, index) => {
-        const isOwnRequest = req.requestedBy === currentRole;
-        const date = new Date(req.year, req.month, req.day);
-        const dateStr = `${req.day} de ${monthNames[req.month]} ${req.year}`;
-
-        let statusBadge = '';
-        let actions = '';
-
-        if (req.status === 'pending') {
-            statusBadge = '<span class="request-status pending">Pendiente</span>';
-
-            if (isOwnRequest) {
-                actions = `
-                    <div class="request-actions">
-                        <button class="request-btn cancel" onclick="cancelRequest(${index})">
-                            <i data-lucide="x"></i>
-                            Cancelar
-                        </button>
-                    </div>
-                `;
+        // AUTH LOGIC
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                currentUser = user;
+                try {
+                    const snap = await db.collection("users").doc(user.uid).get();
+                    if (snap.exists) {
+                        const data = snap.data();
+                        currentRole = data.role || "madre";
+                        currentChildName = data.childName || "";
+                        loadApp();
+                    } else {
+                        document.getElementById("login-view").classList.add("hidden");
+                        document.getElementById("onboarding-modal").classList.add("open");
+                    }
+                } catch (err) { console.error(err); }
             } else {
-                actions = `
-                    <div class="request-actions">
-                        <button class="request-btn accept" onclick="acceptRequest(${index})">
-                            <i data-lucide="check"></i>
-                            Aceptar
-                        </button>
-                        <button class="request-btn reject" onclick="rejectRequest(${index})">
-                            <i data-lucide="x"></i>
-                            Rechazar
-                        </button>
-                    </div>
-                `;
+                currentUser = null;
+                currentRole = null;
+                document.getElementById("login-view").classList.remove("hidden");
+                document.getElementById("app-root").classList.add("hidden");
+                document.getElementById("onboarding-modal").classList.remove("open");
             }
-        } else if (req.status === 'accepted') {
-            statusBadge = '<span class="request-status accepted">Aceptada</span>';
-        } else if (req.status === 'rejected') {
-            statusBadge = '<span class="request-status rejected">Rechazada</span>';
-        }
+        });
 
-        return `
-            <div class="request-card">
-                <div class="request-header">
-                    <div class="request-date">${dateStr}</div>
-                    ${statusBadge}
-                </div>
-                <div class="request-info">
-                    <div class="request-info-item">
-                        <i data-lucide="user"></i>
-                        <span>Solicitado por: <strong>${req.requestedBy === 'father' ? 'Padre' : 'Madre'}</strong></span>
-                    </div>
-                    <div class="request-info-item">
-                        <i data-lucide="arrow-right"></i>
-                        <span>Custodio propuesto: <strong>${req.proposedCustodian === 'father' ? 'Padre' : 'Madre'}</strong></span>
-                    </div>
-                </div>
-                ${actions}
-            </div>
-        `;
-    }).join('');
+        document.getElementById("toggle-auth-mode").onclick = function() {
+            isRegistering = !isRegistering;
+            this.textContent = isRegistering ? "¿Ya tienes cuenta? Entra aquí" : "¿No tienes cuenta? Regístrate";
+            document.getElementById("login-submit-btn").textContent = isRegistering ? "Crear cuenta" : "Entrar";
+            document.getElementById("login-error-msg").textContent = "";
+        };
 
-    lucide.createIcons();
-}
+        document.getElementById("login-form").addEventListener("submit", (e) => {
+            e.preventDefault();
+            const email = document.getElementById("login-email").value;
+            const pass = document.getElementById("login-password").value;
+            const errorMsg = document.getElementById("login-error-msg");
+            errorMsg.textContent = "Procesando...";
 
-// ACEPTAR SOLICITUD
-async function acceptRequest(index) {
-    const req = pendingRequests[index];
-    req.status = 'accepted';
-
-    const key = `${req.year}-${req.month}-${req.day}`;
-    custodyData[key] = req.proposedCustodian;
-
-    await saveDataToFirestore();
-
-    // Notificación Telegram
-    const dateStr = `${req.day}/${req.month + 1}/${req.year}`;
-    sendTelegramMessage(`✅ Solicitud ACEPTADA: ${dateStr} - Custodio: ${req.proposedCustodian === 'father' ? 'Padre' : 'Madre'}`);
-
-    showToast('✅ Solicitud aceptada', 'success');
-    renderRequests();
-    renderCalendar();
-}
-
-// RECHAZAR SOLICITUD
-async function rejectRequest(index) {
-    const req = pendingRequests[index];
-    req.status = 'rejected';
-
-    await saveDataToFirestore();
-
-    // Notificación Telegram
-    const dateStr = `${req.day}/${req.month + 1}/${req.year}`;
-    sendTelegramMessage(`❌ Solicitud RECHAZADA: ${dateStr}`);
-
-    showToast('❌ Solicitud rechazada', 'error');
-    renderRequests();
-}
-
-// CANCELAR SOLICITUD
-async function cancelRequest(index) {
-    const req = pendingRequests[index];
-    const dateStr = `${req.day}/${req.month + 1}/${req.year}`;
-
-    pendingRequests.splice(index, 1);
-    await saveDataToFirestore();
-
-    sendTelegramMessage(`🗑️ Solicitud CANCELADA: ${dateStr}`);
-
-    showToast('🗑️ Solicitud cancelada', 'info');
-    renderRequests();
-    renderCalendar();
-}
-
-// RENDERIZAR EVENTOS
-function renderEvents() {
-    const eventsList = document.getElementById('eventsList');
-
-    const events = [];
-    for (const [key, custodian] of Object.entries(custodyData)) {
-        const [year, month, day] = key.split('-').map(Number);
-        events.push({ year, month, day, custodian });
-    }
-
-    events.sort((a, b) => {
-        const dateA = new Date(a.year, a.month, a.day);
-        const dateB = new Date(b.year, b.month, b.day);
-        return dateA - dateB;
-    });
-
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const futureEvents = events.filter(e => {
-        const eventDate = new Date(e.year, e.month, e.day);
-        return eventDate >= today;
-    });
-
-    if (futureEvents.length === 0) {
-        eventsList.innerHTML = `
-            <div class="no-events">
-                <i data-lucide="calendar-x"></i>
-                <p>No hay eventos programados</p>
-            </div>
-        `;
-        lucide.createIcons();
-        return;
-    }
-
-    eventsList.innerHTML = futureEvents.map(event => {
-        const date = new Date(event.year, event.month, event.day);
-        const dateStr = `${event.day} de ${monthNames[event.month]} ${event.year}`;
-        const dayName = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'][date.getDay()];
-        const custodianLabel = event.custodian === 'father' ? 'Padre' : 'Madre';
-        const custodianClass = event.custodian === 'father' ? 'father' : 'mother';
-
-        const isToday = date.getTime() === today.getTime();
-        const todayBadge = isToday ? '<span style="margin-left: 8px; color: #fbbf24; font-size: 12px;">● HOY</span>' : '';
-
-        return `
-            <div class="event-card ${custodianClass}-event" onclick="openDayFromList(${event.year}, ${event.month}, ${event.day})">
-                <div class="event-card-header">
-                    <div class="event-date-display">${dateStr}${todayBadge}</div>
-                    <div class="event-custodian ${custodianClass}">${custodianLabel}</div>
-                </div>
-                <div class="event-details">
-                    <div class="event-detail-item">
-                        <i data-lucide="calendar"></i>
-                        <span>${dayName}</span>
-                    </div>
-                </div>
-            </div>
-        `;
-    }).join('');
-
-    lucide.createIcons();
-}
-
-// ABRIR DÍA DESDE LA LISTA DE EVENTOS
-function openDayFromList(year, month, day) {
-    currentYear = year;
-    currentMonth = month;
-    switchView('home');
-    renderCalendar();
-    setTimeout(() => openDay(day), 300);
-}
-
-// CAMBIAR ROL
-function switchRole(role) {
-    currentRole = role;
-    document.querySelectorAll('.role-btn').forEach(btn => btn.classList.remove('active'));
-    document.querySelector(`.role-btn.${role}`).classList.add('active');
-    renderCalendar();
-
-    const currentView = document.querySelector('.view.active').id;
-    if (currentView === 'requestsView') renderRequests();
-    if (currentView === 'eventsView') renderEvents();
-}
-
-// RENDERIZAR CALENDARIO
-function renderCalendar() {
-    const grid = document.getElementById('calendarGrid');
-    grid.classList.add('fading');
-
-    setTimeout(() => {
-        const firstDay = new Date(currentYear, currentMonth, 1).getDay();
-        const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-        const adjustedFirstDay = (firstDay === 0) ? 6 : firstDay - 1;
-
-        let html = '';
-        for (let i = 0; i < adjustedFirstDay; i++) {
-            html += '<div class="day-cell empty"></div>';
-        }
-
-        const today = new Date();
-        for (let day = 1; day <= daysInMonth; day++) {
-            const key = `${currentYear}-${currentMonth}-${day}`;
-            const custodian = custodyData[key];
-            const pendingReq = pendingRequests.find(r => r.year === currentYear && r.month === currentMonth && r.day === day && r.status === 'pending');
-
-            let classes = 'day-cell';
-            if (custodian === 'father') classes += ' father';
-            if (custodian === 'mother') classes += ' mother';
-            if (pendingReq) classes += ` pending-${pendingReq.proposedCustodian}`;
-            if (today.getDate() === day && today.getMonth() === currentMonth && today.getFullYear() === currentYear) {
-                classes += ' today';
+            if(isRegistering) {
+                auth.createUserWithEmailAndPassword(email, pass)
+                    .catch(err => errorMsg.textContent = "Error: " + err.message);
+            } else {
+                auth.signInWithEmailAndPassword(email, pass)
+                    .catch(err => errorMsg.textContent = "Credenciales incorrectas o usuario no encontrado.");
             }
+        });
 
-            html += `
-                <div class="${classes}" onclick="openDay(${day})">
-                    <span class="day-number">${day}</span>
-                    ${custodian ? '<div class="day-dot"></div>' : ''}
-                </div>
-            `;
+        document.getElementById("onboarding-form").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const role = document.getElementById("onboard-role").value;
+            const childName = document.getElementById("onboard-child-name").value.trim();
+            if (!role || !childName) return showToast("Completa los datos", "error");
+            try {
+                await db.collection("users").doc(currentUser.uid).set({
+                    email: currentUser.email, role: role, childName: childName,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                currentRole = role;
+                currentChildName = childName;
+                document.getElementById("onboarding-modal").classList.remove("open");
+                loadApp();
+            } catch (err) { showToast("Error guardando perfil", "error"); }
+        });
+
+        function loadApp() {
+            const roleLabel = document.getElementById("user-role-label");
+            roleLabel.textContent = currentRole.toUpperCase();
+            roleLabel.className = "";
+            roleLabel.classList.add(currentRole);
+            document.getElementById("whoami-label").textContent = currentRole.toUpperCase();
+            if(currentChildName) document.getElementById("child-name-display").textContent = "Calendario de " + currentChildName;
+
+            document.getElementById("login-view").classList.add("hidden");
+            document.getElementById("app-root").classList.remove("hidden");
+
+            initDataListeners();
+            initSwipeListeners();
         }
 
-        grid.innerHTML = html;
-        grid.classList.remove('fading');
-        document.getElementById('monthYear').textContent = `${monthNames[currentMonth]} ${currentYear}`;
+        function getBaseOwner(year, monthIndex, day) {
+            const date = new Date(year, monthIndex, day, 12, 0, 0);
+            const diffMs = date - BASE_MONDAY;
+            const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
+            const weekIndex = Math.floor(diffDays / 7);
+            return Math.abs(weekIndex % 2) === 0 ? "padre" : "madre";
+        }
 
-        setTimeout(() => {
-            document.querySelectorAll('.day-cell').forEach((cell, i) => {
-                setTimeout(() => cell.classList.add('animated'), i * 15);
+        function renderCalendar() {
+            const grid = document.getElementById("calendar-grid");
+            const titleEl = document.getElementById("calendar-title");
+            if (!grid) return;
+            grid.classList.add("fading");
+            setTimeout(() => {
+                grid.innerHTML = "";
+                titleEl.textContent = `${monthNames[currentMonth]} ${currentYear}`;
+                const table = document.createElement("table");
+                table.className = "month-table";
+                const thead = document.createElement("thead");
+                const trHead = document.createElement("tr");
+                weekDayNames.forEach(d => {
+                    const th = document.createElement("th");
+                    th.textContent = d;
+                    trHead.appendChild(th);
+                });
+                thead.appendChild(trHead);
+                table.appendChild(thead);
+
+                const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+                const firstDayInstance = new Date(currentYear, currentMonth, 1);
+                let startDay = firstDayInstance.getDay() === 0 ? 6 : firstDayInstance.getDay() - 1;
+                const tbody = document.createElement("tbody");
+                let dayCounter = 1, finished = false;
+                const todayKey = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}-${String(now.getDate()).padStart(2,"0")}`;
+
+                while (!finished) {
+                    const tr = document.createElement("tr");
+                    for (let i = 0; i < 7; i++) {
+                        const td = document.createElement("td");
+                        if (dayCounter <= daysInMonth && (dayCounter > 1 || i >= startDay)) {
+                            const dateKey = `${currentYear}-${String(currentMonth+1).padStart(2,"0")}-${String(dayCounter).padStart(2,"0")}`;
+                            const finalOwner = overrides[dateKey] || getBaseOwner(currentYear, currentMonth, dayCounter);
+
+                            td.className = `day-cell day-${finalOwner}`;
+                            if (overrides[dateKey]) td.classList.add("day-overridden");
+                            if (dateKey === todayKey) td.style.borderColor = "#f97316";
+
+                            td.onclick = () => openDayModal(dateKey, finalOwner);
+
+                            td.innerHTML = `<span class="day-number">${dayCounter}</span>
+                                            <img class="owner-icon-img" src="assets/${finalOwner}.png" onerror="this.style.display='none'">`;
+
+                            (eventsData[dateKey] || []).slice(0,3).forEach((evt, idx) => {
+                                const colorClass = `evt-${evt.type}`;
+                                td.innerHTML += `<div class="event-marker ${colorClass} pos-${idx}">
+                                    <i data-lucide="${ICON_MAP[evt.type]||'star'}" style="width:12px;"></i>
+                                </div>`;
+                            });
+                            dayCounter++;
+                        } else {
+                            td.style.pointerEvents = "none";
+                            td.style.background = "transparent";
+                            td.style.border = "none";
+                        }
+                        tr.appendChild(td);
+                    }
+                    tbody.appendChild(tr);
+                    if (dayCounter > daysInMonth) finished = true;
+                }
+                table.appendChild(tbody);
+                grid.appendChild(table);
+                lucide.createIcons();
+                grid.classList.remove("fading");
+            }, 150);
+        }
+
+        function initSwipeListeners() {
+            const grid = document.getElementById("calendar-grid");
+            grid.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, {passive: true});
+            grid.addEventListener('touchend', e => {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipeGesture();
+            }, {passive: true});
+        }
+
+        function handleSwipeGesture() {
+            const distance = touchEndX - touchStartX;
+            if (Math.abs(distance) > 50) {
+                if (distance < 0) document.getElementById("next-period").click();
+                else document.getElementById("prev-period").click();
+            }
+        }
+
+        function initDataListeners() {
+            if (listenersAttached) return;
+            listenersAttached = true;
+
+            // CARGAR OVERRIDES (cambios de custodia) desde Firebase
+            db.collection("overrides").onSnapshot(snap => {
+                overrides = {};
+                snap.forEach(doc => overrides[doc.id] = doc.data().owner);
+                renderCalendar();
             });
-        }, 50);
-    }, 200);
 
-    lucide.createIcons();
-}
+            // CARGAR EVENTOS desde Firebase
+            db.collection("events").onSnapshot(snap => {
+                eventsData = {};
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    if (!eventsData[d.date]) eventsData[d.date] = [];
+                    eventsData[d.date].push({ id: doc.id, ...d });
+                });
+                renderCalendar();
+                renderEventsView();
+            });
 
-// ABRIR DÍA
-function openDay(day) {
-    const key = `${currentYear}-${currentMonth}-${day}`;
-    const custodian = custodyData[key];
-    const pendingReq = pendingRequests.find(r => r.year === currentYear && r.month === currentMonth && r.day === day && r.status === 'pending');
+            // CARGAR SOLICITUDES desde Firebase
+            db.collection("requests").orderBy("createdAt", "desc").onSnapshot(snap => {
+                pendingRequests = [];
+                const listEl = document.getElementById("pending-requests");
+                listEl.innerHTML = "";
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    if(d.status === "pendiente") pendingRequests.push({id:doc.id, ...d});
+                });
+                if(pendingRequests.length === 0) {
+                    listEl.innerHTML = "<div style='text-align:center;color:#64748b;font-size:0.85rem;padding:20px;'>Sin cambios pendientes</div>";
+                } else {
+                    pendingRequests.forEach(req => {
+                        const isMyReq = req.requesterRole === currentRole;
+                        const actions = !isMyReq ? `<div style="display:flex; gap:6px; margin-top:10px;">
+                            <button onclick="processRequest('${req.id}','aceptado','${req.requesterRole}','${req.startDate}','${req.endDate}')" style="flex:1;background:#22c55e;border:none;border-radius:10px;padding:10px;color:white;font-weight:700;cursor:pointer;">✅ ACEPTAR</button>
+                            <button onclick="processRequest('${req.id}','rechazado')" style="flex:1;background:#ef4444;border:none;border-radius:10px;padding:10px;color:white;font-weight:700;cursor:pointer;">❌ RECHAZAR</button></div>`
+                            : `<div style="font-style:italic;color:#9ca3af;font-size:0.75rem;margin-top:8px;">⏳ Esperando respuesta...</div>`;
 
-    const dateStr = `${day} de ${monthNames[currentMonth]} ${currentYear}`;
-    const canModify = !pendingReq || pendingReq.requestedBy === currentRole;
+                        listEl.innerHTML += `<div class="request-item">
+                            <div style="font-weight:700;display:flex;justify-content:space-between;margin-bottom:8px;">
+                                <span style="color:#e5e7eb;">${req.requesterRole.toUpperCase()}</span>
+                                <span style="color:#38bdf8;font-size:0.9rem;">${formatearFecha(req.startDate)} - ${formatearFecha(req.endDate)}</span>
+                            </div>
+                            <div style="color:#cbd5e1;font-size:0.9rem;margin-bottom:8px;">${req.reason}</div>
+                            ${actions}
+                        </div>`;
+                    });
+                }
+            });
 
-    let modalHTML = `
-        <div class="modal-header">
-            <div class="modal-title">
-                <i data-lucide="calendar-days"></i>
-                ${dateStr}
-            </div>
-            <button class="close-btn" onclick="closeModal()"><i data-lucide="x"></i></button>
-        </div>
-    `;
-
-    if (pendingReq) {
-        modalHTML += `
-            <div class="event-info" style="background: rgba(251, 191, 36, 0.15); border-color: rgba(251, 191, 36, 0.3);">
-                <p><strong>⏳ Solicitud pendiente</strong></p>
-                <p>Solicitado por: <strong>${pendingReq.requestedBy === 'father' ? 'Padre' : 'Madre'}</strong></p>
-                <p>Custodio propuesto: <strong>${pendingReq.proposedCustodian === 'father' ? 'Padre' : 'Madre'}</strong></p>
-            </div>
-        `;
-
-        if (pendingReq.requestedBy !== currentRole) {
-            modalHTML += `
-                <div class="action-buttons">
-                    <button class="btn btn-primary" onclick="acceptRequestFromModal('${key}')">
-                        <i data-lucide="check"></i> Aceptar
-                    </button>
-                    <button class="btn btn-danger" onclick="rejectRequestFromModal('${key}')">
-                        <i data-lucide="x"></i> Rechazar
-                    </button>
-                </div>
-            `;
-        } else {
-            modalHTML += `
-                <div class="action-buttons">
-                    <button class="btn btn-secondary" onclick="cancelRequestFromModal('${key}')">
-                        <i data-lucide="trash-2"></i> Cancelar solicitud
-                    </button>
-                </div>
-            `;
+            lucide.createIcons();
         }
-    } else if (custodian) {
-        modalHTML += `
-            <div class="event-info">
-                <p><i data-lucide="user"></i> <strong>Custodio:</strong> ${custodian === 'father' ? 'Padre 👨' : 'Madre 👩'}</p>
-            </div>
-        `;
 
-        if (canModify) {
-            modalHTML += `
-                <div class="form-group">
-                    <label>Cambiar custodio</label>
-                    <select id="custodianSelect">
-                        <option value="father" ${custodian === 'father' ? 'selected' : ''}>👨 Padre</option>
-                        <option value="mother" ${custodian === 'mother' ? 'selected' : ''}>👩 Madre</option>
-                    </select>
-                </div>
-                <div class="action-buttons">
-                    <button class="btn btn-primary" onclick="requestCustodyChange('${key}')">
-                        <i data-lucide="send"></i> Solicitar cambio
-                    </button>
-                    <button class="btn btn-danger" onclick="deleteCustody('${key}')">
-                        <i data-lucide="trash-2"></i> Eliminar
-                    </button>
-                </div>
-            `;
+        window.processRequest = async (id, status, role, start, end) => {
+            const batch = db.batch();
+            batch.update(db.collection("requests").doc(id), { status });
+            if (status === "aceptado") {
+                for (let d = new Date(start); d <= new Date(end); d.setDate(d.getDate() + 1)) {
+                    batch.set(db.collection("overrides").doc(d.toISOString().split("T")[0]), { owner: role });
+                }
+            }
+            await batch.commit();
+            showToast(`Solicitud ${status}`);
+
+            const icon = status === "aceptado" ? "✅" : "❌";
+            const responder = currentRole === "madre" ? "Madre" : "Padre";
+            sendTelegramMessage(`${icon} Solicitud ${status.toUpperCase()} por ${responder}.`);
+        };
+
+        function openDayModal(date, owner) {
+            selectedDateKey = date;
+            document.getElementById("day-modal").classList.add("open");
+            document.getElementById("modal-date-title").textContent = date.split("-").reverse().join("/");
+            document.getElementById("modal-custody-img").src = `assets/${owner}.png`;
+            document.getElementById("modal-custody-text").textContent = owner.toUpperCase();
+            renderModalEvents();
         }
-    } else {
-        modalHTML += `
-            <div class="form-group">
-                <label>Asignar custodio</label>
-                <select id="custodianSelect">
-                    <option value="">Seleccionar...</option>
-                    <option value="father">👨 Padre</option>
-                    <option value="mother">👩 Madre</option>
-                </select>
-            </div>
-            <div class="action-buttons">
-                <button class="btn btn-primary" onclick="assignCustody('${key}')">
-                    <i data-lucide="check"></i> Asignar
-                </button>
-                <button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
-            </div>
-        `;
-    }
 
-    document.getElementById('modalContent').innerHTML = modalHTML;
-    document.getElementById('modalOverlay').classList.remove('hidden');
-    lucide.createIcons();
-}
+        function closeModal() {
+            document.getElementById("day-modal").classList.remove("open");
+        }
 
-// ASIGNAR CUSTODIA
-async function assignCustody(key) {
-    const select = document.getElementById('custodianSelect');
-    if (!select.value) {
-        showToast('⚠️ Selecciona un custodio', 'warning');
-        return;
-    }
-    custodyData[key] = select.value;
-    await saveDataToFirestore();
+        function selectIcon(t,b) {
+            selectedIconType=t;
+            document.querySelectorAll(".icon-btn").forEach(x=>x.classList.remove("selected"));
+            b.classList.add("selected");
+        }
 
-    const [year, month, day] = key.split('-');
-    sendTelegramMessage(`📅 Custodia asignada: ${day}/${parseInt(month) + 1}/${year} - ${select.value === 'father' ? 'Padre' : 'Madre'}`);
+        async function saveEvent() {
+            const title = document.getElementById("event-title").value;
+            if(!title) return;
+            await db.collection("events").add({
+                date:selectedDateKey,
+                title,
+                type:selectedIconType,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            document.getElementById("event-title").value = "";
+            closeModal();
+            showToast("Evento guardado");
+        }
 
-    showToast('✅ Custodia asignada', 'success');
-    closeModal();
-    renderCalendar();
-}
+        async function deleteEvent(id) {
+            await db.collection("events").doc(id).delete();
+            renderModalEvents();
+        }
 
-// SOLICITAR CAMBIO DE CUSTODIA
-async function requestCustodyChange(key) {
-    const select = document.getElementById('custodianSelect');
-    const [year, month, day] = key.split('-').map(Number);
+        function renderModalEvents() {
+            const list = document.getElementById("modal-event-list");
+            list.innerHTML = "";
+            (eventsData[selectedDateKey]||[]).forEach(e => {
+                list.innerHTML += `<div class="request-item" style="display:flex;justify-content:space-between;align-items:center;">
+                    <div style="display:flex;gap:8px;align-items:center;">
+                        <div style="width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;color:white;" class="evt-${e.type}">
+                            <i data-lucide="${ICON_MAP[e.type]}" style="width:14px;"></i>
+                        </div>
+                        <span style="color:#e5e7eb;">${e.title}</span>
+                    </div>
+                    <button onclick="deleteEvent('${e.id}')" style="background:none;border:none;color:#f87171;cursor:pointer;font-size:24px;">×</button>
+                </div>`;
+            });
+            lucide.createIcons();
+        }
 
-    pendingRequests.push({
-        year, month, day,
-        requestedBy: currentRole,
-        proposedCustodian: select.value,
-        status: 'pending'
-    });
+        // NAVEGACIÓN ENTRE VISTAS
+        function switchView(viewName) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
 
-    await saveDataToFirestore();
+            if (viewName === 'home') {
+                document.getElementById('homeView').classList.add('active');
+                document.querySelectorAll('.nav-item')[0].classList.add('active');
+            } else if (viewName === 'requests') {
+                document.getElementById('requestsView').classList.add('active');
+                document.querySelectorAll('.nav-item')[1].classList.add('active');
+            } else if (viewName === 'events') {
+                document.getElementById('eventsView').classList.add('active');
+                document.querySelectorAll('.nav-item')[2].classList.add('active');
+                renderEventsView();
+            }
+        }
 
-    sendTelegramMessage(`📤 Nueva solicitud: ${day}/${month + 1}/${year} - Propuesto: ${select.value === 'father' ? 'Padre' : 'Madre'}`);
+        // RENDERIZAR VISTA DE EVENTOS
+        function renderEventsView() {
+            const eventsList = document.getElementById("events-list");
+            if (!eventsList) return;
 
-    showToast('📤 Solicitud enviada', 'info');
-    closeModal();
-    renderCalendar();
-}
+            // Agrupar eventos por fecha
+            const allEvents = [];
+            for (const [dateKey, events] of Object.entries(eventsData)) {
+                events.forEach(evt => {
+                    allEvents.push({
+                        date: dateKey,
+                        ...evt
+                    });
+                });
+            }
 
-// ACEPTAR/RECHAZAR/CANCELAR DESDE MODAL
-function acceptRequestFromModal(key) {
-    const [year, month, day] = key.split('-').map(Number);
-    const index = pendingRequests.findIndex(r => r.year === year && r.month === month && r.day === day && r.status === 'pending');
-    if (index !== -1) acceptRequest(index);
-    closeModal();
-}
+            // Ordenar por fecha
+            allEvents.sort((a, b) => new Date(a.date) - new Date(b.date));
 
-function rejectRequestFromModal(key) {
-    const [year, month, day] = key.split('-').map(Number);
-    const index = pendingRequests.findIndex(r => r.year === year && r.month === month && r.day === day && r.status === 'pending');
-    if (index !== -1) rejectRequest(index);
-    closeModal();
-}
+            if (allEvents.length === 0) {
+                eventsList.innerHTML = `<div style="text-align:center;padding:60px 20px;color:rgba(255,255,255,0.5);">
+                    <i data-lucide="calendar-x" style="width:64px;height:64px;margin-bottom:16px;opacity:0.3;"></i>
+                    <p style="font-size:16px;">No hay eventos programados</p>
+                </div>`;
+                lucide.createIcons();
+                return;
+            }
 
-function cancelRequestFromModal(key) {
-    const [year, month, day] = key.split('-').map(Number);
-    const index = pendingRequests.findIndex(r => r.year === year && r.month === month && r.day === day && r.status === 'pending');
-    if (index !== -1) cancelRequest(index);
-    closeModal();
-}
+            eventsList.innerHTML = allEvents.map(evt => {
+                const [year, month, day] = evt.date.split('-');
+                const dateObj = new Date(parseInt(year), parseInt(month)-1, parseInt(day));
+                const owner = overrides[evt.date] || getBaseOwner(parseInt(year), parseInt(month)-1, parseInt(day));
+                const dateStr = `${day}/${month}/${year}`;
+                const dayName = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'][dateObj.getDay()];
 
-// ELIMINAR CUSTODIA
-async function deleteCustody(key) {
-    delete custodyData[key];
-    await saveDataToFirestore();
+                return `<div class="event-card ${owner}-event" onclick="goToDateAndOpen('${evt.date}')">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                        <div>
+                            <div style="font-weight:700;color:#e5e7eb;font-size:16px;">${dateStr}</div>
+                            <div style="font-size:13px;color:#9ca3af;">${dayName}</div>
+                        </div>
+                        <div style="padding:4px 12px;border-radius:12px;font-size:11px;font-weight:700;text-transform:uppercase;
+                            ${owner === 'padre' ? 'background:rgba(14,165,233,0.2);color:#0ea5e9;border:1px solid rgba(14,165,233,0.3);' : 
+                                'background:rgba(244,114,182,0.2);color:#f472b6;border:1px solid rgba(244,114,182,0.3);'}">
+                            ${owner}
+                        </div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <div style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;" class="evt-${evt.type}">
+                            <i data-lucide="${ICON_MAP[evt.type]}" style="width:16px;"></i>
+                        </div>
+                        <span style="color:#e5e7eb;font-weight:500;">${evt.title}</span>
+                    </div>
+                </div>`;
+            }).join('');
 
-    const [year, month, day] = key.split('-');
-    sendTelegramMessage(`🗑️ Custodia eliminada: ${day}/${parseInt(month) + 1}/${year}`);
+            lucide.createIcons();
+        }
 
-    showToast('🗑️ Custodia eliminada', 'info');
-    closeModal();
-    renderCalendar();
-}
+        function goToDateAndOpen(dateKey) {
+            const [year, month, day] = dateKey.split('-').map(Number);
+            currentYear = year;
+            currentMonth = month - 1;
+            switchView('home');
+            renderCalendar();
+            setTimeout(() => {
+                const owner = overrides[dateKey] || getBaseOwner(year, month - 1, day);
+                openDayModal(dateKey, owner);
+            }, 300);
+        }
 
-// CERRAR MODAL
-function closeModal(event) {
-    if (!event || event.target.id === 'modalOverlay') {
-        document.getElementById('modalOverlay').classList.add('hidden');
-    }
-}
+        document.getElementById("logout-btn").onclick = () => {
+            listenersAttached=false;
+            auth.signOut();
+        };
 
-// TOAST
-function showToast(message, type = 'info') {
-    const container = document.getElementById('toastContainer');
-    const iconMap = {
-        success: 'check-circle',
-        error: 'x-circle',
-        warning: 'alert-circle',
-        info: 'info'
-    };
+        document.getElementById("prev-period").onclick = () => {
+            if(--currentMonth<0){currentMonth=11;currentYear--;}
+            renderCalendar();
+        };
 
-    const toast = document.createElement('div');
-    toast.className = 'toast';
-    toast.innerHTML = `
-        <div class="toast-icon"><i data-lucide="${iconMap[type]}"></i></div>
-        <div class="toast-content">${message}</div>
-    `;
-    container.appendChild(toast);
-    lucide.createIcons();
+        document.getElementById("next-period").onclick = () => {
+            if(++currentMonth>11){currentMonth=0;currentYear++;}
+            renderCalendar();
+        };
 
-    setTimeout(() => toast.remove(), 3000);
-}
+        document.getElementById("request-form").onsubmit = async (e) => {
+            e.preventDefault();
+            const startVal = document.getElementById("start-date").value;
+            const endVal = document.getElementById("end-date").value;
+            const reasonVal = document.getElementById("reason").value;
 
-// NAVEGACIÓN CALENDARIO
-function changeMonth(delta) {
-    currentMonth += delta;
-    if (currentMonth > 11) { currentMonth = 0; currentYear++; }
-    if (currentMonth < 0) { currentMonth = 11; currentYear--; }
-    renderCalendar();
-}
+            await db.collection("requests").add({
+                requesterUid: currentUser.uid,
+                requesterRole: currentRole,
+                startDate: startVal,
+                endDate: endVal,
+                reason: reasonVal,
+                status: "pendiente",
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            showToast("Solicitud enviada");
+            e.target.reset();
 
-function goToToday() {
-    const today = new Date();
-    currentMonth = today.getMonth();
-    currentYear = today.getFullYear();
-    renderCalendar();
-}
+            const quien = currentRole === "madre" ? "Madre" : "Padre";
+            sendTelegramMessage(`📅 NUEVA SOLICITUD de ${quien}:\nDesde: ${formatearFecha(startVal)}\nHasta: ${formatearFecha(endVal)}\nMotivo: ${reasonVal}`);
+        };
 
-// SWIPE
-const grid = document.getElementById('calendarGrid');
-grid.addEventListener('touchstart', e => { swipeStartX = e.changedTouches[0].screenX; }, {passive: true});
-grid.addEventListener('touchend', e => {
-    swipeEndX = e.changedTouches[0].screenX;
-    if (swipeStartX - swipeEndX > 50) changeMonth(1);
-    if (swipeEndX - swipeStartX > 50) changeMonth(-1);
-}, {passive: true});
-
-// AUTH
-auth.onAuthStateChanged(async (user) => {
-    if (user) {
-        currentUser = user;
-        await loadDataFromFirestore();
-    } else {
-        // Redirigir a login o crear usuario anónimo
-        await auth.signInAnonymously();
-    }
-});
-
-// INICIALIZAR
-lucide.createIcons();
-</script>
-
+        document.addEventListener("DOMContentLoaded", () => {
+            const ys = document.getElementById("year-select");
+            [2025,2026,2027].forEach(y => {
+                const o = document.createElement("option");
+                o.value=y;
+                o.textContent=y;
+                if(y===currentYear)o.selected=true;
+                ys.appendChild(o);
+            });
+            ys.onchange = (e) => {
+                currentYear=parseInt(e.target.value);
+                renderCalendar();
+            };
+            renderCalendar();
+            lucide.createIcons();
+        });
+    </script>
 </body>
 </html>

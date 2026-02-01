@@ -1,60 +1,100 @@
 # 👨‍👩‍👧‍👦 Custodia Familiar
 
-Aplicación web progresiva (PWA) para la gestión y coordinación de la custodia compartida entre padres, con calendario interactivo, sistema de solicitudes y notificaciones en tiempo real.
+Aplicación web progresiva (PWA) para la gestión y coordinación de la custodia compartida entre padres. Sistema completo con calendario interactivo basado en semanas alternas, gestión de solicitudes de cambio, eventos programados y notificaciones en tiempo real.
 
-## ✨ Características
+## ✨ Características Principales
 
-### 📅 Calendario Interactivo
-- Vista mensual con navegación intuitiva
-- Visualización por roles (Padre/Madre) con código de colores
-- Indicador del día actual
-- Gestos swipe para cambiar de mes
-- Asignación rápida de días de custodia
+### 🔐 Sistema de Autenticación
+- **Login y Registro** con email y contraseña
+- **Onboarding inicial** para configurar perfil (rol: Padre/Madre y nombre del niño/a)
+- **Autenticación segura** con Firebase Authentication
+- **Sesiones persistentes** entre dispositivos
 
-### 📨 Sistema de Solicitudes
-- Envío de solicitudes de cambio de custodia
-- Vista centralizada de todas las solicitudes
-- Estados: Pendiente, Aceptada, Rechazada
-- Aceptar/Rechazar solicitudes de la otra parte
-- Cancelar solicitudes propias antes de ser procesadas
-- Notificaciones automáticas por Telegram
+### 📅 Calendario Inteligente
+- **Sistema de semanas alternas** automático desde el 5 de enero de 2026
+- **Visualización mensual** con código de colores por custodio
+- **Indicador del día actual** destacado
+- **Gestos swipe** para navegación rápida entre meses
+- **Overrides manuales** para modificar días específicos
+- **Eventos visuales** con iconos de categorías
 
-### 📋 Lista de Eventos
-- Vista cronológica de todos los días con custodia asignada
-- Filtrado automático de eventos futuros
-- Indicador visual del día actual
-- Navegación rápida desde la lista al calendario
+### 📨 Gestión de Solicitudes
+- **Envío de solicitudes** de cambio de custodia con rango de fechas
+- **Vista centralizada** de todas las solicitudes
+- **Estados**: Pendiente, Aceptada, Rechazada
+- **Acciones rápidas**: Aceptar/Rechazar solicitudes de la otra parte
+- **Notificaciones automáticas** por Telegram para cada acción
+- **Historial completo** de solicitudes
 
-### 🔔 Notificaciones
-- Integración con Telegram mediante Cloud Functions
-- Notificaciones instantáneas para:
-  - Nuevas solicitudes
-  - Solicitudes aceptadas/rechazadas
-  - Solicitudes canceladas
-  - Asignaciones y eliminaciones de custodia
+### 📋 Eventos Programados
+- **Lista cronológica** de todas las actividades del calendario
+- **8 categorías de eventos**: Médico, Dentista, Escuela, Deporte, Cumpleaños, Parque, General, Vacaciones
+- **Iconos visuales** en el calendario
+- **Navegación directa** desde la lista al día en el calendario
+- **Eliminar eventos** con un clic
 
-### 💾 Sincronización en la Nube
-- Base de datos en tiempo real con Firebase Firestore
-- Sincronización automática entre dispositivos
-- Autenticación anónima para acceso rápido
-- Persistencia de datos segura
+### 🔔 Notificaciones en Tiempo Real
+- **Integración con Telegram** mediante Cloud Functions
+- Notificaciones automáticas para:
+  - ✅ Nuevas solicitudes de cambio
+  - ✅ Solicitudes aceptadas o rechazadas
+  - ✅ Asignación de custodia
+  - ✅ Eventos importantes
 
-## 🚀 Tecnologías Utilizadas
+### 💾 Sincronización Automática
+- **Base de datos en tiempo real** con Firebase Firestore
+- **Sincronización instantánea** entre dispositivos
+- **Persistencia de datos** en la nube
+- **Sin pérdida de información**: Los datos existentes se conservan y cargan automáticamente
 
-- **HTML5 + CSS3**: Interfaz responsive y moderna
-- **JavaScript Vanilla**: Sin frameworks pesados
-- **Firebase Firestore**: Base de datos en tiempo real
-- **Firebase Auth**: Autenticación de usuarios
-- **Google Cloud Functions**: Backend serverless para Telegram
-- **Telegram Bot API**: Sistema de notificaciones
-- **Lucide Icons**: Iconografía moderna
-- **Google Fonts**: Tipografía (Google Sans + Inter)
+## 🚀 Tecnologías
+
+| Tecnología | Uso |
+|-----------|-----|
+| **HTML5 + CSS3** | Interfaz responsive y moderna |
+| **JavaScript Vanilla** | Sin dependencias pesadas |
+| **Firebase Firestore** | Base de datos NoSQL en tiempo real |
+| **Firebase Auth** | Autenticación de usuarios |
+| **Google Cloud Functions** | Backend serverless para Telegram |
+| **Telegram Bot API** | Sistema de notificaciones |
+| **Lucide Icons** | Iconografía moderna |
+| **Google Fonts** | Tipografía (Google Sans + Inter) |
+
+## 📦 Estructura de Datos en Firebase
+
+### Colecciones de Firestore
+
+```
+users/{userId}
+  ├── email: string
+  ├── role: "padre" | "madre"
+  ├── childName: string
+  └── createdAt: timestamp
+
+overrides/{YYYY-MM-DD}
+  └── owner: "padre" | "madre"
+
+events/{eventId}
+  ├── date: "YYYY-MM-DD"
+  ├── title: string
+  ├── type: "medico" | "dentista" | "escuela" | "deporte" | "cumple" | "parque" | "general" | "vacaciones"
+  └── createdAt: timestamp
+
+requests/{requestId}
+  ├── requesterUid: string
+  ├── requesterRole: "padre" | "madre"
+  ├── startDate: "YYYY-MM-DD"
+  ├── endDate: "YYYY-MM-DD"
+  ├── reason: string
+  ├── status: "pendiente" | "aceptado" | "rechazado"
+  └── createdAt: timestamp
+```
 
 ## ⚙️ Configuración
 
-### Firebase
+### 1. Firebase Setup
 
-El proyecto utiliza Firebase para la sincronización de datos. La configuración está en el archivo HTML:
+El proyecto ya está configurado con estas credenciales:
 
 ```javascript
 const firebaseConfig = {
@@ -67,58 +107,57 @@ const firebaseConfig = {
 };
 ```
 
-#### Configurar tu propio proyecto Firebase:
+#### Reglas de seguridad recomendadas para Firestore:
 
-1. Crea un proyecto en [Firebase Console](https://console.firebase.google.com/)
-2. Habilita **Firestore Database** en modo de prueba
-3. Habilita **Authentication** con el proveedor "Anónimo"
-4. Copia las credenciales de tu proyecto
-5. Reemplaza `firebaseConfig` en el archivo HTML con tus credenciales
+```javascript
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Usuarios solo pueden leer/escribir sus propios datos
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
 
-#### Estructura de datos en Firestore:
+    // Overrides y eventos compartidos
+    match /overrides/{document=**} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
 
+    match /events/{document=**} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+
+    // Solicitudes accesibles por todos los usuarios autenticados
+    match /requests/{document=**} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+  }
+}
 ```
-users/{userId}
-  ├── custodyData: {
-  │     "2026-1-15": "father",
-  │     "2026-1-16": "mother",
-  │     ...
-  │   }
-  ├── pendingRequests: [
-  │     {
-  │       year: 2026,
-  │       month: 1,
-  │       day: 20,
-  │       requestedBy: "father",
-  │       proposedCustodian: "mother",
-  │       status: "pending"
-  │     }
-  │   ]
-  └── lastModified: timestamp
-```
 
-### Telegram Bot
+### 2. Telegram Bot
 
-Las notificaciones se envían mediante una Cloud Function de Google Cloud.
-
-**URL del endpoint:**
+**URL de la Cloud Function actual:**
 ```
 https://sendtelegram-jd4jwaesba-uc.a.run.app
 ```
 
-#### Configurar tu propio bot de Telegram:
+#### Para configurar tu propio bot:
 
-1. Crea un bot con [@BotFather](https://t.me/botfather) en Telegram
+1. Crea un bot con [@BotFather](https://t.me/botfather)
 2. Obtén el token del bot
-3. Obtén tu Chat ID (puedes usar [@userinfobot](https://t.me/userinfobot))
-4. Crea una Cloud Function en Google Cloud:
+3. Obtén tu Chat ID usando [@userinfobot](https://t.me/userinfobot)
+4. Crea una Cloud Function en Google Cloud Platform:
 
 ```javascript
 const functions = require('@google-cloud/functions-framework');
 const fetch = require('node-fetch');
 
-const TELEGRAM_BOT_TOKEN = 'TU_BOT_TOKEN';
-const TELEGRAM_CHAT_ID = 'TU_CHAT_ID';
+const TELEGRAM_BOT_TOKEN = 'TU_BOT_TOKEN_AQUI';
+const TELEGRAM_CHAT_ID = 'TU_CHAT_ID_AQUI';
 
 functions.http('sendTelegram', async (req, res) => {
     res.set('Access-Control-Allow-Origin', '*');
@@ -130,7 +169,6 @@ functions.http('sendTelegram', async (req, res) => {
     }
 
     const { text } = req.body;
-
     const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
 
     try {
@@ -143,7 +181,6 @@ functions.http('sendTelegram', async (req, res) => {
                 parse_mode: 'HTML'
             })
         });
-
         res.status(200).send({ success: true });
     } catch (error) {
         res.status(500).send({ error: error.message });
@@ -151,119 +188,132 @@ functions.http('sendTelegram', async (req, res) => {
 });
 ```
 
-5. Despliega la función y actualiza la URL en el código HTML
+5. Despliega y actualiza la URL en el archivo HTML
 
-## 📦 Instalación
+## 🎯 Instalación y Uso
 
-### Opción 1: Uso directo
-1. Descarga el archivo `Custodia_Familiar_v2.html`
+### Instalación Rápida
+
+1. Descarga el archivo `Custodia_Familiar_Final.html`
 2. Ábrelo en tu navegador web
-3. ¡Listo! La aplicación funcionará inmediatamente
+3. Crea una cuenta o inicia sesión
+4. Configura tu perfil (Padre/Madre y nombre del niño/a)
+5. ¡Listo! Todos tus datos existentes se cargarán automáticamente
 
-### Opción 2: Configuración personalizada
-1. Clona este repositorio:
-   ```bash
-   git clone https://github.com/tu-usuario/custodia-familiar.git
-   cd custodia-familiar
-   ```
+### Uso de las 3 Vistas
 
-2. Configura Firebase (ver sección de configuración)
+#### 📅 Vista Calendario
+- **Ver custodia**: El calendario muestra automáticamente el patrón de semanas alternas
+- **Modificar días**: Haz clic en cualquier día para ver detalles y añadir eventos
+- **Navegación**: Usa las flechas o gestos swipe para cambiar de mes
+- **Eventos**: Los iconos de colores indican actividades programadas
 
-3. Configura Telegram Bot (opcional, ver sección de configuración)
+#### 📨 Vista Solicitudes
+- **Crear solicitud**: Rellena el formulario con fechas y motivo
+- **Gestionar solicitudes**: 
+  - Si eres el receptor → Acepta o rechaza
+  - Si eres el solicitante → Espera respuesta
+- **Historial**: Ve todas las solicitudes pendientes en tiempo real
 
-4. Abre el archivo HTML en tu navegador
-
-## 📱 Uso
-
-### Cambiar de Rol
-- Usa los botones en la cabecera para alternar entre **Padre** y **Madre**
-- Cada rol tiene una vista personalizada del calendario
-
-### Asignar Custodia
-1. Haz clic en un día vacío del calendario
-2. Selecciona el custodio (Padre o Madre)
-3. Confirma la asignación
-
-### Solicitar Cambios
-1. Haz clic en un día ya asignado
-2. Cambia el custodio en el selector
-3. Presiona "Solicitar cambio"
-4. La otra parte recibirá una notificación
-
-### Gestionar Solicitudes
-1. Ve a la pestaña "Solicitudes" en la navegación inferior
-2. Revisa las solicitudes pendientes
-3. **Si eres el receptor**: Acepta o rechaza
-4. **Si eres el solicitante**: Puedes cancelar antes de que sea procesada
-
-### Ver Eventos Programados
-1. Ve a la pestaña "Eventos"
-2. Visualiza todos los días de custodia confirmados
-3. Haz clic en cualquier evento para ir al calendario
+#### 📋 Vista Eventos
+- **Ver todos los eventos**: Lista ordenada cronológicamente
+- **Filtro automático**: Solo muestra eventos futuros y actuales
+- **Navegación rápida**: Haz clic en cualquier evento para ir a ese día en el calendario
 
 ## 🎨 Personalización
 
-### Colores
-Puedes personalizar los colores en las variables CSS al inicio del archivo:
+### Cambiar el patrón de semanas
 
-```css
-:root {
-    --father-primary: #0ea5e9;  /* Color del padre */
-    --mother-primary: #f472b6;  /* Color de la madre */
-    --text-main: #0f172a;       /* Color del texto */
-}
-```
-
-### Idioma
-Los textos están en español. Para cambiar el idioma, modifica:
-- Array `monthNames` para los nombres de meses
-- Array de días de la semana en `.weekdays`
-- Textos de botones y mensajes en el HTML
-
-## 🔒 Seguridad
-
-- La autenticación es anónima por defecto
-- Los datos se almacenan por usuario único
-- Firestore Rules recomendadas:
+Modifica la fecha base en el código:
 
 ```javascript
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-    }
-  }
-}
+const BASE_MONDAY = new Date(2026, 0, 5, 12, 0, 0); // 5 de enero de 2026
 ```
+
+### Añadir nuevas categorías de eventos
+
+1. Añade el tipo al objeto `ICON_MAP`:
+```javascript
+const ICON_MAP = {
+    medico: "stethoscope",
+    tuCategoria: "tu-icono-lucide"
+};
+```
+
+2. Añade el botón en el modal:
+```html
+<button class="icon-btn evt-tuCategoria" onclick="selectIcon('tuCategoria', this)">
+    <i data-lucide="tu-icono"></i>
+</button>
+```
+
+3. Añade el estilo CSS:
+```css
+.evt-tuCategoria { background: #tu-color; }
+```
+
+## 🔒 Seguridad y Privacidad
+
+- ✅ Autenticación requerida para todos los datos
+- ✅ Datos encriptados en tránsito (HTTPS)
+- ✅ Reglas de seguridad de Firestore configurables
+- ✅ Sin tracking de terceros
+- ✅ Datos almacenados en servidores de Google (Firebase)
+
+## 📱 Características Técnicas
+
+- **Responsive Design**: Funciona en móviles, tablets y escritorio
+- **PWA Ready**: Se puede instalar como aplicación
+- **Offline-first**: Datos cacheados localmente
+- **Real-time**: Actualizaciones instantáneas entre dispositivos
+- **Touch Gestures**: Swipe para navegación en móviles
+
+## 🐛 Solución de Problemas
+
+### No veo mis datos
+- Verifica que hayas iniciado sesión con la cuenta correcta
+- Revisa la consola del navegador (F12) para errores de Firebase
+- Asegúrate de tener conexión a internet
+
+### No llegan notificaciones de Telegram
+- Verifica que la URL de la Cloud Function sea correcta
+- Comprueba que el bot esté activo en Telegram
+- Revisa los logs de la Cloud Function en Google Cloud Console
+
+### Las solicitudes no se actualizan
+- Comprueba las reglas de seguridad de Firestore
+- Verifica que ambos usuarios tengan los permisos correctos
+- Refresca la página para forzar sincronización
 
 ## 📄 Licencia
 
-Este proyecto es de código abierto y está disponible bajo la licencia MIT.
+Este proyecto es de código abierto bajo licencia MIT.
 
 ## 🤝 Contribuciones
 
-Las contribuciones son bienvenidas. Por favor:
+¡Las contribuciones son bienvenidas!
 
-1. Haz fork del proyecto
-2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
-3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
-4. Push a la rama (`git push origin feature/AmazingFeature`)
+1. Fork el proyecto
+2. Crea tu rama de feature (`git checkout -b feature/MejoraNueva`)
+3. Commit tus cambios (`git commit -m 'Añadir nueva funcionalidad'`)
+4. Push a la rama (`git push origin feature/MejoraNueva`)
 5. Abre un Pull Request
 
 ## 📞 Soporte
 
-Si encuentras algún problema o tienes sugerencias:
-- Abre un [Issue](https://github.com/tu-usuario/custodia-familiar/issues)
-- Envía un Pull Request con mejoras
+- 🐛 **Issues**: [GitHub Issues](https://github.com/tu-usuario/custodia-familiar/issues)
+- 💬 **Preguntas**: Abre una discusión en GitHub
+- 📧 **Email**: Para consultas privadas
 
 ## ⭐ Agradecimientos
 
-- [Lucide Icons](https://lucide.dev/) por los iconos
-- [Firebase](https://firebase.google.com/) por la infraestructura backend
-- [Telegram](https://telegram.org/) por la API de mensajería
-- [Google Fonts](https://fonts.google.com/) por las tipografías
+- [Firebase](https://firebase.google.com/) - Backend y autenticación
+- [Lucide Icons](https://lucide.dev/) - Sistema de iconos
+- [Google Fonts](https://fonts.google.com/) - Tipografías
+- [Telegram](https://telegram.org/) - Sistema de notificaciones
 
 ---
 
 **Desarrollado con ❤️ para facilitar la coordinación familiar**
+
+*Última actualización: Febrero 2026*

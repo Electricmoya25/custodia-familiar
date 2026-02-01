@@ -13,7 +13,9 @@ Aplicación web progresiva (PWA) para la gestión y coordinación de la custodia
 ### 📅 Calendario Inteligente
 - **Sistema de semanas alternas** automático desde el 5 de enero de 2026
 - **Visualización mensual** con código de colores por custodio
-- **Indicador del día actual** destacado
+- **Iconos grandes sin fondo** de padre/madre (48px) para mejor visibilidad
+- **Calendario a pantalla completa** en móviles aprovechando todo el espacio
+- **Indicador del día actual** destacado en naranja
 - **Gestos swipe** para navegación rápida entre meses
 - **Overrides manuales** para modificar días específicos
 - **Eventos visuales** con iconos de categorías
@@ -56,6 +58,7 @@ Aplicación web progresiva (PWA) para la gestión y coordinación de la custodia
 - **Tarjetas blancas** con sombras sutiles
 - **Alta legibilidad** con contraste adecuado
 - **Completamente responsive** - se adapta perfectamente a móviles, tablets y escritorio
+- **Calendario a pantalla completa** en móviles para máxima usabilidad
 
 ## 🚀 Tecnologías
 
@@ -117,6 +120,24 @@ const firebaseConfig = {
 };
 ```
 
+### 2. Imágenes de Padre y Madre
+
+Para que los iconos se muestren correctamente, crea una carpeta `assets/` junto al archivo HTML con dos imágenes PNG transparentes:
+
+```
+📁 Proyecto/
+├── Custodia_Familiar_Fullscreen.html
+└── 📁 assets/
+    ├── padre.png (icono/emoji del padre - PNG transparente)
+    └── madre.png (icono/emoji de la madre - PNG transparente)
+```
+
+**Recomendaciones para las imágenes:**
+- Formato: PNG con transparencia
+- Tamaño recomendado: 256x256 px o superior
+- Sin fondo (transparente)
+- Pueden ser emojis, avatares o iconos personalizados
+
 #### Reglas de seguridad recomendadas para Firestore:
 
 ```javascript
@@ -150,7 +171,7 @@ service cloud.firestore {
 }
 ```
 
-### 2. Telegram Bot
+### 3. Telegram Bot
 
 **URL de la Cloud Function actual:**
 ```
@@ -206,20 +227,22 @@ functions.http('sendTelegram', async (req, res) => {
 
 ### Instalación Rápida
 
-1. Descarga el archivo `Custodia_Familiar_Light.html`
-2. Ábrelo en tu navegador web
-3. Crea una cuenta o inicia sesión
-4. Configura tu perfil (Padre/Madre y nombre del niño/a)
-5. ¡Listo! Todos tus datos existentes se cargarán automáticamente
+1. Descarga el archivo `Custodia_Familiar_Fullscreen.html`
+2. Crea la carpeta `assets/` con las imágenes `padre.png` y `madre.png`
+3. Ábrelo en tu navegador web
+4. Crea una cuenta o inicia sesión
+5. Configura tu perfil (Padre/Madre y nombre del niño/a)
+6. ¡Listo! Todos tus datos existentes se cargarán automáticamente
 
 ### Uso de las 3 Vistas
 
 #### 📅 Vista Calendario
 - **Ver custodia**: El calendario muestra automáticamente el patrón de semanas alternas
+- **Iconos grandes**: Identifica fácilmente quién tiene la custodia cada día
 - **Modificar días**: Haz clic en cualquier día para ver detalles y añadir eventos
 - **Navegación**: Usa las flechas o gestos swipe para cambiar de mes
 - **Eventos**: Los iconos de colores indican actividades programadas
-- **Responsive**: El calendario se adapta perfectamente a pantallas móviles
+- **Pantalla completa**: En móvil aprovecha todo el espacio disponible
 
 #### 📨 Vista Solicitudes
 - **Crear solicitud**: Rellena el formulario con fechas y motivo
@@ -270,23 +293,58 @@ Acción:
 - **Madre**: Rosa (#ec4899)
 - **Acentos**: Tonos pastel para mejor legibilidad
 
+### Optimización Móvil
+
+#### Iconos Padre/Madre
+```css
+/* Escritorio y tablets */
+.owner-icon-img {
+    width: 48px;
+    height: 48px;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+/* Móviles (<640px) */
+@media (max-width: 640px) {
+    .owner-icon-img {
+        width: 40px;
+        height: 40px;
+    }
+}
+
+/* Móviles pequeños (<380px) */
+@media (max-width: 380px) {
+    .owner-icon-img {
+        width: 36px;
+        height: 36px;
+    }
+}
+```
+
+#### Calendario Pantalla Completa
+- **Header compacto**: Reducido en móviles (8px padding)
+- **Flexbox layout**: El calendario ocupa todo el espacio disponible
+- **Márgenes mínimos**: Solo 4px de padding en móvil
+- **Bottom nav reducido**: 70px total en móviles
+- **Espaciado optimizado**: 2px entre celdas en móvil
+
 ### Responsive Design
 
 ```css
 /* Móviles (< 640px) */
 - Espaciado reducido
-- Texto más pequeño pero legible
-- Iconos adaptados
-- Botones táctiles grandes
+- Texto optimizado
+- Iconos grandes y claros (40px)
+- Calendario a pantalla completa
 
 /* Tablets (640px - 1024px) */
-- Aprovecha el espacio horizontal
-- Tarjetas más amplias
+- Aprovecha espacio horizontal
+- Iconos estándar (48px)
 
 /* Escritorio (> 1024px) */
 - Máximo ancho de 1200px
 - Diseño centrado
-- Espaciado generoso
+- Iconos grandes (48px)
 ```
 
 ## 🔒 Seguridad y Privacidad
@@ -303,16 +361,28 @@ Acción:
 - **Responsive Design**: Funciona perfectamente en móviles, tablets y escritorio
 - **PWA Ready**: Se puede instalar como aplicación
 - **Touch Optimized**: Gestos táctiles nativos (swipe)
+- **Fullscreen Calendar**: Calendario a pantalla completa en móviles
 - **Real-time**: Actualizaciones instantáneas entre dispositivos
 - **Lightweight**: Sin frameworks pesados, código vanilla optimizado
-- **Accessible**: Contraste adecuado y tamaño de texto legible
+- **Accessible**: Contraste adecuado y tamaño de iconos grandes
 
 ## 🐛 Solución de Problemas
+
+### No se ven los iconos de padre/madre
+- Asegúrate de tener la carpeta `assets/` en el mismo directorio que el HTML
+- Verifica que las imágenes se llamen exactamente `padre.png` y `madre.png`
+- Usa imágenes PNG con fondo transparente
+- Tamaño recomendado: 256x256 px o superior
 
 ### No veo mis datos
 - Verifica que hayas iniciado sesión con la cuenta correcta
 - Revisa la consola del navegador (F12) para errores de Firebase
 - Asegúrate de tener conexión a internet
+
+### El calendario no ocupa toda la pantalla
+- Asegúrate de estar usando un navegador moderno que soporte Flexbox
+- Prueba en modo móvil (F12 → Toggle device toolbar en Chrome)
+- Verifica que no haya CSS personalizado interfiriendo
 
 ### No llegan notificaciones de Telegram
 - Verifica que la URL de la Cloud Function sea correcta
@@ -351,6 +421,12 @@ Este proyecto es de código abierto bajo licencia MIT.
 
 ## 🎉 Changelog
 
+### Versión 2.1 (Febrero 2026) - ACTUAL
+- ✅ **Iconos grandes sin fondo** - Iconos de padre/madre más visibles (48px)
+- ✅ **Calendario pantalla completa** - Aprovecha todo el espacio en móviles
+- ✅ **Header compacto** - Más espacio para el calendario
+- ✅ **Optimización responsive mejorada** - Ajustes automáticos según tamaño
+
 ### Versión 2.0 (Febrero 2026)
 - ✅ **Nuevo diseño en colores claros** - Tema light con gradientes suaves
 - ✅ **Función de cancelar solicitudes** - Cancela tus propias solicitudes pendientes
@@ -377,4 +453,4 @@ Este proyecto es de código abierto bajo licencia MIT.
 
 **Desarrollado con ❤️ para facilitar la coordinación familiar**
 
-*Última actualización: Febrero 2026 - Versión 2.0*
+*Última actualización: Febrero 2026 - Versión 2.1*

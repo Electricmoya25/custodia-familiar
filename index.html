@@ -2,1421 +2,1283 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Calendario de Custodia</title>
+    <title>Custodia Familiar</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' x='0.1em' font-size='80'%3EF👨‍👩‍👧‍👦%3C/text%3E%3C/svg%3E">
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap');
+
+        :root {
+            --father-primary: #0ea5e9;
+            --mother-primary: #f472b6;
+            --text-main: #0f172a;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
         body {
-            font-family: 'Arial', sans-serif;
-            margin: 0;
-            padding: 0;
-            background: linear-gradient(135deg, #1e3c72, #2a5298);
-            color: #fff;
-            text-align: center;
+            margin: 0; font-family: 'Google Sans', 'Inter', system-ui, sans-serif;
+            background: radial-gradient(circle at 0% 0%, rgba(236, 72, 153, 0.18), transparent 55%),
+                        radial-gradient(circle at 100% 100%, rgba(56, 189, 248, 0.2), transparent 55%), #020617;
+            color: var(--text-main); padding-bottom: 80px; overscroll-behavior-y: none; letter-spacing: -0.01em;
         }
 
-        .app-container {
-            margin: 20px auto 80px auto;
-            padding: 20px;
-            max-width: 800px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-
-        h1, h2 {
-            margin: 10px 0;
-            color: #fff;
-        }
-
-        .calendar-header {
-            margin-bottom: 20px;
-        }
-
-        .navigation-buttons, .year-selection {
-            margin: 10px 0;
-        }
-
-        select, input[type="month"], button, input[type="text"], input[type="email"], input[type="password"] {
-            padding: 8px;
-            border-radius: 5px;
-            border: none;
-            margin: 5px;
-        }
-
-        button {
-            background-color: rgba(255, 255, 255, 0.2);
-            color: #fff;
-            cursor: pointer;
-            font-weight: bold;
-            box-shadow: 0 5px 10px rgba(0,0,0,0.3);
-        }
-
-        button:hover {
-            background-color: rgba(255, 255, 255, 0.4);
-        }
-
-        .event-types, .event-actions {
-            margin: 10px 0;
-        }
-
-        .event-types label, .event-actions label {
-            margin: 0 10px;
-        }
-
-        .legend {
-            margin: 20px 0;
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-        }
-
-        .legend-color {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            margin-right: 5px;
-        }
-
-        .legend-color.mañana { background-color: rgba(144, 238, 144, 0.8); }
-        .legend-color.tarde { background-color: rgba(255, 165, 0, 0.8); }
-        .legend-color.dia-completo { background-color: rgba(255, 99, 71, 0.8); }
-
-        .legend-color.mañana-puente { background: repeating-linear-gradient(
-            45deg,
-            rgba(50, 205, 50, 0.8),
-            rgba(50, 205, 50, 0.8) 5px,
-            rgba(144, 238, 144, 0.8) 5px,
-            rgba(144, 238, 144, 0.8) 10px
-        ); }
-
-        .legend-color.tarde-puente { background: repeating-linear-gradient(
-            45deg,
-            rgba(255, 140, 0, 0.8),
-            rgba(255, 140, 0, 0.8) 5px,
-            rgba(255, 165, 0, 0.8) 5px,
-            rgba(255, 165, 0, 0.8) 10px
-        ); }
-
-        .legend-color.dia-completo-puente { background: repeating-linear-gradient(
-            45deg,
-            rgba(220, 20, 60, 0.8),
-            rgba(220, 20, 60, 0.8) 5px,
-            rgba(255, 99, 71, 0.8) 5px,
-            rgba(255, 99, 71, 0.8) 10px
-        ); }
-
-        .legend-color.festivo {
-            background-color: rgba(173, 216, 230, 0.8);
-            border: 2px dashed #1e90ff;
-        }
-
-        .legend-color.no-laborable {
-            background-color: rgba(255, 218, 185, 0.8);
-            border: 2px dashed #ff8c00;
-        }
-
-        .legend-color.escolar {
-            background-color: rgba(255, 255, 0, 0.8);
-            border: 2px dashed #ffd700;
-        }
-
-        .calendar-container {
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
-
-        th, td {
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 8px;
-            text-align: center;
-        }
-
-        th {
-            background-color: rgba(0, 0, 0, 0.3);
-        }
-
-        td {
-            position: relative;
-            cursor: pointer;
-        }
-
-        td span {
-            display: block;
-        }
-
-        .event-marker {
-            width: 5px;
-            height: 5px;
-            background-color: yellow;
-            border-radius: 50%;
-            position: absolute;
-            bottom: 5px;
-            right: 5px;
-        }
-
-        .event-info {
-            margin: 10px 0;
-        }
-
-        .event-toggle {
-            margin: 10px 0;
-        }
-
-        .export-buttons {
-            margin: 20px 0;
-        }
-
-        .switch-user {
-            margin: 15px 0;
-        }
-
-        .summary-panel {
-            margin: 20px auto;
-            padding: 15px;
-            max-width: 600px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 10px;
-            text-align: left;
-        }
-
-        .summary-panel h3 {
-            margin-top: 0;
-        }
-
-        .summary-row {
-            display: flex;
-            justify-content: space-between;
-            margin: 5px 0;
-        }
-
-        .summary-label {
-            font-weight: bold;
-        }
-
-        .summary-value {
-            font-weight: normal;
-        }
-
-        .vacation-control, .custom-day-control, .fixed-days-control {
-            margin: 20px 0;
-            text-align: left;
-        }
-
-        .vacation-control label, .custom-day-control label, .fixed-days-control label {
-            display: inline-block;
-            margin-right: 10px;
-        }
-
-        .vacation-control input[type="date"], .custom-day-control input[type="date"] {
-            margin-right: 5px;
-        }
-
-        .fixed-days-container {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-
-        .highlight-today {
-            border: 2px solid yellow;
-            box-shadow: 0 0 10px yellow;
-        }
-
-        .highlight-dob {
-            border: 2px solid pink;
-            box-shadow: 0 0 10px pink;
-        }
-
-        .holiday-highlight {
-            border: 2px solid lightblue;
-            box-shadow: 0 0 10px lightblue;
-        }
-
-        .custom-highlight {
-            border: 2px solid orange;
-            box-shadow: 0 0 10px orange;
-        }
-
-        .vacation-day {
-            border: 2px dashed yellow;
-        }
-
-        .holiday-description {
-            font-size: 0.8em;
-            color: #fff;
-            margin-top: 5px;
-        }
-
-        .school-holiday-description {
-            font-size: 0.8em;
-            color: #ffd700;
-            margin-top: 5px;
-        }
-
-        .login-container, .register-container {
-            margin: 20px auto;
-            padding: 15px;
-            max-width: 400px;
-            background: rgba(0, 0, 0, 0.4);
-            border-radius: 10px;
-        }
-
-        .login-container h2, .register-container h2 {
-            margin-top: 0;
-        }
-
-        .login-container input, .register-container input {
-            width: 80%;
-            margin: 5px 0;
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        .user-info {
-            margin: 10px 0;
-        }
-
-        .notification-banner {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            display: none;
-        }
-
-        .notification-banner.visible {
-            display: block;
-        }
-
-        .notification-banner span {
-            font-weight: bold;
-        }
-
-        .switch-view-buttons {
-            margin: 10px 0;
-        }
-
-        .switch-view-buttons button {
-            margin: 0 5px;
-        }
-
-        .calendar-view {
-            display: block;
-        }
-
-        .weekly-view, .list-view {
-            display: none;
-        }
-
-        .week-selector, .list-selector {
-            margin: 10px 0;
-        }
-
-        .week-selector select, .list-selector select {
-            padding: 5px;
-        }
-
-        .reset-button {
-            margin-top: 10px;
-            background-color: rgba(255, 69, 0, 0.7);
-        }
-
-        .reset-button:hover {
-            background-color: rgba(255, 69, 0, 0.9);
-        }
-
-        .event-details {
-            font-size: 0.8em;
-            margin-top: 5px;
-        }
-
-        .event-icon {
-            font-size: 1.2em;
-            margin-right: 5px;
-        }
-
-        .event-extra-info {
-            font-size: 0.9em;
-            margin-top: 5px;
-            font-style: italic;
-        }
-
-        .shared-calendar-toggle {
-            margin: 20px 0;
-        }
-
-        .shared-calendar-toggle label {
-            margin-right: 10px;
-        }
-
-        .shared-calendar-toggle input[type="checkbox"] {
-            transform: scale(1.2);
-            margin-right: 5px;
-        }
-
-        @media (max-width: 600px) {
-            .app-container {
-                margin: 10px;
-                padding: 10px;
-            }
-
-            th, td {
-                padding: 5px;
-                font-size: 0.8em;
-            }
-
-            .legend {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .fixed-days-container {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .summary-panel {
-                padding: 10px;
-            }
-        }
+        .hidden { display: none !important; }
 
-        /* NUEVO: vistas y barra inferior */
+        /* --- VISTAS --- */
         .view {
             display: none;
         }
-        .view.visible {
+        .view.active {
             display: block;
         }
 
-        #bottom-nav {
+        /* --- NAVEGACIÓN INFERIOR --- */
+        .bottom-nav {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            height: 60px;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
             justify-content: space-around;
-            align-items: center;
-            background: #ffffff;
-            border-top: 1px solid #ddd;
+            padding: 12px 0 calc(12px + env(safe-area-inset-bottom));
             z-index: 1000;
         }
 
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 12px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-item.active {
+            color: #60a5fa;
+        }
+
+        .nav-item svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .nav-item span {
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        /* --- CALENDARIO & SWIPE --- */
+        .calendar-grid {
+            opacity: 1; transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            touch-action: pan-y;
+            user-select: none;
+        }
+        .calendar-grid.fading { opacity: 0; transform: scale(0.97); }
+
+        .day-cell {
+            opacity: 0; transform: translateY(10px) scale(0.96);
+            transition: all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .day-cell.animated { opacity: 1; transform: translateY(0) scale(1); }
+
+        /* --- TOAST --- */
+        .toast-container {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999;
+            display: flex; flex-direction: column; gap: 12px; pointer-events: none; width: 90%; max-width: 400px;
+        }
+        .toast {
+            background: rgba(15, 23, 42, 0.96); backdrop-filter: blur(30px); color: white;
+            padding: 16px 20px; border-radius: 16px; display: flex; align-items: center; gap: 12px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1);
+            animation: slideInDown 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            pointer-events: auto;
+        }
+        @keyframes slideInDown {
+            from { opacity: 0; transform: translateY(-30px) scale(0.9); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .toast-icon { flex-shrink: 0; }
+        .toast-content { flex: 1; font-size: 14px; font-weight: 500; }
+
+        /* --- HEADER --- */
+        header {
+            padding: max(20px, env(safe-area-inset-top) + 10px) 20px 20px;
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.12), rgba(236, 72, 153, 0.12));
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            position: sticky; top: 0; z-index: 100;
+        }
+        .header-content {
+            display: flex; align-items: center; justify-content: space-between; max-width: 500px; margin: 0 auto;
+        }
+        .header-title {
+            display: flex; align-items: center; gap: 12px;
+        }
+        .header-title h1 {
+            margin: 0; font-size: 24px; font-weight: 700; color: white;
+            background: linear-gradient(135deg, var(--father-primary), var(--mother-primary));
+            -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .role-toggle {
+            background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border-radius: 30px; padding: 6px;
+            display: inline-flex; gap: 6px; border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        .role-btn {
+            padding: 10px 20px; border-radius: 24px; border: none; cursor: pointer;
+            font-weight: 600; font-size: 13px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: transparent; color: rgba(255, 255, 255, 0.6);
+        }
+        .role-btn.active {
+            background: white; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        .role-btn.father.active { color: var(--father-primary); }
+        .role-btn.mother.active { color: var(--mother-primary); }
+
+        /* --- CALENDAR --- */
+        .calendar {
+            max-width: 500px; margin: 0 auto; padding: 20px;
+        }
+        .calendar-header {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
+            padding: 16px 20px; background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px);
+            border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .month-year {
+            font-size: 20px; font-weight: 700; color: white;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .nav-buttons {
+            display: flex; gap: 8px;
+        }
         .nav-btn {
-            background: none;
-            border: none;
-            font-size: 26px;
-            padding: 8px;
-            border-radius: 50%;
-            color: #333;
+            background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px; padding: 10px; cursor: pointer; transition: all 0.3s ease;
+            display: flex; align-items: center; justify-content: center; color: rgba(255, 255, 255, 0.7);
+        }
+        .nav-btn:hover { background: rgba(255, 255, 255, 0.15); transform: scale(1.05); }
+        .nav-btn:active { transform: scale(0.95); }
+
+        .weekdays {
+            display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-bottom: 12px;
+        }
+        .weekday {
+            text-align: center; font-size: 12px; font-weight: 600; color: rgba(255, 255, 255, 0.5);
+            padding: 8px 0; text-transform: uppercase; letter-spacing: 0.5px;
         }
 
-        .nav-btn.active {
-            background: #1e3c72;
-            color: #fff;
+        .calendar-grid {
+            display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px;
+        }
+        .day-cell {
+            aspect-ratio: 1; border-radius: 14px; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; cursor: pointer; position: relative;
+            background: rgba(255, 255, 255, 0.03); border: 1.5px solid rgba(255, 255, 255, 0.06);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .day-cell:hover { transform: scale(1.08); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3); }
+        .day-cell.empty { background: transparent; border: none; cursor: default; }
+        .day-cell.empty:hover { transform: none; box-shadow: none; }
+        .day-cell.other-month { opacity: 0.3; }
+        .day-cell.today {
+            border-color: #fbbf24; box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.2), 0 4px 12px rgba(251, 191, 36, 0.3);
         }
 
-        .solicitud-item, .evento-item {
-            border: 1px solid rgba(255,255,255,0.3);
-            margin: 10px;
-            padding: 15px;
+        .day-number {
+            font-size: 14px; font-weight: 600; margin-bottom: 2px; z-index: 1; color: white;
+        }
+        .day-dot {
+            width: 6px; height: 6px; border-radius: 50%; z-index: 1;
+        }
+        .day-cell.father { background: linear-gradient(135deg, rgba(14, 165, 233, 0.25), rgba(6, 182, 212, 0.15)); border-color: rgba(14, 165, 233, 0.4); }
+        .day-cell.mother { background: linear-gradient(135deg, rgba(244, 114, 182, 0.25), rgba(236, 72, 153, 0.15)); border-color: rgba(244, 114, 182, 0.4); }
+        .day-cell.father .day-dot { background: var(--father-primary); box-shadow: 0 0 8px var(--father-primary); }
+        .day-cell.mother .day-dot { background: var(--mother-primary); box-shadow: 0 0 8px var(--mother-primary); }
+
+        .day-cell.pending-father { background: linear-gradient(135deg, rgba(14, 165, 233, 0.15), rgba(6, 182, 212, 0.08)); border: 1.5px dashed rgba(14, 165, 233, 0.5); }
+        .day-cell.pending-mother { background: linear-gradient(135deg, rgba(244, 114, 182, 0.15), rgba(236, 72, 153, 0.08)); border: 1.5px dashed rgba(244, 114, 182, 0.5); }
+        .day-cell.pending-father::after, .day-cell.pending-mother::after {
+            content: '?'; position: absolute; top: 4px; right: 6px; font-size: 10px; font-weight: 700;
+            background: rgba(251, 191, 36, 0.9); color: #0f172a; width: 16px; height: 16px;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        }
+
+        /* --- MODAL --- */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(8px);
+            display: flex; align-items: flex-end; justify-content: center; z-index: 999;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .modal {
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.98), rgba(30, 41, 59, 0.98));
+            backdrop-filter: blur(30px); border-radius: 24px 24px 0 0; padding: 24px;
+            width: 100%; max-width: 500px; max-height: 80vh; overflow-y: auto;
+            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5); border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .modal-header {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
+        }
+        .modal-title {
+            font-size: 20px; font-weight: 700; color: white;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .close-btn {
+            background: rgba(255, 255, 255, 0.1); border: none; border-radius: 50%;
+            width: 36px; height: 36px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: all 0.3s ease; color: rgba(255, 255, 255, 0.7);
+        }
+        .close-btn:hover { background: rgba(255, 255, 255, 0.15); transform: rotate(90deg); }
+
+        .event-info {
+            background: rgba(255, 255, 255, 0.05); border-radius: 16px; padding: 16px; margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .event-info p {
+            margin: 8px 0; font-size: 14px; color: rgba(255, 255, 255, 0.8);
+            display: flex; align-items: center; gap: 10px;
+        }
+        .event-info strong { color: white; font-weight: 600; }
+
+        .action-buttons {
+            display: flex; gap: 12px; margin-top: 20px;
+        }
+        .btn {
+            flex: 1; padding: 14px; border-radius: 12px; border: none; font-weight: 600;
+            font-size: 15px; cursor: pointer; transition: all 0.3s ease;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #60a5fa, #3b82f6);
+            color: white; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4); }
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1); color: white;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.15); }
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+        .btn-danger:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4); }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px; color: rgba(255, 255, 255, 0.9);
+        }
+        .form-group select, .form-group input {
+            width: 100%; padding: 12px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.05); color: white; font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        .form-group select:focus, .form-group input:focus {
+            outline: none; border-color: #60a5fa; background: rgba(255, 255, 255, 0.08);
+        }
+        .form-group option {
+            background: #1e293b; color: white;
+        }
+
+        /* --- REQUESTS VIEW --- */
+        .requests-container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .requests-header {
+            margin-bottom: 24px;
+        }
+
+        .requests-header h2 {
+            font-size: 24px;
+            font-weight: 700;
+            color: white;
+            margin: 0 0 8px 0;
+        }
+
+        .requests-header p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+            margin: 0;
+        }
+
+        .requests-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .request-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .request-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .request-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .request-date {
+            font-size: 16px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .request-status {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .request-status.pending {
+            background: rgba(251, 191, 36, 0.2);
+            color: #fbbf24;
+            border: 1px solid rgba(251, 191, 36, 0.3);
+        }
+
+        .request-status.accepted {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .request-status.rejected {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .request-info {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .request-info-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .request-info-item svg {
+            width: 16px;
+            height: 16px;
+            opacity: 0.6;
+        }
+
+        .request-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .request-btn {
+            flex: 1;
+            padding: 10px;
             border-radius: 10px;
-            background: rgba(0,0,0,0.3);
-            text-align: left;
+            border: none;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
         }
 
-        .solicitud-item button {
-            margin-top: 10px;
+        .request-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .request-btn.accept {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+        }
+
+        .request-btn.reject {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+        }
+
+        .request-btn.cancel {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .request-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .no-requests {
+            text-align: center;
+            padding: 60px 20px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .no-requests svg {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+
+        .no-requests p {
+            font-size: 16px;
+            margin: 0;
+        }
+
+        /* --- EVENTS VIEW --- */
+        .events-container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .events-header {
+            margin-bottom: 24px;
+        }
+
+        .events-header h2 {
+            font-size: 24px;
+            font-weight: 700;
+            color: white;
+            margin: 0 0 8px 0;
+        }
+
+        .events-header p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+            margin: 0;
+        }
+
+        .events-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .event-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .event-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .event-card.father-event {
+            border-left: 4px solid var(--father-primary);
+            background: linear-gradient(90deg, rgba(14, 165, 233, 0.1), rgba(255, 255, 255, 0.05));
+        }
+
+        .event-card.mother-event {
+            border-left: 4px solid var(--mother-primary);
+            background: linear-gradient(90deg, rgba(244, 114, 182, 0.1), rgba(255, 255, 255, 0.05));
+        }
+
+        .event-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .event-date-display {
+            font-size: 16px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .event-custodian {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .event-custodian.father {
+            background: rgba(14, 165, 233, 0.2);
+            color: var(--father-primary);
+            border: 1px solid rgba(14, 165, 233, 0.3);
+        }
+
+        .event-custodian.mother {
+            background: rgba(244, 114, 182, 0.2);
+            color: var(--mother-primary);
+            border: 1px solid rgba(244, 114, 182, 0.3);
+        }
+
+        .event-details {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .event-detail-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .event-detail-item svg {
+            width: 16px;
+            height: 16px;
+            opacity: 0.6;
+        }
+
+        .no-events {
+            text-align: center;
+            padding: 60px 20px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .no-events svg {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+
+        .no-events p {
+            font-size: 16px;
+            margin: 0;
         }
     </style>
 </head>
 <body>
-    <!-- VISTA HOME (CALENDARIO ORIGINAL) -->
-    <div id="view-home" class="view visible">
-        <div class="app-container">
-            <h1>Calendario de Custodia</h1>
-            <div class="notification-banner" id="notificationBanner">
-                <span>Notificación:</span> <span id="notificationText"></span>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<header>
+    <div class="header-content">
+        <div class="header-title">
+            <h1>👨‍👩‍👧‍👦 Custodia</h1>
+        </div>
+        <div class="role-toggle">
+            <button class="role-btn father active" onclick="switchRole('father')">👨 Padre</button>
+            <button class="role-btn mother" onclick="switchRole('mother')">👩 Madre</button>
+        </div>
+    </div>
+</header>
+
+<!-- VISTA HOME (Calendario) -->
+<div class="view active" id="homeView">
+    <div class="calendar">
+        <div class="calendar-header">
+            <div class="month-year">
+                <span id="monthYear"></span>
             </div>
-            <div class="login-container" id="loginContainer">
-                <h2>Iniciar Sesión</h2>
-                <input type="email" id="loginEmail" placeholder="Correo electrónico"><br>
-                <input type="password" id="loginPassword" placeholder="Contraseña"><br>
-                <button id="loginButton">Iniciar Sesión</button>
-                <button id="showRegisterButton">Registrarse</button>
+            <div class="nav-buttons">
+                <button class="nav-btn" onclick="changeMonth(-1)"><i data-lucide="chevron-left"></i></button>
+                <button class="nav-btn" onclick="goToToday()"><i data-lucide="calendar"></i></button>
+                <button class="nav-btn" onclick="changeMonth(1)"><i data-lucide="chevron-right"></i></button>
             </div>
-            <div class="register-container hidden" id="registerContainer">
-                <h2>Registrarse</h2>
-                <input type="email" id="registerEmail" placeholder="Correo electrónico"><br>
-                <input type="password" id="registerPassword" placeholder="Contraseña"><br>
-                <input type="text" id="registerName" placeholder="Nombre"><br>
-                <input type="text" id="registerChildName" placeholder="Nombre del hijo/hija"><br>
-                <input type="date" id="registerChildDob" placeholder="Fecha de nacimiento del hijo/hija"><br>
-                <button id="registerButton">Crear Cuenta</button>
-                <button id="cancelRegisterButton">Cancelar</button>
+        </div>
+
+        <div class="weekdays">
+            <div class="weekday">Lun</div>
+            <div class="weekday">Mar</div>
+            <div class="weekday">Mié</div>
+            <div class="weekday">Jue</div>
+            <div class="weekday">Vie</div>
+            <div class="weekday">Sáb</div>
+            <div class="weekday">Dom</div>
+        </div>
+
+        <div class="calendar-grid" id="calendarGrid"></div>
+    </div>
+</div>
+
+<!-- VISTA SOLICITUDES -->
+<div class="view" id="requestsView">
+    <div class="requests-container">
+        <div class="requests-header">
+            <h2>Solicitudes</h2>
+            <p>Gestiona las solicitudes de cambio de custodia</p>
+        </div>
+        <div class="requests-list" id="requestsList"></div>
+    </div>
+</div>
+
+<!-- VISTA EVENTOS -->
+<div class="view" id="eventsView">
+    <div class="events-container">
+        <div class="events-header">
+            <h2>Eventos Programados</h2>
+            <p>Listado de días de custodia confirmados</p>
+        </div>
+        <div class="events-list" id="eventsList"></div>
+    </div>
+</div>
+
+<!-- NAVEGACIÓN INFERIOR -->
+<div class="bottom-nav">
+    <div class="nav-item active" onclick="switchView('home')">
+        <i data-lucide="calendar"></i>
+        <span>Calendario</span>
+    </div>
+    <div class="nav-item" onclick="switchView('requests')">
+        <i data-lucide="inbox"></i>
+        <span>Solicitudes</span>
+    </div>
+    <div class="nav-item" onclick="switchView('events')">
+        <i data-lucide="list"></i>
+        <span>Eventos</span>
+    </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay hidden" id="modalOverlay" onclick="closeModal(event)">
+    <div class="modal" onclick="event.stopPropagation()" id="modalContent"></div>
+</div>
+
+<script>
+// Firebase Configuration
+const firebaseConfig = {
+    apiKey: "AIzaSyAwgk4_l0zvaCUCgm1CjqqqXjJHr5KPBjc",
+    authDomain: "custodia-familiar.firebaseapp.com",
+    projectId: "custodia-familiar",
+    storageBucket: "custodia-familiar.firebasestorage.app",
+    messagingSenderId: "1038952432258",
+    appId: "1:1038952432258:web:7608d6a48d8ad8308a6a9b"
+  };
+
+firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+  const auth = firebase.auth();
+
+let currentMonth = new Date().getMonth();
+let currentYear = new Date().getFullYear();
+let currentRole = 'father';
+let currentUser = null;
+let currentUserData = null;
+let custodyData = {};
+let pendingRequests = [];
+let swipeStartX = 0;
+let swipeEndX = 0;
+
+const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+                    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+
+// --- TELEGRAM ---
+        function sendTelegramMessage(text) {
+            const url = "https://sendtelegram-jd4jwaesba-uc.a.run.app";
+            fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ text })
+            }).catch(err => console.error("Error Telegram", err));
+        }
+
+// Cargar datos desde Firestore
+async function loadDataFromFirestore() {
+    if (!currentUser) return;
+
+    try {
+        const userDoc = await db.collection("users").doc(currentUser.uid).get();
+        if (userDoc.exists) {
+            currentUserData = userDoc.data();
+            custodyData = currentUserData.custodyData || {};
+            pendingRequests = currentUserData.pendingRequests || [];
+            renderCalendar();
+        }
+    } catch (error) {
+        console.error("Error loading data:", error);
+    }
+}
+
+// Guardar datos en Firestore
+async function saveDataToFirestore() {
+    if (!currentUser) return;
+
+    try {
+        await db.collection("users").doc(currentUser.uid).update({
+            custodyData: custodyData,
+            pendingRequests: pendingRequests,
+            lastModified: firebase.firestore.FieldValue.serverTimestamp()
+        });
+    } catch (error) {
+        console.error("Error saving data:", error);
+    }
+}
+
+// NAVEGACIÓN ENTRE VISTAS
+function switchView(viewName) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
+    if (viewName === 'home') {
+        document.getElementById('homeView').classList.add('active');
+        document.querySelectorAll('.nav-item')[0].classList.add('active');
+    } else if (viewName === 'requests') {
+        document.getElementById('requestsView').classList.add('active');
+        document.querySelectorAll('.nav-item')[1].classList.add('active');
+        renderRequests();
+    } else if (viewName === 'events') {
+        document.getElementById('eventsView').classList.add('active');
+        document.querySelectorAll('.nav-item')[2].classList.add('active');
+        renderEvents();
+    }
+}
+
+// RENDERIZAR SOLICITUDES
+function renderRequests() {
+    const requestsList = document.getElementById('requestsList');
+    const requests = pendingRequests;
+
+    if (requests.length === 0) {
+        requestsList.innerHTML = `
+            <div class="no-requests">
+                <i data-lucide="inbox"></i>
+                <p>No hay solicitudes pendientes</p>
             </div>
-            <div id="mainContent" class="hidden">
-                <div class="user-info">
-                    <p>Usuario: <span id="userName"></span> (<span id="userEmail"></span>)</p>
-                    <button id="logoutButton">Cerrar Sesión</button>
+        `;
+        lucide.createIcons();
+        return;
+    }
+
+    requestsList.innerHTML = requests.map((req, index) => {
+        const isOwnRequest = req.requestedBy === currentRole;
+        const date = new Date(req.year, req.month, req.day);
+        const dateStr = `${req.day} de ${monthNames[req.month]} ${req.year}`;
+
+        let statusBadge = '';
+        let actions = '';
+
+        if (req.status === 'pending') {
+            statusBadge = '<span class="request-status pending">Pendiente</span>';
+
+            if (isOwnRequest) {
+                actions = `
+                    <div class="request-actions">
+                        <button class="request-btn cancel" onclick="cancelRequest(${index})">
+                            <i data-lucide="x"></i>
+                            Cancelar
+                        </button>
+                    </div>
+                `;
+            } else {
+                actions = `
+                    <div class="request-actions">
+                        <button class="request-btn accept" onclick="acceptRequest(${index})">
+                            <i data-lucide="check"></i>
+                            Aceptar
+                        </button>
+                        <button class="request-btn reject" onclick="rejectRequest(${index})">
+                            <i data-lucide="x"></i>
+                            Rechazar
+                        </button>
+                    </div>
+                `;
+            }
+        } else if (req.status === 'accepted') {
+            statusBadge = '<span class="request-status accepted">Aceptada</span>';
+        } else if (req.status === 'rejected') {
+            statusBadge = '<span class="request-status rejected">Rechazada</span>';
+        }
+
+        return `
+            <div class="request-card">
+                <div class="request-header">
+                    <div class="request-date">${dateStr}</div>
+                    ${statusBadge}
                 </div>
-                <div class="switch-user">
-                    <label for="parentSelect">Ver calendario como:</label>
-                    <select id="parentSelect">
-                        <option value="madre">Madre</option>
-                        <option value="padre">Padre</option>
+                <div class="request-info">
+                    <div class="request-info-item">
+                        <i data-lucide="user"></i>
+                        <span>Solicitado por: <strong>${req.requestedBy === 'father' ? 'Padre' : 'Madre'}</strong></span>
+                    </div>
+                    <div class="request-info-item">
+                        <i data-lucide="arrow-right"></i>
+                        <span>Custodio propuesto: <strong>${req.proposedCustodian === 'father' ? 'Padre' : 'Madre'}</strong></span>
+                    </div>
+                </div>
+                ${actions}
+            </div>
+        `;
+    }).join('');
+
+    lucide.createIcons();
+}
+
+// ACEPTAR SOLICITUD
+async function acceptRequest(index) {
+    const req = pendingRequests[index];
+    req.status = 'accepted';
+
+    const key = `${req.year}-${req.month}-${req.day}`;
+    custodyData[key] = req.proposedCustodian;
+
+    await saveDataToFirestore();
+
+    // Notificación Telegram
+    const dateStr = `${req.day}/${req.month + 1}/${req.year}`;
+    sendTelegramMessage(`✅ Solicitud ACEPTADA: ${dateStr} - Custodio: ${req.proposedCustodian === 'father' ? 'Padre' : 'Madre'}`);
+
+    showToast('✅ Solicitud aceptada', 'success');
+    renderRequests();
+    renderCalendar();
+}
+
+// RECHAZAR SOLICITUD
+async function rejectRequest(index) {
+    const req = pendingRequests[index];
+    req.status = 'rejected';
+
+    await saveDataToFirestore();
+
+    // Notificación Telegram
+    const dateStr = `${req.day}/${req.month + 1}/${req.year}`;
+    sendTelegramMessage(`❌ Solicitud RECHAZADA: ${dateStr}`);
+
+    showToast('❌ Solicitud rechazada', 'error');
+    renderRequests();
+}
+
+// CANCELAR SOLICITUD
+async function cancelRequest(index) {
+    const req = pendingRequests[index];
+    const dateStr = `${req.day}/${req.month + 1}/${req.year}`;
+
+    pendingRequests.splice(index, 1);
+    await saveDataToFirestore();
+
+    sendTelegramMessage(`🗑️ Solicitud CANCELADA: ${dateStr}`);
+
+    showToast('🗑️ Solicitud cancelada', 'info');
+    renderRequests();
+    renderCalendar();
+}
+
+// RENDERIZAR EVENTOS
+function renderEvents() {
+    const eventsList = document.getElementById('eventsList');
+
+    const events = [];
+    for (const [key, custodian] of Object.entries(custodyData)) {
+        const [year, month, day] = key.split('-').map(Number);
+        events.push({ year, month, day, custodian });
+    }
+
+    events.sort((a, b) => {
+        const dateA = new Date(a.year, a.month, a.day);
+        const dateB = new Date(b.year, b.month, b.day);
+        return dateA - dateB;
+    });
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const futureEvents = events.filter(e => {
+        const eventDate = new Date(e.year, e.month, e.day);
+        return eventDate >= today;
+    });
+
+    if (futureEvents.length === 0) {
+        eventsList.innerHTML = `
+            <div class="no-events">
+                <i data-lucide="calendar-x"></i>
+                <p>No hay eventos programados</p>
+            </div>
+        `;
+        lucide.createIcons();
+        return;
+    }
+
+    eventsList.innerHTML = futureEvents.map(event => {
+        const date = new Date(event.year, event.month, event.day);
+        const dateStr = `${event.day} de ${monthNames[event.month]} ${event.year}`;
+        const dayName = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'][date.getDay()];
+        const custodianLabel = event.custodian === 'father' ? 'Padre' : 'Madre';
+        const custodianClass = event.custodian === 'father' ? 'father' : 'mother';
+
+        const isToday = date.getTime() === today.getTime();
+        const todayBadge = isToday ? '<span style="margin-left: 8px; color: #fbbf24; font-size: 12px;">● HOY</span>' : '';
+
+        return `
+            <div class="event-card ${custodianClass}-event" onclick="openDayFromList(${event.year}, ${event.month}, ${event.day})">
+                <div class="event-card-header">
+                    <div class="event-date-display">${dateStr}${todayBadge}</div>
+                    <div class="event-custodian ${custodianClass}">${custodianLabel}</div>
+                </div>
+                <div class="event-details">
+                    <div class="event-detail-item">
+                        <i data-lucide="calendar"></i>
+                        <span>${dayName}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    lucide.createIcons();
+}
+
+// ABRIR DÍA DESDE LA LISTA DE EVENTOS
+function openDayFromList(year, month, day) {
+    currentYear = year;
+    currentMonth = month;
+    switchView('home');
+    renderCalendar();
+    setTimeout(() => openDay(day), 300);
+}
+
+// CAMBIAR ROL
+function switchRole(role) {
+    currentRole = role;
+    document.querySelectorAll('.role-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelector(`.role-btn.${role}`).classList.add('active');
+    renderCalendar();
+
+    const currentView = document.querySelector('.view.active').id;
+    if (currentView === 'requestsView') renderRequests();
+    if (currentView === 'eventsView') renderEvents();
+}
+
+// RENDERIZAR CALENDARIO
+function renderCalendar() {
+    const grid = document.getElementById('calendarGrid');
+    grid.classList.add('fading');
+
+    setTimeout(() => {
+        const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+        const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+        const adjustedFirstDay = (firstDay === 0) ? 6 : firstDay - 1;
+
+        let html = '';
+        for (let i = 0; i < adjustedFirstDay; i++) {
+            html += '<div class="day-cell empty"></div>';
+        }
+
+        const today = new Date();
+        for (let day = 1; day <= daysInMonth; day++) {
+            const key = `${currentYear}-${currentMonth}-${day}`;
+            const custodian = custodyData[key];
+            const pendingReq = pendingRequests.find(r => r.year === currentYear && r.month === currentMonth && r.day === day && r.status === 'pending');
+
+            let classes = 'day-cell';
+            if (custodian === 'father') classes += ' father';
+            if (custodian === 'mother') classes += ' mother';
+            if (pendingReq) classes += ` pending-${pendingReq.proposedCustodian}`;
+            if (today.getDate() === day && today.getMonth() === currentMonth && today.getFullYear() === currentYear) {
+                classes += ' today';
+            }
+
+            html += `
+                <div class="${classes}" onclick="openDay(${day})">
+                    <span class="day-number">${day}</span>
+                    ${custodian ? '<div class="day-dot"></div>' : ''}
+                </div>
+            `;
+        }
+
+        grid.innerHTML = html;
+        grid.classList.remove('fading');
+        document.getElementById('monthYear').textContent = `${monthNames[currentMonth]} ${currentYear}`;
+
+        setTimeout(() => {
+            document.querySelectorAll('.day-cell').forEach((cell, i) => {
+                setTimeout(() => cell.classList.add('animated'), i * 15);
+            });
+        }, 50);
+    }, 200);
+
+    lucide.createIcons();
+}
+
+// ABRIR DÍA
+function openDay(day) {
+    const key = `${currentYear}-${currentMonth}-${day}`;
+    const custodian = custodyData[key];
+    const pendingReq = pendingRequests.find(r => r.year === currentYear && r.month === currentMonth && r.day === day && r.status === 'pending');
+
+    const dateStr = `${day} de ${monthNames[currentMonth]} ${currentYear}`;
+    const canModify = !pendingReq || pendingReq.requestedBy === currentRole;
+
+    let modalHTML = `
+        <div class="modal-header">
+            <div class="modal-title">
+                <i data-lucide="calendar-days"></i>
+                ${dateStr}
+            </div>
+            <button class="close-btn" onclick="closeModal()"><i data-lucide="x"></i></button>
+        </div>
+    `;
+
+    if (pendingReq) {
+        modalHTML += `
+            <div class="event-info" style="background: rgba(251, 191, 36, 0.15); border-color: rgba(251, 191, 36, 0.3);">
+                <p><strong>⏳ Solicitud pendiente</strong></p>
+                <p>Solicitado por: <strong>${pendingReq.requestedBy === 'father' ? 'Padre' : 'Madre'}</strong></p>
+                <p>Custodio propuesto: <strong>${pendingReq.proposedCustodian === 'father' ? 'Padre' : 'Madre'}</strong></p>
+            </div>
+        `;
+
+        if (pendingReq.requestedBy !== currentRole) {
+            modalHTML += `
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="acceptRequestFromModal('${key}')">
+                        <i data-lucide="check"></i> Aceptar
+                    </button>
+                    <button class="btn btn-danger" onclick="rejectRequestFromModal('${key}')">
+                        <i data-lucide="x"></i> Rechazar
+                    </button>
+                </div>
+            `;
+        } else {
+            modalHTML += `
+                <div class="action-buttons">
+                    <button class="btn btn-secondary" onclick="cancelRequestFromModal('${key}')">
+                        <i data-lucide="trash-2"></i> Cancelar solicitud
+                    </button>
+                </div>
+            `;
+        }
+    } else if (custodian) {
+        modalHTML += `
+            <div class="event-info">
+                <p><i data-lucide="user"></i> <strong>Custodio:</strong> ${custodian === 'father' ? 'Padre 👨' : 'Madre 👩'}</p>
+            </div>
+        `;
+
+        if (canModify) {
+            modalHTML += `
+                <div class="form-group">
+                    <label>Cambiar custodio</label>
+                    <select id="custodianSelect">
+                        <option value="father" ${custodian === 'father' ? 'selected' : ''}>👨 Padre</option>
+                        <option value="mother" ${custodian === 'mother' ? 'selected' : ''}>👩 Madre</option>
                     </select>
                 </div>
-                <div class="calendar-header">
-                    <div class="navigation-buttons">
-                        <button id="prevMonthButton">&lt; Anterior</button>
-                        <span id="monthYearDisplay"></span>
-                        <button id="nextMonthButton">Siguiente &gt;</button>
-                    </div>
-                    <div class="year-selection">
-                        <label for="yearSelect">Seleccionar periodo (año escolar):</label>
-                        <select id="yearSelect">
-                            <option value="2024-2025">Curso 2024-2025</option>
-                            <option value="2025-2026">Curso 2025-2026</option>
-                            <option value="2026-2027">Curso 2026-2027</option>
-                            <option value="2027-2028">Curso 2027-2028</option>
-                        </select>
-                    </div>
-                    <div class="switch-view-buttons">
-                        <button id="monthlyViewButton">Vista Mensual</button>
-                        <button id="weeklyViewButton">Vista Semanal</button>
-                        <button id="listViewButton">Vista Lista</button>
-                    </div>
-                    <div class="week-selector hidden" id="weekSelector">
-                        <label for="weekSelect">Seleccionar semana:</label>
-                        <select id="weekSelect"></select>
-                    </div>
-                    <div class="list-selector hidden" id="listSelector">
-                        <label for="listStartDate">Desde:</label>
-                        <input type="date" id="listStartDate">
-                        <label for="listEndDate">Hasta:</label>
-                        <input type="date" id="listEndDate">
-                        <button id="applyListFilter">Aplicar</button>
-                    </div>
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="requestCustodyChange('${key}')">
+                        <i data-lucide="send"></i> Solicitar cambio
+                    </button>
+                    <button class="btn btn-danger" onclick="deleteCustody('${key}')">
+                        <i data-lucide="trash-2"></i> Eliminar
+                    </button>
                 </div>
-                <div class="event-toggle">
-                    <label>
-                        <input type="checkbox" id="toggleOfficialEvents" checked>
-                        Mostrar solo calendario escolar oficial
-                    </label>
-                    <label>
-                        <input type="checkbox" id="toggleVacations">
-                        Incluir periodos de vacaciones personalizados
-                    </label>
-                    <label>
-                        <input type="checkbox" id="toggleCustomDays">
-                        Incluir días especiales personalizados
-                    </label>
-                    <label>
-                        <input type="checkbox" id="toggleFixedDays">
-                        Incluir días fijos de custodia
-                    </label>
-                    <label>
-                        <input type="checkbox" id="toggleSharedCalendar">
-                        Mostrar calendario compartido con la otra parte
-                    </label>
-                </div>
-                <div class="event-types">
-                    <label><input type="radio" name="eventType" value="mañana" checked> Mañana</label>
-                    <label><input type="radio" name="eventType" value="tarde"> Tarde</label>
-                    <label><input type="radio" name="eventType" value="dia-completo"> Día Completo</label>
-                    <label><input type="radio" name="eventType" value="mañana-puente"> Mañana Puente</label>
-                    <label><input type="radio" name="eventType" value="tarde-puente"> Tarde Puente</label>
-                    <label><input type="radio" name="eventType" value="dia-completo-puente"> Día Completo Puente</label>
-                    <label><input type="radio" name="eventType" value="festivo"> Festivo</label>
-                    <label><input type="radio" name="eventType" value="no-laborable"> No Laborable</label>
-                    <label><input type="radio" name="eventType" value="escolar"> Vacaciones Escolares</label>
-                </div>
-                <div class="event-actions">
-                    <label for="startDate">Desde:</label>
-                    <input type="date" id="startDate">
-                    <label for="endDate">Hasta:</label>
-                    <input type="date" id="endDate">
-                    <button id="applyEventButton">Aplicar</button>
-                    <button id="removeEventButton">Eliminar Evento</button>
-                </div>
-                <div class="vacation-control">
-                    <h3>Vacaciones Personalizadas</h3>
-                    <label for="vacationStart">Inicio:</label>
-                    <input type="date" id="vacationStart">
-                    <label for="vacationEnd">Fin:</label>
-                    <input type="date" id="vacationEnd">
-                    <button id="addVacationButton">Añadir Vacaciones</button>
-                    <button id="removeVacationButton">Eliminar Vacaciones</button>
-                </div>
-                <div class="custom-day-control">
-                    <h3>Días Especiales Personalizados</h3>
-                    <label for="customDate">Fecha:</label>
-                    <input type="date" id="customDate">
-                    <label for="customDescription">Descripción:</label>
-                    <input type="text" id="customDescription" placeholder="Ej: Cumpleaños del niño">
-                    <button id="addCustomDayButton">Añadir Día Especial</button>
-                    <button id="removeCustomDayButton">Eliminar Día Especial</button>
-                </div>
-                <div class="fixed-days-control">
-                    <h3>Días Fijos de Custodia</h3>
-                    <div class="fixed-days-container">
-                        <div>
-                            <h4>Madre</h4>
-                            <label><input type="checkbox" class="fixed-day-madre" value="1"> Lunes</label><br>
-                            <label><input type="checkbox" class="fixed-day-madre" value="2"> Martes</label><br>
-                            <label><input type="checkbox" class="fixed-day-madre" value="3"> Miércoles</label><br>
-                            <label><input type="checkbox" class="fixed-day-madre" value="4"> Jueves</label><br>
-                            <label><input type="checkbox" class="fixed-day-madre" value="5"> Viernes</label><br>
-                            <label><input type="checkbox" class="fixed-day-madre" value="6"> Sábado</label><br>
-                            <label><input type="checkbox" class="fixed-day-madre" value="0"> Domingo</label>
-                        </div>
-                        <div>
-                            <h4>Padre</h4>
-                            <label><input type="checkbox" class="fixed-day-padre" value="1"> Lunes</label><br>
-                            <label><input type="checkbox" class="fixed-day-padre" value="2"> Martes</label><br>
-                            <label><input type="checkbox" class="fixed-day-padre" value="3"> Miércoles</label><br>
-                            <label><input type="checkbox" class="fixed-day-padre" value="4"> Jueves</label><br>
-                            <label><input type="checkbox" class="fixed-day-padre" value="5"> Viernes</label><br>
-                            <label><input type="checkbox" class="fixed-day-padre" value="6"> Sábado</label><br>
-                            <label><input type="checkbox" class="fixed-day-padre" value="0"> Domingo</label>
-                        </div>
-                    </div>
-                    <button id="saveFixedDaysButton">Guardar Días Fijos</button>
-                </div>
-                <div class="summary-panel">
-                    <h3>Resumen de Custodia</h3>
-                    <div class="summary-row">
-                        <span class="summary-label">Total días Madre:</span>
-                        <span class="summary-value" id="totalMadre">0</span>
-                    </div>
-                    <div class="summary-row">
-                        <span class="summary-label">Total días Padre:</span>
-                        <span class="summary-value" id="totalPadre">0</span>
-                    </div>
-                    <div class="summary-row">
-                        <span class="summary-label">Total mañana Madre:</span>
-                        <span class="summary-value" id="totalMananaMadre">0</span>
-                    </div>
-                    <div class="summary-row">
-                        <span class="summary-label">Total tarde Madre:</span>
-                        <span class="summary-value" id="totalTardeMadre">0</span>
-                    </div>
-                    <div class="summary-row">
-                        <span class="summary-label">Total día completo Madre:</span>
-                        <span class="summary-value" id="totalDiaCompletoMadre">0</span>
-                    </div>
-                    <div class="summary-row">
-                        <span class="summary-label">Total mañana Padre:</span>
-                        <span class="summary-value" id="totalMananaPadre">0</span>
-                    </div>
-                    <div class="summary-row">
-                        <span class="summary-label">Total tarde Padre:</span>
-                        <span class="summary-value" id="totalTardePadre">0</span>
-                    </div>
-                    <div class="summary-row">
-                        <span class="summary-label">Total día completo Padre:</span>
-                        <span class="summary-value" id="totalDiaCompletoPadre">0</span>
-                    </div>
-                </div>
-                <div class="legend">
-                    <div class="legend-item">
-                        <div class="legend-color mañana"></div> Mañana
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-color tarde"></div> Tarde
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-color dia-completo"></div> Día Completo
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-color mañana-puente"></div> Mañana Puente
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-color tarde-puente"></div> Tarde Puente
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-color dia-completo-puente"></div> Día Completo Puente
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-color festivo"></div> Festivo
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-color no-laborable"></div> No Laborable
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-color escolar"></div> Vacaciones Escolares
-                    </div>
-                </div>
-                <div class="calendar-container">
-                    <div class="calendar-view" id="calendarView">
-                        <table id="calendar">
-                            <thead>
-                                <tr>
-                                    <th>Domingo</th>
-                                    <th>Lunes</th>
-                                    <th>Martes</th>
-                                    <th>Miércoles</th>
-                                    <th>Jueves</th>
-                                    <th>Viernes</th>
-                                    <th>Sábado</th>
-                                </tr>
-                            </thead>
-                            <tbody id="calendarBody"></tbody>
-                        </table>
-                    </div>
-                    <div class="weekly-view" id="weeklyView">
-                        <table id="weeklyCalendar">
-                            <thead>
-                                <tr>
-                                    <th>Domingo</th>
-                                    <th>Lunes</th>
-                                    <th>Martes</th>
-                                    <th>Miércoles</th>
-                                    <th>Jueves</th>
-                                    <th>Viernes</th>
-                                    <th>Sábado</th>
-                                </tr>
-                            </thead>
-                            <tbody id="weeklyCalendarBody"></tbody>
-                        </table>
-                    </div>
-                    <div class="list-view" id="listView">
-                        <table id="listCalendar">
-                            <thead>
-                                <tr>
-                                    <th>Fecha</th>
-                                    <th>Tipo de Evento</th>
-                                    <th>Custodia</th>
-                                    <th>Detalles</th>
-                                </tr>
-                            </thead>
-                            <tbody id="listCalendarBody"></tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="event-info" id="eventInfo"></div>
-                <div class="export-buttons">
-                    <button id="exportPdfButton">Exportar a PDF</button>
-                    <button id="exportPngButton">Exportar como Imagen</button>
-                    <button id="exportShareButton">Compartir Calendario</button>
-                    <button id="resetCalendarButton" class="reset-button">Resetear Calendario</button>
-                </div>
+            `;
+        }
+    } else {
+        modalHTML += `
+            <div class="form-group">
+                <label>Asignar custodio</label>
+                <select id="custodianSelect">
+                    <option value="">Seleccionar...</option>
+                    <option value="father">👨 Padre</option>
+                    <option value="mother">👩 Madre</option>
+                </select>
             </div>
-        </div>
-    </div>
-
-    <!-- VISTA SOLICITUDES -->
-    <div id="view-solicitudes" class="view hidden">
-        <div class="app-container">
-            <h2>📄 Solicitudes</h2>
-            <div id="lista-solicitudes">
-                <p>No hay solicitudes aún.</p>
+            <div class="action-buttons">
+                <button class="btn btn-primary" onclick="assignCustody('${key}')">
+                    <i data-lucide="check"></i> Asignar
+                </button>
+                <button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
             </div>
-        </div>
-    </div>
+        `;
+    }
+
+    document.getElementById('modalContent').innerHTML = modalHTML;
+    document.getElementById('modalOverlay').classList.remove('hidden');
+    lucide.createIcons();
+}
+
+// ASIGNAR CUSTODIA
+async function assignCustody(key) {
+    const select = document.getElementById('custodianSelect');
+    if (!select.value) {
+        showToast('⚠️ Selecciona un custodio', 'warning');
+        return;
+    }
+    custodyData[key] = select.value;
+    await saveDataToFirestore();
+
+    const [year, month, day] = key.split('-');
+    sendTelegramMessage(`📅 Custodia asignada: ${day}/${parseInt(month) + 1}/${year} - ${select.value === 'father' ? 'Padre' : 'Madre'}`);
+
+    showToast('✅ Custodia asignada', 'success');
+    closeModal();
+    renderCalendar();
+}
+
+// SOLICITAR CAMBIO DE CUSTODIA
+async function requestCustodyChange(key) {
+    const select = document.getElementById('custodianSelect');
+    const [year, month, day] = key.split('-').map(Number);
+
+    pendingRequests.push({
+        year, month, day,
+        requestedBy: currentRole,
+        proposedCustodian: select.value,
+        status: 'pending'
+    });
+
+    await saveDataToFirestore();
+
+    sendTelegramMessage(`📤 Nueva solicitud: ${day}/${month + 1}/${year} - Propuesto: ${select.value === 'father' ? 'Padre' : 'Madre'}`);
+
+    showToast('📤 Solicitud enviada', 'info');
+    closeModal();
+    renderCalendar();
+}
+
+// ACEPTAR/RECHAZAR/CANCELAR DESDE MODAL
+function acceptRequestFromModal(key) {
+    const [year, month, day] = key.split('-').map(Number);
+    const index = pendingRequests.findIndex(r => r.year === year && r.month === month && r.day === day && r.status === 'pending');
+    if (index !== -1) acceptRequest(index);
+    closeModal();
+}
+
+function rejectRequestFromModal(key) {
+    const [year, month, day] = key.split('-').map(Number);
+    const index = pendingRequests.findIndex(r => r.year === year && r.month === month && r.day === day && r.status === 'pending');
+    if (index !== -1) rejectRequest(index);
+    closeModal();
+}
+
+function cancelRequestFromModal(key) {
+    const [year, month, day] = key.split('-').map(Number);
+    const index = pendingRequests.findIndex(r => r.year === year && r.month === month && r.day === day && r.status === 'pending');
+    if (index !== -1) cancelRequest(index);
+    closeModal();
+}
+
+// ELIMINAR CUSTODIA
+async function deleteCustody(key) {
+    delete custodyData[key];
+    await saveDataToFirestore();
+
+    const [year, month, day] = key.split('-');
+    sendTelegramMessage(`🗑️ Custodia eliminada: ${day}/${parseInt(month) + 1}/${year}`);
+
+    showToast('🗑️ Custodia eliminada', 'info');
+    closeModal();
+    renderCalendar();
+}
+
+// CERRAR MODAL
+function closeModal(event) {
+    if (!event || event.target.id === 'modalOverlay') {
+        document.getElementById('modalOverlay').classList.add('hidden');
+    }
+}
+
+// TOAST
+function showToast(message, type = 'info') {
+    const container = document.getElementById('toastContainer');
+    const iconMap = {
+        success: 'check-circle',
+        error: 'x-circle',
+        warning: 'alert-circle',
+        info: 'info'
+    };
+
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.innerHTML = `
+        <div class="toast-icon"><i data-lucide="${iconMap[type]}"></i></div>
+        <div class="toast-content">${message}</div>
+    `;
+    container.appendChild(toast);
+    lucide.createIcons();
+
+    setTimeout(() => toast.remove(), 3000);
+}
+
+// NAVEGACIÓN CALENDARIO
+function changeMonth(delta) {
+    currentMonth += delta;
+    if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+    if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+    renderCalendar();
+}
+
+function goToToday() {
+    const today = new Date();
+    currentMonth = today.getMonth();
+    currentYear = today.getFullYear();
+    renderCalendar();
+}
+
+// SWIPE
+const grid = document.getElementById('calendarGrid');
+grid.addEventListener('touchstart', e => { swipeStartX = e.changedTouches[0].screenX; }, {passive: true});
+grid.addEventListener('touchend', e => {
+    swipeEndX = e.changedTouches[0].screenX;
+    if (swipeStartX - swipeEndX > 50) changeMonth(1);
+    if (swipeEndX - swipeStartX > 50) changeMonth(-1);
+}, {passive: true});
+
+// AUTH
+auth.onAuthStateChanged(async (user) => {
+    if (user) {
+        currentUser = user;
+        await loadDataFromFirestore();
+    } else {
+        // Redirigir a login o crear usuario anónimo
+        await auth.signInAnonymously();
+    }
+});
+
+// INICIALIZAR
+lucide.createIcons();
+</script>
 
-    <!-- VISTA EVENTOS -->
-    <div id="view-eventos" class="view hidden">
-        <div class="app-container">
-            <h2>📆 Eventos programados</h2>
-            <div id="lista-eventos">
-                <p>No hay eventos programados todavía.</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- BARRA DE NAVEGACIÓN INFERIOR -->
-    <nav id="bottom-nav">
-        <button id="btn-nav-home" class="nav-btn active" title="Calendario">
-            🏠
-        </button>
-        <button id="btn-nav-solicitudes" class="nav-btn" title="Solicitudes">
-            📄
-        </button>
-        <button id="btn-nav-eventos" class="nav-btn" title="Eventos">
-            📆
-        </button>
-    </nav>
-
-    <script>
-        // TODO: AQUÍ VA TODO TU SCRIPT ORIGINAL DEL BACKUP.
-        // A continuación está pegado íntegro desde tu HTML original:
-
-        let currentUser = null;
-        let events = {};
-        let vacations = [];
-        let customDays = [];
-        let fixedDays = { madre: [], padre: [] };
-        let sharedCalendar = false;
-        let currentView = 'monthly';
-        let currentMonth = new Date().getMonth();
-        let currentYear = new Date().getFullYear();
-        let selectedCourse = '2024-2025';
-
-        function initialize() {
-            document.getElementById('loginButton').addEventListener('click', login);
-            document.getElementById('showRegisterButton').addEventListener('click', showRegister);
-            document.getElementById('registerButton').addEventListener('click', register);
-            document.getElementById('cancelRegisterButton').addEventListener('click', cancelRegister);
-            document.getElementById('logoutButton').addEventListener('click', logout);
-            document.getElementById('prevMonthButton').addEventListener('click', () => changeMonth(-1));
-            document.getElementById('nextMonthButton').addEventListener('click', () => changeMonth(1));
-            document.getElementById('yearSelect').addEventListener('change', changeYear);
-            document.getElementById('applyEventButton').addEventListener('click', applyEvent);
-            document.getElementById('removeEventButton').addEventListener('click', removeEvent);
-            document.getElementById('addVacationButton').addEventListener('click', addVacation);
-            document.getElementById('removeVacationButton').addEventListener('click', removeVacation);
-            document.getElementById('addCustomDayButton').addEventListener('click', addCustomDay);
-            document.getElementById('removeCustomDayButton').addEventListener('click', removeCustomDay);
-            document.getElementById('saveFixedDaysButton').addEventListener('click', saveFixedDays);
-            document.getElementById('toggleOfficialEvents').addEventListener('change', renderCalendar);
-            document.getElementById('toggleVacations').addEventListener('change', renderCalendar);
-            document.getElementById('toggleCustomDays').addEventListener('change', renderCalendar);
-            document.getElementById('toggleFixedDays').addEventListener('change', renderCalendar);
-            document.getElementById('toggleSharedCalendar').addEventListener('change', toggleSharedCalendarView);
-            document.getElementById('parentSelect').addEventListener('change', renderCalendar);
-            document.getElementById('monthlyViewButton').addEventListener('click', () => switchView('monthly'));
-            document.getElementById('weeklyViewButton').addEventListener('click', () => switchView('weekly'));
-            document.getElementById('listViewButton').addEventListener('click', () => switchView('list'));
-            document.getElementById('exportPdfButton').addEventListener('click', exportToPdf);
-            document.getElementById('exportPngButton').addEventListener('click', exportToPng);
-            document.getElementById('exportShareButton').addEventListener('click', shareCalendar);
-            document.getElementById('resetCalendarButton').addEventListener('click', resetCalendar);
-            document.getElementById('applyListFilter').addEventListener('click', applyListFilter);
-
-            initializeCalendar();
-        }
-
-        function login() {
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-            if (email && password) {
-                currentUser = { email, name: 'Usuario', childName: 'Hijo/Hija', childDob: '2015-01-01' };
-                document.getElementById('userName').textContent = currentUser.name;
-                document.getElementById('userEmail').textContent = currentUser.email;
-                document.getElementById('loginContainer').classList.add('hidden');
-                document.getElementById('mainContent').classList.remove('hidden');
-                loadUserData();
-                renderCalendar();
-            } else {
-                alert('Por favor, introduce correo y contraseña.');
-            }
-        }
-
-        function showRegister() {
-            document.getElementById('loginContainer').classList.add('hidden');
-            document.getElementById('registerContainer').classList.remove('hidden');
-        }
-
-        function register() {
-            const email = document.getElementById('registerEmail').value;
-            const password = document.getElementById('registerPassword').value;
-            const name = document.getElementById('registerName').value;
-            const childName = document.getElementById('registerChildName').value;
-            const childDob = document.getElementById('registerChildDob').value;
-
-            if (email && password && name && childName && childDob) {
-                currentUser = { email, name, childName, childDob };
-                document.getElementById('userName').textContent = currentUser.name;
-                document.getElementById('userEmail').textContent = currentUser.email;
-                document.getElementById('registerContainer').classList.add('hidden');
-                document.getElementById('mainContent').classList.remove('hidden');
-                saveUserData();
-                renderCalendar();
-            } else {
-                alert('Por favor, completa todos los campos.');
-            }
-        }
-
-        function cancelRegister() {
-            document.getElementById('registerContainer').classList.add('hidden');
-            document.getElementById('loginContainer').classList.remove('hidden');
-        }
-
-        function logout() {
-            currentUser = null;
-            document.getElementById('mainContent').classList.add('hidden');
-            document.getElementById('loginContainer').classList.remove('hidden');
-        }
-
-        function initializeCalendar() {
-            const today = new Date();
-            currentMonth = today.getMonth();
-            currentYear = today.getFullYear();
-            selectedCourse = document.getElementById('yearSelect').value;
-            updateMonthYearDisplay();
-            renderCalendar();
-        }
-
-        function changeMonth(offset) {
-            currentMonth += offset;
-            if (currentMonth < 0) {
-                currentMonth = 11;
-                currentYear--;
-            } else if (currentMonth > 11) {
-                currentMonth = 0;
-                currentYear++;
-            }
-            updateMonthYearDisplay();
-            renderCalendar();
-        }
-
-        function changeYear() {
-            selectedCourse = document.getElementById('yearSelect').value;
-            renderCalendar();
-        }
-
-        function updateMonthYearDisplay() {
-            const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-            document.getElementById('monthYearDisplay').textContent = `${monthNames[currentMonth]} ${currentYear}`;
-        }
-
-        function applyEvent() {
-            const startDate = document.getElementById('startDate').value;
-            const endDate = document.getElementById('endDate').value;
-            const eventType = document.querySelector('input[name="eventType"]:checked').value;
-
-            if (!startDate || !endDate) {
-                alert('Por favor, selecciona un rango de fechas.');
-                return;
-            }
-
-            const start = new Date(startDate);
-            const end = new Date(endDate);
-
-            let current = new Date(start);
-            while (current <= end) {
-                const dateKey = current.toISOString().split('T')[0];
-                if (!events[dateKey]) {
-                    events[dateKey] = [];
-                }
-                events[dateKey].push({
-                    type: eventType,
-                    parent: document.getElementById('parentSelect').value
-                });
-                current.setDate(current.getDate() + 1);
-            }
-
-            saveUserData();
-            renderCalendar();
-        }
-
-        function removeEvent() {
-            const startDate = document.getElementById('startDate').value;
-            const endDate = document.getElementById('endDate').value;
-            const eventType = document.querySelector('input[name="eventType"]:checked').value;
-
-            if (!startDate || !endDate) {
-                alert('Por favor, selecciona un rango de fechas.');
-                return;
-            }
-
-            const start = new Date(startDate);
-            const end = new Date(endDate);
-
-            let current = new Date(start);
-            while (current <= end) {
-                const dateKey = current.toISOString().split('T')[0];
-                if (events[dateKey]) {
-                    events[dateKey] = events[dateKey].filter(event => event.type !== eventType || event.parent !== document.getElementById('parentSelect').value);
-                    if (events[dateKey].length === 0) {
-                        delete events[dateKey];
-                    }
-                }
-                current.setDate(current.getDate() + 1);
-            }
-
-            saveUserData();
-            renderCalendar();
-        }
-
-        function addVacation() {
-            const start = document.getElementById('vacationStart').value;
-            const end = document.getElementById('vacationEnd').value;
-
-            if (!start || !end) {
-                alert('Por favor, selecciona un rango de fechas.');
-                return;
-            }
-
-            vacations.push({ start, end });
-            saveUserData();
-            renderCalendar();
-        }
-
-        function removeVacation() {
-            const start = document.getElementById('vacationStart').value;
-            const end = document.getElementById('vacationEnd').value;
-
-            vacations = vacations.filter(vacation => vacation.start !== start || vacation.end !== end);
-            saveUserData();
-            renderCalendar();
-        }
-
-        function addCustomDay() {
-            const date = document.getElementById('customDate').value;
-            const description = document.getElementById('customDescription').value;
-
-            if (!date || !description) {
-                alert('Por favor, introduce fecha y descripción.');
-                return;
-            }
-
-            customDays.push({ date, description });
-            saveUserData();
-            renderCalendar();
-        }
-
-        function removeCustomDay() {
-            const date = document.getElementById('customDate').value;
-
-            customDays = customDays.filter(day => day.date !== date);
-            saveUserData();
-            renderCalendar();
-        }
-
-        function saveFixedDays() {
-            const madreDays = Array.from(document.querySelectorAll('.fixed-day-madre:checked')).map(input => parseInt(input.value));
-            const padreDays = Array.from(document.querySelectorAll('.fixed-day-padre:checked')).map(input => parseInt(input.value));
-
-            fixedDays = { madre: madreDays, padre: padreDays };
-            saveUserData();
-            renderCalendar();
-        }
-
-        function toggleSharedCalendarView() {
-            sharedCalendar = document.getElementById('toggleSharedCalendar').checked;
-            renderCalendar();
-        }
-
-        function switchView(view) {
-            currentView = view;
-            document.getElementById('calendarView').style.display = view === 'monthly' ? 'block' : 'none';
-            document.getElementById('weeklyView').style.display = view === 'weekly' ? 'block' : 'none';
-            document.getElementById('listView').style.display = view === 'list' ? 'block' : 'none';
-            document.getElementById('weekSelector').classList.toggle('hidden', view !== 'weekly');
-            document.getElementById('listSelector').classList.toggle('hidden', view !== 'list');
-            renderCalendar();
-        }
-
-        function renderCalendar() {
-            if (currentView === 'monthly') {
-                renderMonthlyCalendar();
-            } else if (currentView === 'weekly') {
-                renderWeeklyCalendar();
-            } else if (currentView === 'list') {
-                renderListCalendar();
-            }
-            updateSummary();
-        }
-
-        function renderMonthlyCalendar() {
-            const calendarBody = document.getElementById('calendarBody');
-            calendarBody.innerHTML = '';
-
-            const firstDay = new Date(currentYear, currentMonth, 1);
-            const lastDay = new Date(currentYear, currentMonth + 1, 0);
-            const startDayOfWeek = firstDay.getDay();
-
-            let currentDate = new Date(firstDay);
-            currentDate.setDate(currentDate.getDate() - startDayOfWeek);
-
-            for (let i = 0; i < 6; i++) {
-                const row = document.createElement('tr');
-                for (let j = 0; j < 7; j++) {
-                    const cell = document.createElement('td');
-                    const dateKey = currentDate.toISOString().split('T')[0];
-
-                    if (currentDate.getMonth() === currentMonth) {
-                        cell.innerHTML = `<span>${currentDate.getDate()}</span>`;
-                        cell.addEventListener('click', () => handleDateClick(dateKey));
-                        applyDateStyles(cell, currentDate, dateKey);
-                    } else {
-                        cell.classList.add('hidden');
-                    }
-
-                    row.appendChild(cell);
-                    currentDate.setDate(currentDate.getDate() + 1);
-                }
-                calendarBody.appendChild(row);
-            }
-        }
-
-        function renderWeeklyCalendar() {
-            const weeklyCalendarBody = document.getElementById('weeklyCalendarBody');
-            weeklyCalendarBody.innerHTML = '';
-
-            const weekSelect = document.getElementById('weekSelect');
-            weekSelect.innerHTML = '';
-
-            const firstDay = new Date(currentYear, currentMonth, 1);
-            const lastDay = new Date(currentYear, currentMonth + 1, 0);
-
-            let currentDate = new Date(firstDay);
-            currentDate.setDate(currentDate.getDate() - currentDate.getDay());
-
-            let weekIndex = 0;
-            while (currentDate <= lastDay) {
-                const weekOption = document.createElement('option');
-                const weekStart = new Date(currentDate);
-                const weekEnd = new Date(currentDate);
-                weekEnd.setDate(weekEnd.getDate() + 6);
-                weekOption.value = weekIndex;
-                weekOption.textContent = `Semana ${weekIndex + 1}: ${weekStart.toLocaleDateString()} - ${weekEnd.toLocaleDateString()}`;
-                weekSelect.appendChild(weekOption);
-
-                if (weekIndex === 0) {
-                    const row = document.createElement('tr');
-                    for (let i = 0; i < 7; i++) {
-                        const cell = document.createElement('td');
-                        const dateKey = currentDate.toISOString().split('T')[0];
-                        cell.innerHTML = `<span>${currentDate.getDate()}</span>`;
-                        cell.addEventListener('click', () => handleDateClick(dateKey));
-                        applyDateStyles(cell, currentDate, dateKey);
-                        row.appendChild(cell);
-                        currentDate.setDate(currentDate.getDate() + 1);
-                    }
-                    weeklyCalendarBody.appendChild(row);
-                } else {
-                    currentDate.setDate(currentDate.getDate() + 7);
-                }
-
-                weekIndex++;
-            }
-
-            weekSelect.addEventListener('change', () => {
-                const selectedWeek = parseInt(weekSelect.value);
-                weeklyCalendarBody.innerHTML = '';
-
-                currentDate = new Date(firstDay);
-                currentDate.setDate(currentDate.getDate() - currentDate.getDay());
-                currentDate.setDate(currentDate.getDate() + (selectedWeek * 7));
-
-                const row = document.createElement('tr');
-                for (let i = 0; i < 7; i++) {
-                    const cell = document.createElement('td');
-                    const dateKey = currentDate.toISOString().split('T')[0];
-                    cell.innerHTML = `<span>${currentDate.getDate()}</span>`;
-                    cell.addEventListener('click', () => handleDateClick(dateKey));
-                    applyDateStyles(cell, currentDate, dateKey);
-                    row.appendChild(cell);
-                    currentDate.setDate(currentDate.getDate() + 1);
-                }
-                weeklyCalendarBody.appendChild(row);
-            });
-        }
-
-        function renderListCalendar() {
-            const listCalendarBody = document.getElementById('listCalendarBody');
-            listCalendarBody.innerHTML = '';
-
-            const listStartDate = document.getElementById('listStartDate').value || `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-01`;
-            const listEndDate = document.getElementById('listEndDate').value || new Date(currentYear, currentMonth + 1, 0).toISOString().split('T')[0];
-
-            const start = new Date(listStartDate);
-            const end = new Date(listEndDate);
-
-            let current = new Date(start);
-            while (current <= end) {
-                const dateKey = current.toISOString().split('T')[0];
-                const row = document.createElement('tr');
-                const dateCell = document.createElement('td');
-                dateCell.textContent = current.toLocaleDateString();
-                row.appendChild(dateCell);
-
-                const eventTypeCell = document.createElement('td');
-                const custodyCell = document.createElement('td');
-                const detailsCell = document.createElement('td');
-
-                if (events[dateKey]) {
-                    const eventDetails = events[dateKey].map(event => {
-                        return `${event.type} (${event.parent})`;
-                    }).join(', ');
-                    eventTypeCell.textContent = eventDetails;
-                    custodyCell.textContent = events[dateKey].map(event => event.parent).join(', ');
-                    detailsCell.textContent = 'Evento personalizado';
-                } else {
-                    eventTypeCell.textContent = 'Sin evento';
-                    custodyCell.textContent = '-';
-                    detailsCell.textContent = '-';
-                }
-
-                row.appendChild(eventTypeCell);
-                row.appendChild(custodyCell);
-                row.appendChild(detailsCell);
-
-                listCalendarBody.appendChild(row);
-                current.setDate(current.getDate() + 1);
-            }
-        }
-
-        function applyListFilter() {
-            renderListCalendar();
-        }
-
-        function applyDateStyles(cell, date, dateKey) {
-            const today = new Date();
-            const childDob = new Date(currentUser ? currentUser.childDob : '2015-01-01');
-
-            if (date.toDateString() === today.toDateString()) {
-                cell.classList.add('highlight-today');
-            }
-
-            if (date.toDateString() === childDob.toDateString()) {
-                cell.classList.add('highlight-dob');
-            }
-
-            if (events[dateKey]) {
-                events[dateKey].forEach(event => {
-                    const eventDiv = document.createElement('div');
-                    eventDiv.classList.add('event-details');
-                    eventDiv.textContent = `${event.type} (${event.parent})`;
-                    cell.appendChild(eventDiv);
-                });
-            }
-        }
-
-        function handleDateClick(dateKey) {
-            const eventInfo = document.getElementById('eventInfo');
-            if (events[dateKey]) {
-                const details = events[dateKey].map(event => `${event.type} - ${event.parent}`).join(', ');
-                eventInfo.textContent = `Eventos para ${dateKey}: ${details}`;
-            } else {
-                eventInfo.textContent = `No hay eventos para ${dateKey}.`;
-            }
-        }
-
-        function updateSummary() {
-            let totalMadre = 0;
-            let totalPadre = 0;
-            let totalMananaMadre = 0;
-            let totalTardeMadre = 0;
-            let totalDiaCompletoMadre = 0;
-            let totalMananaPadre = 0;
-            let totalTardePadre = 0;
-            let totalDiaCompletoPadre = 0;
-
-            for (const dateKey in events) {
-                events[dateKey].forEach(event => {
-                    if (event.parent === 'madre') {
-                        totalMadre++;
-                        if (event.type.includes('mañana')) totalMananaMadre++;
-                        if (event.type.includes('tarde')) totalTardeMadre++;
-                        if (event.type.includes('dia-completo')) totalDiaCompletoMadre++;
-                    } else if (event.parent === 'padre') {
-                        totalPadre++;
-                        if (event.type.includes('mañana')) totalMananaPadre++;
-                        if (event.type.includes('tarde')) totalTardePadre++;
-                        if (event.type.includes('dia-completo')) totalDiaCompletoPadre++;
-                    }
-                });
-            }
-
-            document.getElementById('totalMadre').textContent = totalMadre;
-            document.getElementById('totalPadre').textContent = totalPadre;
-            document.getElementById('totalMananaMadre').textContent = totalMananaMadre;
-            document.getElementById('totalTardeMadre').textContent = totalTardeMadre;
-            document.getElementById('totalDiaCompletoMadre').textContent = totalDiaCompletoMadre;
-            document.getElementById('totalMananaPadre').textContent = totalMananaPadre;
-            document.getElementById('totalTardePadre').textContent = totalTardePadre;
-            document.getElementById('totalDiaCompletoPadre').textContent = totalDiaCompletoPadre;
-        }
-
-        function exportToPdf() {
-            alert('Función de exportar a PDF no implementada en este ejemplo.');
-        }
-
-        function exportToPng() {
-            alert('Función de exportar como imagen no implementada en este ejemplo.');
-        }
-
-        function shareCalendar() {
-            alert('Función de compartir calendario no implementada en este ejemplo.');
-        }
-
-        function resetCalendar() {
-            if (confirm('¿Estás seguro de que deseas resetear el calendario? Esta acción no se puede deshacer.')) {
-                events = {};
-                vacations = [];
-                customDays = [];
-                fixedDays = { madre: [], padre: [] };
-                saveUserData();
-                renderCalendar();
-            }
-        }
-
-        function saveUserData() {
-            if (currentUser) {
-                const userData = {
-                    events,
-                    vacations,
-                    customDays,
-                    fixedDays,
-                    sharedCalendar
-                };
-                localStorage.setItem(`calendarData_${currentUser.email}`, JSON.stringify(userData));
-            }
-        }
-
-        function loadUserData() {
-            if (currentUser) {
-                const userData = JSON.parse(localStorage.getItem(`calendarData_${currentUser.email}`));
-                if (userData) {
-                    events = userData.events || {};
-                    vacations = userData.vacations || [];
-                    customDays = userData.customDays || [];
-                    fixedDays = userData.fixedDays || { madre: [], padre: [] };
-                    sharedCalendar = userData.sharedCalendar || false;
-                    document.getElementById('toggleSharedCalendar').checked = sharedCalendar;
-                }
-            }
-        }
-
-        window.onload = initialize;
-
-        // ========= NUEVO: NAVEGACIÓN INFERIOR Y LISTAS =========
-
-        function mostrarVista(idVista) {
-            document.querySelectorAll('.view').forEach(v => {
-                v.classList.toggle('visible', v.id === idVista);
-                v.classList.toggle('hidden', v.id !== idVista);
-            });
-
-            document.querySelectorAll('#bottom-nav .nav-btn').forEach(btn => btn.classList.remove('active'));
-            if (idVista === 'view-home') document.getElementById('btn-nav-home').classList.add('active');
-            if (idVista === 'view-solicitudes') document.getElementById('btn-nav-solicitudes').classList.add('active');
-            if (idVista === 'view-eventos') document.getElementById('btn-nav-eventos').classList.add('active');
-        }
-
-        document.getElementById('btn-nav-home').addEventListener('click', () => {
-            mostrarVista('view-home');
-        });
-
-        document.getElementById('btn-nav-solicitudes').addEventListener('click', () => {
-            cargarSolicitudes();
-            mostrarVista('view-solicitudes');
-        });
-
-        document.getElementById('btn-nav-eventos').addEventListener('click', () => {
-            cargarEventosProgramados();
-            mostrarVista('view-eventos');
-        });
-
-        // Simulación básica de solicitudes.
-        // Si más adelante conectas con backend, aquí puedes leer de Firestore o API.
-        function obtenerSolicitudesMock() {
-            const raw = localStorage.getItem('solicitudes_mock') || '[]';
-            return JSON.parse(raw);
-        }
-
-        function guardarSolicitudesMock(lista) {
-            localStorage.setItem('solicitudes_mock', JSON.stringify(lista));
-        }
-
-        function cargarSolicitudes() {
-            const cont = document.getElementById('lista-solicitudes');
-            const solicitudes = obtenerSolicitudesMock();
-
-            if (!solicitudes.length) {
-                cont.innerHTML = '<p>No tienes solicitudes registradas.</p>';
-                return;
-            }
-
-            cont.innerHTML = '';
-            solicitudes.forEach(s => {
-                const div = document.createElement('div');
-                div.className = 'solicitud-item';
-
-                const color =
-                    s.estado === 'pendiente' ? 'orange' :
-                    s.estado === 'aceptada' ? 'lightgreen' :
-                    'salmon';
-
-                div.innerHTML = `
-                    <p><strong>ID:</strong> ${s.id}</p>
-                    <p><strong>Estado:</strong> <span style="color:${color}">${s.estado}</span></p>
-                    <p><strong>Fecha:</strong> ${s.fecha || '-'}</p>
-                    <p><strong>Detalle:</strong> ${s.detalle || '-'}</p>
-                `;
-
-                if (s.estado === 'pendiente') {
-                    const btn = document.createElement('button');
-                    btn.textContent = 'Cancelar solicitud';
-                    btn.onclick = () => {
-                        if (!confirm('¿Seguro que quieres cancelar esta solicitud?')) return;
-                        s.estado = 'cancelada';
-                        guardarSolicitudesMock(solicitudes);
-                        cargarSolicitudes();
-                    };
-                    div.appendChild(btn);
-                }
-
-                cont.appendChild(div);
-            });
-        }
-
-        function cargarEventosProgramados() {
-            const cont = document.getElementById('lista-eventos');
-            const lista = [];
-
-            for (const key in events) {
-                if (!Object.prototype.hasOwnProperty.call(events, key)) continue;
-                const evts = events[key];
-                evts.forEach(e => {
-                    lista.push({
-                        fecha: key,
-                        tipo: e.type,
-                        parent: e.parent
-                    });
-                });
-            }
-
-            if (!lista.length) {
-                cont.innerHTML = '<p>No hay eventos programados.</p>';
-                return;
-            }
-
-            lista.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
-
-            cont.innerHTML = '';
-            lista.forEach(e => {
-                const div = document.createElement('div');
-                div.className = 'evento-item';
-                const fechaStr = new Date(e.fecha).toLocaleDateString('es-ES', {
-                    weekday: 'short',
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric'
-                });
-
-                div.innerHTML = `
-                    <p><strong>${fechaStr}</strong></p>
-                    <p>Tipo: ${e.tipo}</p>
-                    <p>Custodia: ${e.parent}</p>
-                `;
-
-                div.onclick = () => {
-                    mostrarVista('view-home');
-                    // aquí podrías hacer scroll o resaltar ese día
-                };
-
-                cont.appendChild(div);
-            });
-        }
-    </script>
 </body>
 </html>

@@ -8,7 +8,7 @@
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
         * { 
             margin: 0; 
@@ -18,13 +18,15 @@
         }
 
         body {
-            font-family: 'Google Sans', 'Inter', system-ui, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Roboto', system-ui, sans-serif;
+            background: linear-gradient(180deg, #f5f5f7 0%, #e8e8ed 100%);
             background-attachment: fixed;
-            color: #1e293b;
+            color: #1d1d1f;
             overscroll-behavior-y: none;
-            letter-spacing: -0.01em;
+            letter-spacing: -0.02em;
             min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         .hidden { display: none !important; }
@@ -35,201 +37,441 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 16px;
         }
 
         .login-card {
-            background: white;
-            border-radius: 24px;
-            padding: 40px;
-            max-width: 400px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 0.5px solid rgba(0, 0, 0, 0.04);
+            padding: 32px 24px;
+            max-width: 380px;
             width: 100%;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
         }
 
         .login-title {
-            font-size: 32px;
+            font-size: 28px;
             font-weight: 700;
-            color: #1e293b;
-            margin-bottom: 8px;
+            color: #1d1d1f;
+            margin-bottom: 6px;
             text-align: center;
+            letter-spacing: -0.03em;
         }
 
         .login-subtitle {
-            color: #64748b;
+            color: #86868b;
             text-align: center;
-            margin-bottom: 32px;
+            margin-bottom: 28px;
             font-size: 14px;
+            font-weight: 400;
         }
 
-        .login-field {
-            margin-bottom: 20px;
-        }
-
-        .login-field label {
-            display: block;
-            color: #334155;
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-
-        .login-field input, .login-field select {
-            width: 100%;
-            padding: 14px;
-            border-radius: 12px;
-            border: 2px solid #e2e8f0;
-            background: #f8fafc;
-            color: #1e293b;
-            font-size: 15px;
-            transition: all 0.3s ease;
-        }
-
-        .login-field input:focus, .login-field select:focus {
-            outline: none;
-            border-color: #667eea;
-            background: white;
-        }
-
-        .login-field option {
-            background: white;
-            color: #1e293b;
-        }
-
-        .login-btn {
-            width: 100%;
-            padding: 14px;
-            border-radius: 12px;
-            border: none;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            font-weight: 600;
-            font-size: 15px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 10px;
-        }
-
-        .login-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-        }
-
-        .secondary-btn {
-            width: 100%;
-            padding: 12px;
-            border-radius: 12px;
-            border: 2px solid #e2e8f0;
-            background: transparent;
-            color: #64748b;
-            font-weight: 500;
-            font-size: 14px;
-            cursor: pointer;
-            margin-top: 12px;
-            transition: all 0.3s ease;
-        }
-
-        .secondary-btn:hover {
-            background: #f8fafc;
-            border-color: #cbd5e1;
-        }
-
-        #login-error-msg {
-            color: #ef4444;
-            font-size: 13px;
-            margin-top: 12px;
-            text-align: center;
-        }
-
-        /* --- MODAL OVERLAY --- */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(8px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            padding: 20px;
-        }
-
-        .modal-overlay.open {
-            display: flex;
-        }
-
-        .modal-card {
-            background: white;
-            border-radius: 24px;
-            padding: 32px;
-            max-width: 500px;
-            width: 100%;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            position: relative;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        /* --- APP --- */
-        .app {
-            min-height: 100vh;
-            padding-bottom: 80px;
+        .login-form {
             display: flex;
             flex-direction: column;
+            gap: 16px;
         }
 
-        .topbar {
-            padding: max(12px, env(safe-area-inset-top) + 8px) 16px 12px;
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1d1d1f;
+            padding-left: 4px;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 14px 16px;
+            border: 1px solid #d2d2d7;
+            border-radius: 12px;
+            font-size: 16px;
             background: white;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            color: #1d1d1f;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #007aff;
+            box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
+        }
+
+        .btn-primary {
+            background: #007aff;
+            color: white;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 8px;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        .btn-primary:active {
+            transform: scale(0.97);
+            background: #0051d5;
+        }
+
+        /* --- APP CONTAINER --- */
+        .app-container {
+            min-height: 100vh;
+            padding-bottom: 80px;
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+
+        /* --- HEADER --- */
+        .header {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 0.5px solid rgba(0, 0, 0, 0.06);
+            padding: 12px 16px;
             position: sticky;
             top: 0;
             z-index: 100;
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            justify-content: space-between;
+            gap: 12px;
         }
 
-        .logo-icon {
-            font-size: 24px;
-        }
-
-        .app-name {
-            font-size: 16px;
+        .header-title {
+            font-size: 20px;
             font-weight: 700;
-            color: #1e293b;
-        }
-
-        #user-role-label {
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        #user-role-label.madre {
-            background: #fce7f3;
-            color: #ec4899;
-            border: 2px solid #fbcfe8;
-        }
-
-        #user-role-label.padre {
-            background: #dbeafe;
-            color: #3b82f6;
-            border: 2px solid #bfdbfe;
-        }
-
-        /* --- VIEWS --- */
-        .view {
-            display: none;
+            color: #1d1d1f;
             flex: 1;
+            text-align: center;
+            letter-spacing: -0.03em;
         }
 
-        .view.active {
+        .header-btn {
+            background: #f5f5f7;
+            border: none;
+            border-radius: 10px;
+            padding: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            color: #007aff;
+            min-width: 40px;
+            min-height: 40px;
+        }
+
+        .header-btn:active {
+            transform: scale(0.95);
+            background: #e8e8ed;
+        }
+
+        /* --- CALENDAR --- */
+        .calendar-container {
+            padding: 16px;
+            max-width: 100%;
+        }
+
+        .month-selector {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            gap: 12px;
+            padding: 0 4px;
+        }
+
+        .month-btn {
+            background: white;
+            border: none;
+            border-radius: 10px;
+            padding: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            color: #007aff;
+            min-width: 44px;
+            min-height: 44px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .month-btn:active {
+            transform: scale(0.95);
+            background: #f5f5f7;
+        }
+
+        .month-display {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1d1d1f;
+            text-align: center;
+            flex: 1;
+            letter-spacing: -0.02em;
+        }
+
+        .calendar-grid {
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+        }
+
+        .weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            margin-bottom: 8px;
+        }
+
+        .weekday {
+            text-align: center;
+            font-size: 11px;
+            font-weight: 600;
+            color: #86868b;
+            padding: 8px 0;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+
+        .days-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+        }
+
+        .day-cell {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            background: white;
+            color: #1d1d1f;
+            border: 1px solid transparent;
+            min-height: 44px;
+        }
+
+        .day-cell.inactive {
+            color: #d2d2d7;
+        }
+
+        .day-cell.today {
+            background: #f5f5f7;
+            border-color: #007aff;
+            color: #007aff;
+            font-weight: 600;
+        }
+
+        .day-cell.parent-a {
+            background: linear-gradient(135deg, #34c759, #30d158);
+            color: white;
+            font-weight: 600;
+        }
+
+        .day-cell.parent-b {
+            background: linear-gradient(135deg, #ff9500, #ff8c00);
+            color: white;
+            font-weight: 600;
+        }
+
+        .day-cell:active {
+            transform: scale(0.92);
+        }
+
+        /* --- LEGEND --- */
+        .legend {
+            display: flex;
+            gap: 12px;
+            margin: 16px 16px 0;
+            padding: 16px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #1d1d1f;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 6px;
+        }
+
+        .legend-color.a {
+            background: linear-gradient(135deg, #34c759, #30d158);
+        }
+
+        .legend-color.b {
+            background: linear-gradient(135deg, #ff9500, #ff8c00);
+        }
+
+        /* --- MODALS --- */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            z-index: 1000;
+            padding: 0;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px 20px 0 0;
+            padding: 24px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 85vh;
+            overflow-y: auto;
+            transform: translateY(0);
+            animation: slideUp 0.3s ease-out;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(100%);
+            }
+            to {
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #f5f5f7;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1d1d1f;
+            letter-spacing: -0.02em;
+        }
+
+        .close-btn {
+            background: #f5f5f7;
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #86868b;
+            transition: all 0.2s ease;
+        }
+
+        .close-btn:active {
+            transform: scale(0.9);
+            background: #e8e8ed;
+        }
+
+        .modal-body {
             display: flex;
             flex-direction: column;
+            gap: 16px;
+        }
+
+        /* --- BUTTONS --- */
+        .btn {
+            padding: 14px 20px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            touch-action: manipulation;
+            min-height: 48px;
+        }
+
+        .btn-parent-a {
+            background: #34c759;
+            color: white;
+        }
+
+        .btn-parent-a:active {
+            transform: scale(0.97);
+            background: #2fb350;
+        }
+
+        .btn-parent-b {
+            background: #ff9500;
+            color: white;
+        }
+
+        .btn-parent-b:active {
+            transform: scale(0.97);
+            background: #f08800;
+        }
+
+        .btn-neutral {
+            background: #f5f5f7;
+            color: #1d1d1f;
+        }
+
+        .btn-neutral:active {
+            transform: scale(0.97);
+            background: #e8e8ed;
+        }
+
+        .btn-danger {
+            background: #ff3b30;
+            color: white;
+        }
+
+        .btn-danger:active {
+            transform: scale(0.97);
+            background: #e6342a;
         }
 
         /* --- BOTTOM NAV --- */
@@ -238,1230 +480,1031 @@
             bottom: 0;
             left: 0;
             right: 0;
-            background: white;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 0.5px solid rgba(0, 0, 0, 0.06);
+            padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
             display: flex;
             justify-content: space-around;
-            padding: 8px 0 calc(8px + env(safe-area-inset-bottom));
-            z-index: 1000;
+            z-index: 100;
+            box-shadow: 0 -2px 16px rgba(0, 0, 0, 0.04);
         }
 
-        .nav-item {
+        .nav-btn {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 2px;
-            padding: 6px 16px;
+            gap: 4px;
+            padding: 8px 16px;
+            background: none;
+            border: none;
             cursor: pointer;
-            transition: all 0.3s ease;
+            color: #86868b;
+            transition: all 0.2s ease;
             border-radius: 12px;
-            color: #94a3b8;
-        }
-
-        .nav-item:hover {
-            background: #f8fafc;
-        }
-
-        .nav-item.active {
-            color: #667eea;
-        }
-
-        .nav-item svg {
-            width: 22px;
-            height: 22px;
-        }
-
-        .nav-item span {
-            font-size: 10px;
-            font-weight: 500;
-        }
-
-        /* --- CALENDAR --- */
-        .calendar-wrapper {
             flex: 1;
-            display: flex;
-            flex-direction: column;
-            padding: 8px;
-            max-width: 100%;
+            max-width: 100px;
+            min-height: 56px;
         }
 
-        .calendar-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-            padding: 12px 16px;
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        .nav-btn.active {
+            color: #007aff;
+            background: #f5f5f7;
         }
 
-        .calendar-title {
-            font-size: 18px;
-            font-weight: 700;
-            color: #1e293b;
+        .nav-btn:active {
+            transform: scale(0.95);
         }
 
-        .nav-arrow {
-            background: #f8fafc;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #64748b;
-        }
-
-        .nav-arrow:hover {
-            background: white;
-            border-color: #cbd5e1;
-            transform: scale(1.05);
-        }
-
-        .calendar-grid {
-            opacity: 1;
-            transition: opacity 0.3s ease;
-            flex: 1;
-            display: flex;
-            align-items: center;
-        }
-
-        .calendar-grid.fading {
-            opacity: 0;
-        }
-
-        .month-table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 4px;
-        }
-
-        .month-table th {
-            color: #64748b;
+        .nav-btn span {
             font-size: 11px;
             font-weight: 600;
-            padding: 6px 0;
-            text-transform: uppercase;
+            letter-spacing: -0.01em;
         }
 
-        .day-cell {
-            aspect-ratio: 1;
-            border-radius: 14px;
-            padding: 6px;
-            cursor: pointer;
-            position: relative;
-            background: white;
-            border: 2px solid #e2e8f0;
-            transition: all 0.3s ease;
-            text-align: center;
-            vertical-align: top;
-        }
-
-        .day-cell:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        .day-cell.day-padre {
-            background: linear-gradient(135deg, #dbeafe, #bfdbfe);
-            border-color: #93c5fd;
-        }
-
-        .day-cell.day-madre {
-            background: linear-gradient(135deg, #fce7f3, #fbcfe8);
-            border-color: #f9a8d4;
-        }
-
-        .day-cell.day-overridden {
-            box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.3);
-        }
-
-        .day-number {
-            font-size: 13px;
-            font-weight: 600;
-            color: #1e293b;
-            display: block;
-            margin-bottom: 2px;
-        }
-
-        .owner-icon-img {
-            width: 48px;
-            height: 48px;
-            object-fit: contain;
-            margin: 2px auto;
-            display: block;
-            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
-        }
-
-        .event-marker {
-            position: absolute;
-            width: 18px;
-            height: 18px;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-        }
-
-        .event-marker.pos-0 { top: 4px; right: 4px; }
-        .event-marker.pos-1 { top: 4px; right: 26px; }
-        .event-marker.pos-2 { top: 4px; right: 48px; }
-
-        .evt-medico { background: #3b82f6; }
-        .evt-dentista { background: #06b6d4; }
-        .evt-escuela { background: #8b5cf6; }
-        .evt-deporte { background: #f59e0b; }
-        .evt-cumple { background: #ec4899; }
-        .evt-parque { background: #10b981; }
-        .evt-general { background: #6366f1; }
-        .evt-vacaciones { background: #14b8a6; }
-
-        /* --- REQUESTS VIEW --- */
-        .requests-container, .events-container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .section-title {
-            font-size: 24px;
-            font-weight: 700;
-            color: #1e293b;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .section-subtitle {
-            color: #64748b;
-            font-size: 14px;
-            margin-bottom: 24px;
-        }
-
-        .card {
-            background: white;
-            border-radius: 16px;
-            padding: 20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            margin-bottom: 20px;
-        }
-
-        .request-item {
-            background: #f8fafc;
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 12px;
-            border: 2px solid #e2e8f0;
-            transition: all 0.3s ease;
-        }
-
-        .request-item:hover {
-            background: white;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        .event-card {
-            background: white;
-            border-radius: 16px;
-            padding: 16px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            margin-bottom: 12px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .event-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        .event-card.padre-event {
-            border-left: 4px solid #3b82f6;
-        }
-
-        .event-card.madre-event {
-            border-left: 4px solid #ec4899;
-        }
-
-        /* --- TOAST --- */
-        .toast-container {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 9999;
+        /* --- LISTS --- */
+        .request-list,
+        .activity-list {
             display: flex;
             flex-direction: column;
             gap: 12px;
-            pointer-events: none;
-            width: 90%;
-            max-width: 400px;
+            padding: 16px;
         }
 
-        .toast {
+        .request-card,
+        .activity-card {
             background: white;
-            color: #1e293b;
-            padding: 16px 20px;
             border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-            font-size: 14px;
-            font-weight: 500;
-            opacity: 0;
-            transform: translateY(-20px);
-            transition: all 0.3s ease;
-            pointer-events: auto;
-        }
-
-        .toast.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .toast.success { border-left: 4px solid #22c55e; }
-        .toast.error { border-left: 4px solid #ef4444; }
-
-        /* --- MODAL DAY --- */
-        .icon-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-            margin: 16px 0;
-        }
-
-        .icon-btn {
-            padding: 12px;
-            border-radius: 12px;
-            border: 2px solid transparent;
-            cursor: pointer;
-            transition: all 0.3s ease;
+            padding: 16px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
             display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
+            flex-direction: column;
+            gap: 12px;
         }
 
-        .icon-btn:hover {
-            transform: scale(1.05);
-        }
-
-        .icon-btn.selected {
-            border-color: #1e293b;
-            box-shadow: 0 0 0 3px rgba(30, 41, 59, 0.1);
-        }
-
-        .close-modal {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            background: #f8fafc;
-            border: none;
-            border-radius: 50%;
-            width: 32px;
-            height: 32px;
-            cursor: pointer;
-            color: #64748b;
-            font-size: 20px;
+        .request-header,
+        .activity-header {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
+            justify-content: space-between;
+            align-items: start;
+            gap: 12px;
         }
 
-        .close-modal:hover {
-            background: #e2e8f0;
-            transform: rotate(90deg);
-        }
-
-        .modal-title {
-            font-weight: 700;
-            color: #1e293b;
-            margin-bottom: 16px;
-            font-size: 18px;
-        }
-
-        /* Botones de acción */
-        .btn-accept {
+        .request-info,
+        .activity-info {
             flex: 1;
-            background: linear-gradient(135deg, #22c55e, #16a34a);
-            border: none;
-            border-radius: 10px;
-            padding: 10px;
-            color: white;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
         }
 
-        .btn-accept:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+        .request-date,
+        .activity-date {
+            font-size: 13px;
+            color: #86868b;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .request-reason,
+        .activity-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1d1d1f;
+            margin-bottom: 2px;
+        }
+
+        .request-from {
+            font-size: 13px;
+            color: #86868b;
+        }
+
+        .activity-type {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .type-visita { background: #e8f5e9; color: #2e7d32; }
+        .type-actividad { background: #e3f2fd; color: #1565c0; }
+        .type-medica { background: #fff3e0; color: #e65100; }
+        .type-escolar { background: #f3e5f5; color: #6a1b9a; }
+
+        .request-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-height: 36px;
+        }
+
+        .btn-approve {
+            background: #34c759;
+            color: white;
+        }
+
+        .btn-approve:active {
+            transform: scale(0.95);
+            background: #2fb350;
         }
 
         .btn-reject {
-            flex: 1;
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-            border: none;
-            border-radius: 10px;
-            padding: 10px;
-            color: white;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
+            background: #f5f5f7;
+            color: #ff3b30;
         }
 
-        .btn-reject:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        .btn-reject:active {
+            transform: scale(0.95);
+            background: #e8e8ed;
         }
 
-        .btn-cancel {
-            flex: 1;
-            background: #f8fafc;
-            border: 2px solid #e2e8f0;
-            border-radius: 10px;
-            padding: 10px;
-            color: #64748b;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
+        .empty-state {
+            padding: 60px 20px;
+            text-align: center;
+            color: #86868b;
         }
 
-        .btn-cancel:hover {
+        .empty-state-icon {
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-state-text {
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        /* --- CONFIG --- */
+        .config-container {
+            padding: 16px;
+            padding-bottom: 100px;
+        }
+
+        .config-section {
             background: white;
-            border-color: #cbd5e1;
-            transform: translateY(-2px);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
         }
 
-        /* Responsive - Calendario pantalla completa en móvil */
-        @media (max-width: 640px) {
-            .login-card, .modal-card {
-                padding: 24px;
+        .config-section-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #86868b;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 12px;
+            padding-left: 4px;
+        }
+
+        .config-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 4px;
+            border-bottom: 0.5px solid #f5f5f7;
+        }
+
+        .config-item:last-child {
+            border-bottom: none;
+        }
+
+        .config-label {
+            font-size: 15px;
+            font-weight: 500;
+            color: #1d1d1f;
+        }
+
+        .config-value {
+            font-size: 15px;
+            color: #86868b;
+        }
+
+        .config-button {
+            width: 100%;
+            margin-top: 8px;
+        }
+
+        /* --- RESPONSIVE OPTIMIZATIONS --- */
+        @media (max-width: 380px) {
+            .login-card {
+                padding: 24px 20px;
             }
 
-            .app {
-                padding-bottom: 70px;
-            }
-
-            .topbar {
-                padding: max(8px, env(safe-area-inset-top) + 6px) 12px 8px;
-            }
-
-            .logo-icon {
-                font-size: 20px;
-            }
-
-            .app-name {
-                font-size: 14px;
-            }
-
-            #child-name-display {
-                font-size: 10px !important;
-            }
-
-            #user-role-label {
-                padding: 3px 10px;
-                font-size: 10px;
-            }
-
-            #year-select {
-                font-size: 12px;
-                padding: 4px !important;
-            }
-
-            .calendar-wrapper {
-                padding: 4px;
-            }
-
-            .calendar-header {
-                padding: 10px 12px;
-                margin-bottom: 6px;
-            }
-
-            .calendar-title {
-                font-size: 16px;
-            }
-
-            .nav-arrow {
-                padding: 6px;
-            }
-
-            .section-title {
-                font-size: 20px;
-            }
-
-            .month-table {
-                border-spacing: 2px;
+            .calendar-grid {
+                padding: 12px;
             }
 
             .day-cell {
-                padding: 4px;
-                border-radius: 12px;
+                font-size: 14px;
+                min-height: 40px;
             }
 
-            .day-number {
-                font-size: 12px;
+            .weekday {
+                font-size: 10px;
             }
 
-            .owner-icon-img {
-                width: 40px;
-                height: 40px;
+            .legend {
+                flex-direction: column;
+                gap: 8px;
             }
 
-            .event-marker {
-                width: 16px;
-                height: 16px;
+            .nav-btn {
+                padding: 6px 8px;
+                min-height: 52px;
             }
 
-            .event-marker.pos-1 { right: 22px; }
-            .event-marker.pos-2 { right: 40px; }
-
-            .bottom-nav {
-                padding: 6px 0 calc(6px + env(safe-area-inset-bottom));
-            }
-
-            .nav-item {
-                padding: 4px 12px;
-            }
-
-            .nav-item svg {
-                width: 20px;
-                height: 20px;
-            }
-
-            .requests-container, .events-container {
-                padding: 12px;
+            .nav-btn span {
+                font-size: 10px;
             }
         }
 
-        /* Pantallas muy pequeñas */
-        @media (max-width: 380px) {
-            .owner-icon-img {
-                width: 36px;
-                height: 36px;
+        @media (min-width: 768px) {
+            .app-container {
+                max-width: 600px;
+                margin: 0 auto;
             }
 
-            .day-number {
-                font-size: 11px;
+            .modal-content {
+                border-radius: 20px;
+                max-height: 80vh;
             }
 
-            .event-marker {
-                width: 14px;
-                height: 14px;
+            .modal {
+                align-items: center;
+                padding: 20px;
             }
+        }
+
+        /* Safe area for notched devices */
+        @supports (padding: max(0px)) {
+            .header {
+                padding-top: max(12px, env(safe-area-inset-top));
+                padding-left: max(16px, env(safe-area-inset-left));
+                padding-right: max(16px, env(safe-area-inset-right));
+            }
+
+            .bottom-nav {
+                padding-bottom: max(8px, env(safe-area-inset-bottom));
+                padding-left: max(8px, env(safe-area-inset-left));
+                padding-right: max(8px, env(safe-area-inset-right));
+            }
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #d2d2d7;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #b8b8bd;
         }
     </style>
 </head>
 <body>
-    <div class="toast-container" id="toast-container"></div>
 
-    <!-- ONBOARDING MODAL -->
-    <div class="modal-overlay" id="onboarding-modal">
-        <div class="modal-card">
-            <div style="text-align:center; margin-bottom:20px;">
-                <div style="font-size:3rem;">👋</div>
-                <h2 style="color:#1e293b; margin:10px 0 5px;">¡Bienvenido/a!</h2>
-                <p style="color:#64748b; font-size:0.9rem;">Para configurar el calendario, necesitamos unos datos.</p>
-            </div>
-            <form id="onboarding-form">
-                <div class="login-field">
-                    <label>¿Quién eres?</label>
-                    <select id="onboard-role" required>
-                        <option value="" disabled selected>Selecciona tu rol...</option>
-                        <option value="madre">Soy la Madre</option>
-                        <option value="padre">Soy el Padre</option>
+    <!-- LOGIN SCREEN -->
+    <div id="loginScreen" class="login-wrapper">
+        <div class="login-card">
+            <h1 class="login-title">Custodia Familiar</h1>
+            <p class="login-subtitle">Coordina la custodia familiar de forma visual</p>
+            <form class="login-form" id="loginForm">
+                <div class="form-group">
+                    <label for="userName">Nombre</label>
+                    <input type="text" id="userName" name="userName" required placeholder="Tu nombre">
+                </div>
+                <div class="form-group">
+                    <label for="userRole">Rol</label>
+                    <select id="userRole" name="userRole" required>
+                        <option value="">Selecciona tu rol</option>
+                        <option value="a">Progenitor A</option>
+                        <option value="b">Progenitor B</option>
                     </select>
                 </div>
-                <div class="login-field">
-                    <label>Nombre del niño/a</label>
-                    <input type="text" id="onboard-child-name" required placeholder="Ej. Lucas">
-                </div>
-                <button type="submit" class="login-btn">Guardar y Entrar</button>
+                <button type="submit" class="btn-primary">Iniciar sesión</button>
             </form>
+        </div>
+    </div>
+
+    <!-- MAIN APP -->
+    <div id="appContainer" class="app-container hidden">
+        <!-- HEADER -->
+        <div class="header">
+            <button class="header-btn" id="backBtn" style="visibility: hidden;">
+                <i data-lucide="arrow-left" width="20" height="20"></i>
+            </button>
+            <h1 class="header-title" id="headerTitle">Calendario</h1>
+            <button class="header-btn" id="settingsBtn">
+                <i data-lucide="settings" width="20" height="20"></i>
+            </button>
+        </div>
+
+        <!-- CALENDAR VIEW -->
+        <div id="calendarView">
+            <div class="calendar-container">
+                <div class="month-selector">
+                    <button class="month-btn" id="prevMonth">
+                        <i data-lucide="chevron-left" width="20" height="20"></i>
+                    </button>
+                    <div class="month-display" id="monthDisplay">Enero 2026</div>
+                    <button class="month-btn" id="nextMonth">
+                        <i data-lucide="chevron-right" width="20" height="20"></i>
+                    </button>
+                </div>
+                <div class="calendar-grid">
+                    <div class="weekdays">
+                        <div class="weekday">Lun</div>
+                        <div class="weekday">Mar</div>
+                        <div class="weekday">Mié</div>
+                        <div class="weekday">Jue</div>
+                        <div class="weekday">Vie</div>
+                        <div class="weekday">Sáb</div>
+                        <div class="weekday">Dom</div>
+                    </div>
+                    <div class="days-grid" id="daysGrid"></div>
+                </div>
+            </div>
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color a"></div>
+                    <span id="legendA">Progenitor A</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color b"></div>
+                    <span id="legendB">Progenitor B</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- REQUESTS VIEW -->
+        <div id="requestsView" class="hidden">
+            <div class="request-list" id="requestList"></div>
+        </div>
+
+        <!-- ACTIVITIES VIEW -->
+        <div id="activitiesView" class="hidden">
+            <div class="activity-list" id="activityList"></div>
+        </div>
+
+        <!-- CONFIG VIEW -->
+        <div id="configView" class="hidden">
+            <div class="config-container">
+                <div class="config-section">
+                    <div class="config-section-title">Usuario</div>
+                    <div class="config-item">
+                        <span class="config-label">Nombre</span>
+                        <span class="config-value" id="configUserName">-</span>
+                    </div>
+                    <div class="config-item">
+                        <span class="config-label">Rol</span>
+                        <span class="config-value" id="configUserRole">-</span>
+                    </div>
+                </div>
+                <div class="config-section">
+                    <div class="config-section-title">Progenitores</div>
+                    <div class="config-item">
+                        <span class="config-label">Progenitor A</span>
+                        <span class="config-value" id="configParentA">-</span>
+                    </div>
+                    <div class="config-item">
+                        <span class="config-label">Progenitor B</span>
+                        <span class="config-value" id="configParentB">-</span>
+                    </div>
+                    <button class="btn btn-neutral config-button" id="editNamesBtn">
+                        <i data-lucide="edit-2" width="18" height="18"></i>
+                        Editar nombres
+                    </button>
+                </div>
+                <div class="config-section">
+                    <div class="config-section-title">Datos</div>
+                    <button class="btn btn-neutral config-button" id="exportBtn">
+                        <i data-lucide="download" width="18" height="18"></i>
+                        Exportar datos
+                    </button>
+                    <button class="btn btn-neutral config-button" id="importBtn">
+                        <i data-lucide="upload" width="18" height="18"></i>
+                        Importar datos
+                    </button>
+                    <input type="file" id="importFile" accept=".json" style="display: none;">
+                </div>
+                <div class="config-section">
+                    <button class="btn btn-danger config-button" id="logoutBtn">
+                        <i data-lucide="log-out" width="18" height="18"></i>
+                        Cerrar sesión
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- BOTTOM NAVIGATION -->
+        <div class="bottom-nav">
+            <button class="nav-btn active" id="navCalendar">
+                <i data-lucide="calendar" width="24" height="24"></i>
+                <span>Calendario</span>
+            </button>
+            <button class="nav-btn" id="navRequests">
+                <i data-lucide="inbox" width="24" height="24"></i>
+                <span>Solicitudes</span>
+            </button>
+            <button class="nav-btn" id="navActivities">
+                <i data-lucide="list" width="24" height="24"></i>
+                <span>Actividades</span>
+            </button>
         </div>
     </div>
 
     <!-- DAY MODAL -->
-    <div class="modal-overlay" id="day-modal">
-        <div class="modal-card">
-            <button class="close-modal" onclick="closeModal()">×</button>
-            <div class="modal-title" id="modal-date-title">Detalles</div>
-            <div style="margin:8px 0 14px; padding:10px; background:#f8fafc; border-radius:16px; display:flex; align-items:center; gap:10px; border:2px solid #e2e8f0;">
-                <img id="modal-custody-img" src="" style="width:48px; height:48px; object-fit:contain; filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));">
-                <div>
-                    <div style="font-size:0.7rem; color:#64748b; text-transform:uppercase; font-weight:600;">Custodia actual</div>
-                    <div id="modal-custody-text" style="font-weight:700; font-size:0.9rem; color:#1e293b; text-transform:uppercase;"></div>
-                </div>
+    <div id="dayModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="dayModalTitle">1 de Enero</h2>
+                <button class="close-btn" id="closeDayModal">
+                    <i data-lucide="x" width="20" height="20"></i>
+                </button>
             </div>
-            <input type="text" id="event-title" placeholder="Ej. Fiesta de disfraces…" style="width:100%; padding:12px; border-radius:14px; background:#f8fafc; border:2px solid #e2e8f0; color:#1e293b; margin-top:6px;" />
-            <div class="icon-grid">
-                <button class="icon-btn evt-medico" onclick="selectIcon('medico', this)"><i data-lucide="stethoscope"></i></button>
-                <button class="icon-btn evt-dentista" onclick="selectIcon('dentista', this)"><i data-lucide="smile"></i></button>
-                <button class="icon-btn evt-escuela" onclick="selectIcon('escuela', this)"><i data-lucide="backpack"></i></button>
-                <button class="icon-btn evt-deporte" onclick="selectIcon('deporte', this)"><i data-lucide="trophy"></i></button>
-                <button class="icon-btn evt-cumple" onclick="selectIcon('cumple', this)"><i data-lucide="cake"></i></button>
-                <button class="icon-btn evt-parque" onclick="selectIcon('parque', this)"><i data-lucide="tree-deciduous"></i></button>
-                <button class="icon-btn evt-general" onclick="selectIcon('general', this)"><i data-lucide="star"></i></button>
-                <button class="icon-btn evt-vacaciones" onclick="selectIcon('vacaciones', this)"><i data-lucide="palmtree"></i></button>
-            </div>
-            <button onclick="saveEvent()" class="login-btn" style="margin-top:8px;">Guardar actividad</button>
-            <div id="modal-event-list" style="margin-top:10px; max-height:180px; overflow-y:auto;"></div>
-        </div>
-    </div>
-
-    <!-- LOGIN VIEW -->
-    <div id="login-view" class="login-wrapper">
-        <div class="login-card">
-            <div class="login-title">Calendario</div>
-            <p class="login-subtitle">Coordina la custodia familiar de forma visual.</p>
-            <form id="login-form">
-                <div class="login-field">
-                    <label>Correo electrónico</label>
-                    <input type="email" id="login-email" required placeholder="tu@email.com">
-                </div>
-                <div class="login-field">
-                    <label>Contraseña</label>
-                    <input type="password" id="login-password" required placeholder="••••••••">
-                </div>
-                <button type="submit" class="login-btn" id="login-submit-btn">Entrar</button>
-            </form>
-            <button type="button" class="secondary-btn" id="toggle-auth-mode">¿No tienes cuenta? Regístrate</button>
-            <div id="login-error-msg"></div>
-        </div>
-    </div>
-
-    <!-- APP ROOT -->
-    <div id="app-root" class="app hidden">
-        <div class="topbar">
-            <div style="display:flex; align-items:center; gap:8px;">
-                <div class="logo-icon">👨‍👩‍👧‍👦</div>
-                <div>
-                    <div class="app-name">Custodia Familiar</div>
-                    <div id="child-name-display" style="font-size:0.7rem; color:#64748b; font-weight:500;"></div>
-                </div>
-            </div>
-            <div style="display:flex; align-items:center; gap:6px;">
-                <span id="user-role-label"></span>
-                <select id="year-select" style="background:#f8fafc; border:2px solid #e2e8f0; color:#1e293b; padding:6px; border-radius:999px; font-size:13px;"></select>
-                <button type="button" id="logout-btn" style="background:none; border:none; color:#64748b; cursor:pointer;"><i data-lucide="log-out" style="width:18px;"></i></button>
-            </div>
-        </div>
-
-        <!-- VISTA HOME (Calendario) -->
-        <div class="view active" id="homeView">
-            <div class="calendar-wrapper">
-                <div class="calendar-header">
-                    <button id="prev-period" class="nav-arrow"><i data-lucide="chevron-left"></i></button>
-                    <div class="calendar-title" id="calendar-title"></div>
-                    <button id="next-period" class="nav-arrow"><i data-lucide="chevron-right"></i></button>
-                </div>
-                <div id="calendar-grid" class="calendar-grid"></div>
-            </div>
-        </div>
-
-        <!-- VISTA SOLICITUDES -->
-        <div class="view" id="requestsView">
-            <div class="requests-container">
-                <h2 class="section-title">
-                    <i data-lucide="inbox"></i>
-                    Solicitudes de Cambio
-                </h2>
-                <p class="section-subtitle">Gestiona las solicitudes de cambio de custodia</p>
-
-                <div class="card">
-                    <div style="font-size:0.95rem; font-weight:700; color:#1e293b; margin-bottom:12px; display:flex; align-items:center; gap:6px;">
-                        <i data-lucide="send" style="width:16px;"></i> Nueva Solicitud
-                    </div>
-                    <form id="request-form">
-                        <div style="font-size:0.72rem; color:#64748b; margin-bottom:8px;">Usuario: <span id="whoami-label">...</span></div>
-                        <div style="display:flex; gap:10px; margin-bottom:10px; flex-wrap:wrap;">
-                            <div class="login-field" style="flex:1; min-width:140px; margin-bottom:0;">
-                                <label>Desde</label>
-                                <input type="date" id="start-date" required>
-                            </div>
-                            <div class="login-field" style="flex:1; min-width:140px; margin-bottom:0;">
-                                <label>Hasta</label>
-                                <input type="date" id="end-date" required>
-                            </div>
-                        </div>
-                        <div class="login-field">
-                            <label>Motivo del cambio</label>
-                            <textarea id="reason" placeholder="Explica el motivo..." required style="width:100%; height:80px; resize:none; padding:12px; border-radius:12px; border:2px solid #e2e8f0; background:#f8fafc; color:#1e293b;"></textarea>
-                        </div>
-                        <button type="submit" class="login-btn">Enviar solicitud</button>
-                    </form>
-                </div>
-
-                <div class="card">
-                    <h3 style="font-size:0.95rem; font-weight:700; color:#1e293b; margin-bottom:12px; display:flex; align-items:center; gap:6px;">
-                        <i data-lucide="clock" style="width:16px;"></i> Cambios Pendientes
-                    </h3>
-                    <div id="pending-requests"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- VISTA EVENTOS -->
-        <div class="view" id="eventsView">
-            <div class="events-container">
-                <h2 class="section-title">
-                    <i data-lucide="calendar-check"></i>
-                    Eventos Programados
-                </h2>
-                <p class="section-subtitle">Todas las actividades registradas en el calendario</p>
-                <div id="events-list"></div>
-            </div>
-        </div>
-
-        <!-- NAVEGACIÓN INFERIOR -->
-        <div class="bottom-nav">
-            <div class="nav-item active" onclick="switchView('home')">
-                <i data-lucide="calendar"></i>
-                <span>Calendario</span>
-            </div>
-            <div class="nav-item" onclick="switchView('requests')">
-                <i data-lucide="inbox"></i>
-                <span>Solicitudes</span>
-            </div>
-            <div class="nav-item" onclick="switchView('events')">
-                <i data-lucide="list"></i>
-                <span>Eventos</span>
+            <div class="modal-body">
+                <button class="btn btn-parent-a" id="assignParentA">
+                    <i data-lucide="user" width="20" height="20"></i>
+                    Asignar a <span id="nameA">Progenitor A</span>
+                </button>
+                <button class="btn btn-parent-b" id="assignParentB">
+                    <i data-lucide="user" width="20" height="20"></i>
+                    Asignar a <span id="nameB">Progenitor B</span>
+                </button>
+                <button class="btn btn-neutral" id="requestChange">
+                    <i data-lucide="send" width="20" height="20"></i>
+                    Solicitar cambio
+                </button>
+                <button class="btn btn-neutral" id="addActivity">
+                    <i data-lucide="plus" width="20" height="20"></i>
+                    Añadir actividad
+                </button>
             </div>
         </div>
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <!-- REQUEST CHANGE MODAL -->
+    <div id="requestModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Solicitar cambio</h2>
+                <button class="close-btn" id="closeRequestModal">
+                    <i data-lucide="x" width="20" height="20"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Motivo</label>
+                    <input type="text" id="requestReason" placeholder="Ejemplo: Viaje de trabajo">
+                </div>
+                <button class="btn btn-primary" id="submitRequest">
+                    <i data-lucide="send" width="20" height="20"></i>
+                    Enviar solicitud
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ACTIVITY MODAL -->
+    <div id="activityModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Nueva actividad</h2>
+                <button class="close-btn" id="closeActivityModal">
+                    <i data-lucide="x" width="20" height="20"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Título</label>
+                    <input type="text" id="activityTitle" placeholder="Ejemplo: Partido de fútbol">
+                </div>
+                <div class="form-group">
+                    <label>Tipo</label>
+                    <select id="activityType">
+                        <option value="visita">Visita</option>
+                        <option value="actividad">Actividad</option>
+                        <option value="medica">Médica</option>
+                        <option value="escolar">Escolar</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary" id="submitActivity">
+                    <i data-lucide="plus" width="20" height="20"></i>
+                    Añadir actividad
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- EDIT NAMES MODAL -->
+    <div id="editNamesModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Editar nombres</h2>
+                <button class="close-btn" id="closeEditNamesModal">
+                    <i data-lucide="x" width="20" height="20"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Nombre Progenitor A</label>
+                    <input type="text" id="editNameA" placeholder="Nombre del progenitor A">
+                </div>
+                <div class="form-group">
+                    <label>Nombre Progenitor B</label>
+                    <input type="text" id="editNameB" placeholder="Nombre del progenitor B">
+                </div>
+                <button class="btn btn-primary" id="saveNames">
+                    <i data-lucide="save" width="20" height="20"></i>
+                    Guardar cambios
+                </button>
+            </div>
+        </div>
+    </div>
 
     <script>
-        // Firebase Configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyAwgk4_l0zvaCUCgm1CjqqqXjJHr5KPBjc",
-            authDomain: "custodia-familiar.firebaseapp.com",
-            projectId: "custodia-familiar",
-            storageBucket: "custodia-familiar.firebasestorage.app",
-            messagingSenderId: "1038952432258",
-            appId: "1:1038952432258:web:7608d6a48d8ad8308a6a9b"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        const auth = firebase.auth();
-
-        const now = new Date();
-        let currentYear = now.getFullYear();
-        let currentMonth = now.getMonth();
-        const BASE_MONDAY = new Date(2026, 0, 5, 12, 0, 0);
-
-        let currentUser = null;
-        let currentRole = null;
-        let currentChildName = "";
-        let overrides = {};
-        let eventsData = {};
-        let pendingRequests = [];
-        let selectedDateKey = null;
-        let selectedIconType = "medico";
-        let listenersAttached = false;
-        let isRegistering = false;
-
-        let touchStartX = 0;
-        let touchEndX = 0;
-
-        const monthNames = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
-        const weekDayNames = ["L","M","X","J","V","S","D"];
-        const ICON_MAP = {
-            medico: "stethoscope", dentista: "smile", escuela: "backpack",
-            deporte: "trophy", cumple: "cake", parque: "tree-deciduous",
-            general: "star", vacaciones: "palmtree"
+        // App State
+        let appState = {
+            user: { name: '', role: '' },
+            parentNames: { a: 'Progenitor A', b: 'Progenitor B' },
+            currentMonth: new Date().getMonth(),
+            currentYear: new Date().getFullYear(),
+            calendar: {},
+            requests: [],
+            activities: [],
+            selectedDate: null
         };
 
-        function showToast(msg, type = "success") {
-            const container = document.getElementById("toast-container");
-            const el = document.createElement("div");
-            el.className = "toast " + type;
-            el.innerHTML = type === "success" ? `✅ ${msg}` : `⚠️ ${msg}`;
-            container.appendChild(el);
-            requestAnimationFrame(() => el.classList.add("visible"));
-            setTimeout(() => { el.classList.remove("visible"); setTimeout(() => el.remove(), 200); }, 3000);
-        }
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', () => {
+            loadState();
+            lucide.createIcons();
+            setupEventListeners();
 
-        function sendTelegramMessage(text) {
-            const url = "https://sendtelegram-jd4jwaesba-uc.a.run.app";
-            fetch(url, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ text })
-            }).catch(err => console.error("Error Telegram", err));
-        }
+            if (appState.user.name) {
+                showApp();
+            }
+        });
 
-        function formatearFecha(dateStr) {
-            if (!dateStr) return "";
-            const [y, m, d] = dateStr.split("-");
-            return `${d}/${m}/${y}`;
-        }
+        // Event Listeners
+        function setupEventListeners() {
+            // Login
+            document.getElementById('loginForm').addEventListener('submit', handleLogin);
 
-        // AUTH LOGIC
-        auth.onAuthStateChanged(async (user) => {
-            if (user) {
-                currentUser = user;
-                try {
-                    const snap = await db.collection("users").doc(user.uid).get();
-                    if (snap.exists) {
-                        const data = snap.data();
-                        currentRole = data.role || "madre";
-                        currentChildName = data.childName || "";
-                        loadApp();
-                    } else {
-                        document.getElementById("login-view").classList.add("hidden");
-                        document.getElementById("onboarding-modal").classList.add("open");
+            // Navigation
+            document.getElementById('navCalendar').addEventListener('click', () => showView('calendar'));
+            document.getElementById('navRequests').addEventListener('click', () => showView('requests'));
+            document.getElementById('navActivities').addEventListener('click', () => showView('activities'));
+            document.getElementById('settingsBtn').addEventListener('click', () => showView('config'));
+
+            // Calendar
+            document.getElementById('prevMonth').addEventListener('click', () => changeMonth(-1));
+            document.getElementById('nextMonth').addEventListener('click', () => changeMonth(1));
+
+            // Modals
+            document.getElementById('closeDayModal').addEventListener('click', () => closeModal('dayModal'));
+            document.getElementById('closeRequestModal').addEventListener('click', () => closeModal('requestModal'));
+            document.getElementById('closeActivityModal').addEventListener('click', () => closeModal('activityModal'));
+            document.getElementById('closeEditNamesModal').addEventListener('click', () => closeModal('editNamesModal'));
+
+            // Day actions
+            document.getElementById('assignParentA').addEventListener('click', () => assignDay('a'));
+            document.getElementById('assignParentB').addEventListener('click', () => assignDay('b'));
+            document.getElementById('requestChange').addEventListener('click', () => showRequestModal());
+            document.getElementById('addActivity').addEventListener('click', () => showActivityModal());
+
+            // Submit actions
+            document.getElementById('submitRequest').addEventListener('click', submitRequest);
+            document.getElementById('submitActivity').addEventListener('click', submitActivity);
+
+            // Config
+            document.getElementById('editNamesBtn').addEventListener('click', () => openModal('editNamesModal'));
+            document.getElementById('saveNames').addEventListener('click', saveNames);
+            document.getElementById('exportBtn').addEventListener('click', exportData);
+            document.getElementById('importBtn').addEventListener('click', () => document.getElementById('importFile').click());
+            document.getElementById('importFile').addEventListener('change', importData);
+            document.getElementById('logoutBtn').addEventListener('click', logout);
+
+            // Close modal on background click
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        closeModal(modal.id);
                     }
-                } catch (err) { console.error(err); }
-            } else {
-                currentUser = null;
-                currentRole = null;
-                document.getElementById("login-view").classList.remove("hidden");
-                document.getElementById("app-root").classList.add("hidden");
-                document.getElementById("onboarding-modal").classList.remove("open");
-            }
-        });
-
-        document.getElementById("toggle-auth-mode").onclick = function() {
-            isRegistering = !isRegistering;
-            this.textContent = isRegistering ? "¿Ya tienes cuenta? Entra aquí" : "¿No tienes cuenta? Regístrate";
-            document.getElementById("login-submit-btn").textContent = isRegistering ? "Crear cuenta" : "Entrar";
-            document.getElementById("login-error-msg").textContent = "";
-        };
-
-        document.getElementById("login-form").addEventListener("submit", (e) => {
-            e.preventDefault();
-            const email = document.getElementById("login-email").value;
-            const pass = document.getElementById("login-password").value;
-            const errorMsg = document.getElementById("login-error-msg");
-            errorMsg.textContent = "Procesando...";
-
-            if(isRegistering) {
-                auth.createUserWithEmailAndPassword(email, pass)
-                    .catch(err => errorMsg.textContent = "Error: " + err.message);
-            } else {
-                auth.signInWithEmailAndPassword(email, pass)
-                    .catch(err => errorMsg.textContent = "Credenciales incorrectas o usuario no encontrado.");
-            }
-        });
-
-        document.getElementById("onboarding-form").addEventListener("submit", async (e) => {
-            e.preventDefault();
-            const role = document.getElementById("onboard-role").value;
-            const childName = document.getElementById("onboard-child-name").value.trim();
-            if (!role || !childName) return showToast("Completa los datos", "error");
-            try {
-                await db.collection("users").doc(currentUser.uid).set({
-                    email: currentUser.email, role: role, childName: childName,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
-                currentRole = role;
-                currentChildName = childName;
-                document.getElementById("onboarding-modal").classList.remove("open");
-                loadApp();
-            } catch (err) { showToast("Error guardando perfil", "error"); }
-        });
-
-        function loadApp() {
-            const roleLabel = document.getElementById("user-role-label");
-            roleLabel.textContent = currentRole.toUpperCase();
-            roleLabel.className = "";
-            roleLabel.classList.add(currentRole);
-            document.getElementById("whoami-label").textContent = currentRole.toUpperCase();
-            if(currentChildName) document.getElementById("child-name-display").textContent = "Calendario de " + currentChildName;
-
-            document.getElementById("login-view").classList.add("hidden");
-            document.getElementById("app-root").classList.remove("hidden");
-
-            initDataListeners();
-            initSwipeListeners();
+            });
         }
 
-        function getBaseOwner(year, monthIndex, day) {
-            const date = new Date(year, monthIndex, day, 12, 0, 0);
-            const diffMs = date - BASE_MONDAY;
-            const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
-            const weekIndex = Math.floor(diffDays / 7);
-            return Math.abs(weekIndex % 2) === 0 ? "padre" : "madre";
+        // Login
+        function handleLogin(e) {
+            e.preventDefault();
+            appState.user.name = document.getElementById('userName').value;
+            appState.user.role = document.getElementById('userRole').value;
+            saveState();
+            showApp();
         }
 
+        function showApp() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('appContainer').classList.remove('hidden');
+            updateParentNames();
+            renderCalendar();
+            updateConfigView();
+            lucide.createIcons();
+        }
+
+        // Views
+        function showView(view) {
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+
+            document.getElementById('calendarView').classList.add('hidden');
+            document.getElementById('requestsView').classList.add('hidden');
+            document.getElementById('activitiesView').classList.add('hidden');
+            document.getElementById('configView').classList.add('hidden');
+
+            switch(view) {
+                case 'calendar':
+                    document.getElementById('calendarView').classList.remove('hidden');
+                    document.getElementById('navCalendar').classList.add('active');
+                    document.getElementById('headerTitle').textContent = 'Calendario';
+                    renderCalendar();
+                    break;
+                case 'requests':
+                    document.getElementById('requestsView').classList.remove('hidden');
+                    document.getElementById('navRequests').classList.add('active');
+                    document.getElementById('headerTitle').textContent = 'Solicitudes';
+                    renderRequests();
+                    break;
+                case 'activities':
+                    document.getElementById('activitiesView').classList.remove('hidden');
+                    document.getElementById('navActivities').classList.add('active');
+                    document.getElementById('headerTitle').textContent = 'Actividades';
+                    renderActivities();
+                    break;
+                case 'config':
+                    document.getElementById('configView').classList.remove('hidden');
+                    document.getElementById('headerTitle').textContent = 'Configuración';
+                    updateConfigView();
+                    break;
+            }
+
+            lucide.createIcons();
+        }
+
+        // Calendar
         function renderCalendar() {
-            const grid = document.getElementById("calendar-grid");
-            const titleEl = document.getElementById("calendar-title");
-            if (!grid) return;
-            grid.classList.add("fading");
-            setTimeout(() => {
-                grid.innerHTML = "";
-                titleEl.textContent = `${monthNames[currentMonth]} ${currentYear}`;
-                const table = document.createElement("table");
-                table.className = "month-table";
-                const thead = document.createElement("thead");
-                const trHead = document.createElement("tr");
-                weekDayNames.forEach(d => {
-                    const th = document.createElement("th");
-                    th.textContent = d;
-                    trHead.appendChild(th);
-                });
-                thead.appendChild(trHead);
-                table.appendChild(thead);
+            const grid = document.getElementById('daysGrid');
+            grid.innerHTML = '';
 
-                const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-                const firstDayInstance = new Date(currentYear, currentMonth, 1);
-                let startDay = firstDayInstance.getDay() === 0 ? 6 : firstDayInstance.getDay() - 1;
-                const tbody = document.createElement("tbody");
-                let dayCounter = 1, finished = false;
-                const todayKey = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}-${String(now.getDate()).padStart(2,"0")}`;
+            const firstDay = new Date(appState.currentYear, appState.currentMonth, 1);
+            const lastDay = new Date(appState.currentYear, appState.currentMonth + 1, 0);
+            const startDay = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1;
 
-                while (!finished) {
-                    const tr = document.createElement("tr");
-                    for (let i = 0; i < 7; i++) {
-                        const td = document.createElement("td");
-                        if (dayCounter <= daysInMonth && (dayCounter > 1 || i >= startDay)) {
-                            const dateKey = `${currentYear}-${String(currentMonth+1).padStart(2,"0")}-${String(dayCounter).padStart(2,"0")}`;
-                            const finalOwner = overrides[dateKey] || getBaseOwner(currentYear, currentMonth, dayCounter);
+            // Update month display
+            const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 
+                          'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+            document.getElementById('monthDisplay').textContent = 
+                `${months[appState.currentMonth]} ${appState.currentYear}`;
 
-                            td.className = `day-cell day-${finalOwner}`;
-                            if (overrides[dateKey]) td.classList.add("day-overridden");
-                            if (dateKey === todayKey) td.style.borderColor = "#f97316";
+            // Previous month days
+            const prevLastDay = new Date(appState.currentYear, appState.currentMonth, 0).getDate();
+            for (let i = startDay - 1; i >= 0; i--) {
+                const day = document.createElement('div');
+                day.className = 'day-cell inactive';
+                day.textContent = prevLastDay - i;
+                grid.appendChild(day);
+            }
 
-                            td.onclick = () => openDayModal(dateKey, finalOwner);
+            // Current month days
+            const today = new Date();
+            for (let i = 1; i <= lastDay.getDate(); i++) {
+                const day = document.createElement('div');
+                day.className = 'day-cell';
+                day.textContent = i;
 
-                            td.innerHTML = `<span class="day-number">${dayCounter}</span>
-                                            <img class="owner-icon-img" src="assets/${finalOwner}.png" onerror="this.style.display='none'">`;
+                const dateKey = `${appState.currentYear}-${appState.currentMonth + 1}-${i}`;
+                const assignment = appState.calendar[dateKey];
 
-                            (eventsData[dateKey] || []).slice(0,3).forEach((evt, idx) => {
-                                const colorClass = `evt-${evt.type}`;
-                                td.innerHTML += `<div class="event-marker ${colorClass} pos-${idx}">
-                                    <i data-lucide="${ICON_MAP[evt.type]||'star'}" style="width:11px;"></i>
-                                </div>`;
-                            });
-                            dayCounter++;
-                        } else {
-                            td.style.pointerEvents = "none";
-                            td.style.background = "transparent";
-                            td.style.border = "none";
-                        }
-                        tr.appendChild(td);
-                    }
-                    tbody.appendChild(tr);
-                    if (dayCounter > daysInMonth) finished = true;
+                if (assignment) {
+                    day.classList.add(`parent-${assignment}`);
                 }
-                table.appendChild(tbody);
-                grid.appendChild(table);
-                lucide.createIcons();
-                grid.classList.remove("fading");
-            }, 150);
-        }
 
-        function initSwipeListeners() {
-            const grid = document.getElementById("calendar-grid");
-            grid.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, {passive: true});
-            grid.addEventListener('touchend', e => {
-                touchEndX = e.changedTouches[0].screenX;
-                handleSwipeGesture();
-            }, {passive: true});
-        }
+                if (today.getDate() === i && 
+                    today.getMonth() === appState.currentMonth && 
+                    today.getFullYear() === appState.currentYear) {
+                    day.classList.add('today');
+                }
 
-        function handleSwipeGesture() {
-            const distance = touchEndX - touchStartX;
-            if (Math.abs(distance) > 50) {
-                if (distance < 0) document.getElementById("next-period").click();
-                else document.getElementById("prev-period").click();
+                day.addEventListener('click', () => openDayModal(i));
+                grid.appendChild(day);
+            }
+
+            // Next month days
+            const remainingCells = 42 - grid.children.length;
+            for (let i = 1; i <= remainingCells; i++) {
+                const day = document.createElement('div');
+                day.className = 'day-cell inactive';
+                day.textContent = i;
+                grid.appendChild(day);
             }
         }
 
-        function initDataListeners() {
-            if (listenersAttached) return;
-            listenersAttached = true;
-
-            db.collection("overrides").onSnapshot(snap => {
-                overrides = {};
-                snap.forEach(doc => overrides[doc.id] = doc.data().owner);
-                renderCalendar();
-            });
-
-            db.collection("events").onSnapshot(snap => {
-                eventsData = {};
-                snap.forEach(doc => {
-                    const d = doc.data();
-                    if (!eventsData[d.date]) eventsData[d.date] = [];
-                    eventsData[d.date].push({ id: doc.id, ...d });
-                });
-                renderCalendar();
-                renderEventsView();
-            });
-
-            db.collection("requests").orderBy("createdAt", "desc").onSnapshot(snap => {
-                pendingRequests = [];
-                const listEl = document.getElementById("pending-requests");
-                listEl.innerHTML = "";
-                snap.forEach(doc => {
-                    const d = doc.data();
-                    if(d.status === "pendiente") pendingRequests.push({id:doc.id, ...d});
-                });
-                if(pendingRequests.length === 0) {
-                    listEl.innerHTML = "<div style='text-align:center;color:#64748b;font-size:0.85rem;padding:20px;'>Sin cambios pendientes</div>";
-                } else {
-                    pendingRequests.forEach(req => {
-                        const isMyReq = req.requesterRole === currentRole;
-                        let actions = '';
-
-                        if (isMyReq) {
-                            actions = `<div style="display:flex; gap:6px; margin-top:10px;">
-                                <button onclick="cancelRequest('${req.id}')" class="btn-cancel">🗑️ CANCELAR SOLICITUD</button>
-                            </div>`;
-                        } else {
-                            actions = `<div style="display:flex; gap:6px; margin-top:10px;">
-                                <button onclick="processRequest('${req.id}','aceptado','${req.requesterRole}','${req.startDate}','${req.endDate}')" class="btn-accept">✅ ACEPTAR</button>
-                                <button onclick="processRequest('${req.id}','rechazado')" class="btn-reject">❌ RECHAZAR</button>
-                            </div>`;
-                        }
-
-                        listEl.innerHTML += `<div class="request-item">
-                            <div style="font-weight:700;display:flex;justify-content:space-between;margin-bottom:8px;">
-                                <span style="color:#1e293b;">${req.requesterRole.toUpperCase()}</span>
-                                <span style="color:#667eea;font-size:0.9rem;">${formatearFecha(req.startDate)} - ${formatearFecha(req.endDate)}</span>
-                            </div>
-                            <div style="color:#475569;font-size:0.9rem;margin-bottom:8px;">${req.reason}</div>
-                            ${actions}
-                        </div>`;
-                    });
-                }
-            });
-
-            lucide.createIcons();
-        }
-
-        window.cancelRequest = async (requestId) => {
-            if (!confirm('¿Estás seguro de que quieres cancelar esta solicitud?')) return;
-
-            try {
-                await db.collection("requests").doc(requestId).delete();
-                showToast("Solicitud cancelada");
-                sendTelegramMessage(`🗑️ Solicitud CANCELADA por ${currentRole === 'madre' ? 'Madre' : 'Padre'}`);
-            } catch (error) {
-                console.error("Error al cancelar:", error);
-                showToast("Error al cancelar la solicitud", "error");
+        function changeMonth(delta) {
+            appState.currentMonth += delta;
+            if (appState.currentMonth > 11) {
+                appState.currentMonth = 0;
+                appState.currentYear++;
+            } else if (appState.currentMonth < 0) {
+                appState.currentMonth = 11;
+                appState.currentYear--;
             }
-        };
-
-        window.processRequest = async (id, status, role, start, end) => {
-            const batch = db.batch();
-            batch.update(db.collection("requests").doc(id), { status });
-            if (status === "aceptado") {
-                for (let d = new Date(start); d <= new Date(end); d.setDate(d.getDate() + 1)) {
-                    batch.set(db.collection("overrides").doc(d.toISOString().split("T")[0]), { owner: role });
-                }
-            }
-            await batch.commit();
-            showToast(`Solicitud ${status}`);
-
-            const icon = status === "aceptado" ? "✅" : "❌";
-            const responder = currentRole === "madre" ? "Madre" : "Padre";
-            sendTelegramMessage(`${icon} Solicitud ${status.toUpperCase()} por ${responder}.`);
-        };
-
-        function openDayModal(date, owner) {
-            selectedDateKey = date;
-            document.getElementById("day-modal").classList.add("open");
-            document.getElementById("modal-date-title").textContent = date.split("-").reverse().join("/");
-            document.getElementById("modal-custody-img").src = `assets/${owner}.png`;
-            document.getElementById("modal-custody-text").textContent = owner.toUpperCase();
-            renderModalEvents();
+            renderCalendar();
         }
 
-        function closeModal() {
-            document.getElementById("day-modal").classList.remove("open");
+        // Day Modal
+        function openDayModal(day) {
+            appState.selectedDate = `${appState.currentYear}-${appState.currentMonth + 1}-${day}`;
+            const months = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 
+                          'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+            document.getElementById('dayModalTitle').textContent = 
+                `${day} de ${months[appState.currentMonth]}`;
+            openModal('dayModal');
         }
 
-        function selectIcon(t,b) {
-            selectedIconType=t;
-            document.querySelectorAll(".icon-btn").forEach(x=>x.classList.remove("selected"));
-            b.classList.add("selected");
+        function assignDay(parent) {
+            appState.calendar[appState.selectedDate] = parent;
+            saveState();
+            closeModal('dayModal');
+            renderCalendar();
         }
 
-        async function saveEvent() {
-            const title = document.getElementById("event-title").value;
-            if(!title) return;
-            await db.collection("events").add({
-                date:selectedDateKey,
-                title,
-                type:selectedIconType,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        function showRequestModal() {
+            closeModal('dayModal');
+            openModal('requestModal');
+        }
+
+        function showActivityModal() {
+            closeModal('dayModal');
+            openModal('activityModal');
+        }
+
+        function submitRequest() {
+            const reason = document.getElementById('requestReason').value;
+            if (!reason) return;
+
+            appState.requests.push({
+                id: Date.now(),
+                date: appState.selectedDate,
+                reason: reason,
+                from: appState.user.role,
+                status: 'pending'
             });
-            document.getElementById("event-title").value = "";
-            closeModal();
-            showToast("Evento guardado");
+
+            document.getElementById('requestReason').value = '';
+            saveState();
+            closeModal('requestModal');
+            alert('Solicitud enviada correctamente');
         }
 
-        async function deleteEvent(id) {
-            await db.collection("events").doc(id).delete();
-            renderModalEvents();
+        function submitActivity() {
+            const title = document.getElementById('activityTitle').value;
+            const type = document.getElementById('activityType').value;
+            if (!title) return;
+
+            appState.activities.push({
+                id: Date.now(),
+                date: appState.selectedDate,
+                title: title,
+                type: type
+            });
+
+            document.getElementById('activityTitle').value = '';
+            saveState();
+            closeModal('activityModal');
+            alert('Actividad añadida correctamente');
         }
 
-        function renderModalEvents() {
-            const list = document.getElementById("modal-event-list");
-            list.innerHTML = "";
-            (eventsData[selectedDateKey]||[]).forEach(e => {
-                list.innerHTML += `<div class="request-item" style="display:flex;justify-content:space-between;align-items:center;">
-                    <div style="display:flex;gap:8px;align-items:center;">
-                        <div style="width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;color:white;" class="evt-${e.type}">
-                            <i data-lucide="${ICON_MAP[e.type]}" style="width:14px;"></i>
+        // Requests
+        function renderRequests() {
+            const list = document.getElementById('requestList');
+            const pendingRequests = appState.requests.filter(r => r.status === 'pending');
+
+            if (pendingRequests.length === 0) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">
+                            <i data-lucide="inbox" width="48" height="48"></i>
                         </div>
-                        <span style="color:#1e293b;">${e.title}</span>
+                        <div class="empty-state-text">No hay solicitudes pendientes</div>
                     </div>
-                    <button onclick="deleteEvent('${e.id}')" style="background:none;border:none;color:#ef4444;cursor:pointer;font-size:24px;">×</button>
-                </div>`;
-            });
-            lucide.createIcons();
-        }
-
-        function switchView(viewName) {
-            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-
-            if (viewName === 'home') {
-                document.getElementById('homeView').classList.add('active');
-                document.querySelectorAll('.nav-item')[0].classList.add('active');
-            } else if (viewName === 'requests') {
-                document.getElementById('requestsView').classList.add('active');
-                document.querySelectorAll('.nav-item')[1].classList.add('active');
-            } else if (viewName === 'events') {
-                document.getElementById('eventsView').classList.add('active');
-                document.querySelectorAll('.nav-item')[2].classList.add('active');
-                renderEventsView();
-            }
-        }
-
-        function renderEventsView() {
-            const eventsList = document.getElementById("events-list");
-            if (!eventsList) return;
-
-            const allEvents = [];
-            for (const [dateKey, events] of Object.entries(eventsData)) {
-                events.forEach(evt => {
-                    allEvents.push({
-                        date: dateKey,
-                        ...evt
-                    });
-                });
-            }
-
-            allEvents.sort((a, b) => new Date(a.date) - new Date(b.date));
-
-            if (allEvents.length === 0) {
-                eventsList.innerHTML = `<div style="text-align:center;padding:60px 20px;color:#64748b;">
-                    <i data-lucide="calendar-x" style="width:64px;height:64px;margin-bottom:16px;opacity:0.3;"></i>
-                    <p style="font-size:16px;">No hay eventos programados</p>
-                </div>`;
+                `;
                 lucide.createIcons();
                 return;
             }
 
-            eventsList.innerHTML = allEvents.map(evt => {
-                const [year, month, day] = evt.date.split('-');
-                const dateObj = new Date(parseInt(year), parseInt(month)-1, parseInt(day));
-                const owner = overrides[evt.date] || getBaseOwner(parseInt(year), parseInt(month)-1, parseInt(day));
+            list.innerHTML = pendingRequests.map(req => {
+                const [year, month, day] = req.date.split('-');
                 const dateStr = `${day}/${month}/${year}`;
-                const dayName = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'][dateObj.getDay()];
+                const fromRole = req.from === 'a' ? appState.parentNames.a : appState.parentNames.b;
 
-                return `<div class="event-card ${owner}-event" onclick="goToDateAndOpen('${evt.date}')">
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-                        <div>
-                            <div style="font-weight:700;color:#1e293b;font-size:16px;">${dateStr}</div>
-                            <div style="font-size:13px;color:#64748b;">${dayName}</div>
+                return `
+                    <div class="request-card">
+                        <div class="request-header">
+                            <div class="request-info">
+                                <div class="request-date">${dateStr}</div>
+                                <div class="request-reason">${req.reason}</div>
+                                <div class="request-from">De: ${fromRole}</div>
+                            </div>
                         </div>
-                        <div style="padding:4px 12px;border-radius:12px;font-size:11px;font-weight:700;text-transform:uppercase;
-                            ${owner === 'padre' ? 'background:#dbeafe;color:#3b82f6;border:2px solid #bfdbfe;' : 
-                                'background:#fce7f3;color:#ec4899;border:2px solid #fbcfe8;'}">
-                            ${owner}
+                        <div class="request-actions">
+                            <button class="btn-small btn-approve" onclick="handleRequest(${req.id}, 'approved')">
+                                Aprobar
+                            </button>
+                            <button class="btn-small btn-reject" onclick="handleRequest(${req.id}, 'rejected')">
+                                Rechazar
+                            </button>
                         </div>
                     </div>
-                    <div style="display:flex;align-items:center;gap:10px;">
-                        <div style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;" class="evt-${evt.type}">
-                            <i data-lucide="${ICON_MAP[evt.type]}" style="width:16px;"></i>
-                        </div>
-                        <span style="color:#1e293b;font-weight:500;">${evt.title}</span>
-                    </div>
-                </div>`;
+                `;
             }).join('');
 
             lucide.createIcons();
         }
 
-        function goToDateAndOpen(dateKey) {
-            const [year, month, day] = dateKey.split('-').map(Number);
-            currentYear = year;
-            currentMonth = month - 1;
-            switchView('home');
+        function handleRequest(id, status) {
+            const request = appState.requests.find(r => r.id === id);
+            if (!request) return;
+
+            request.status = status;
+
+            if (status === 'approved') {
+                const targetParent = request.from === 'a' ? 'b' : 'a';
+                appState.calendar[request.date] = targetParent;
+            }
+
+            saveState();
+            renderRequests();
             renderCalendar();
-            setTimeout(() => {
-                const owner = overrides[dateKey] || getBaseOwner(year, month - 1, day);
-                openDayModal(dateKey, owner);
-            }, 300);
+            alert(status === 'approved' ? 'Solicitud aprobada' : 'Solicitud rechazada');
         }
 
-        document.getElementById("logout-btn").onclick = () => {
-            listenersAttached=false;
-            auth.signOut();
-        };
+        // Activities
+        function renderActivities() {
+            const list = document.getElementById('activityList');
 
-        document.getElementById("prev-period").onclick = () => {
-            if(--currentMonth<0){currentMonth=11;currentYear--;}
-            renderCalendar();
-        };
+            if (appState.activities.length === 0) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">
+                            <i data-lucide="calendar" width="48" height="48"></i>
+                        </div>
+                        <div class="empty-state-text">No hay actividades registradas</div>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
 
-        document.getElementById("next-period").onclick = () => {
-            if(++currentMonth>11){currentMonth=0;currentYear++;}
-            renderCalendar();
-        };
+            list.innerHTML = appState.activities.map(act => {
+                const [year, month, day] = act.date.split('-');
+                const dateStr = `${day}/${month}/${year}`;
 
-        document.getElementById("request-form").onsubmit = async (e) => {
-            e.preventDefault();
-            const startVal = document.getElementById("start-date").value;
-            const endVal = document.getElementById("end-date").value;
-            const reasonVal = document.getElementById("reason").value;
+                return `
+                    <div class="activity-card">
+                        <div class="activity-header">
+                            <div class="activity-info">
+                                <div class="activity-date">${dateStr}</div>
+                                <div class="activity-title">${act.title}</div>
+                            </div>
+                            <span class="activity-type type-${act.type}">${act.type}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
 
-            await db.collection("requests").add({
-                requesterUid: currentUser.uid,
-                requesterRole: currentRole,
-                startDate: startVal,
-                endDate: endVal,
-                reason: reasonVal,
-                status: "pendiente",
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            showToast("Solicitud enviada");
-            e.target.reset();
-
-            const quien = currentRole === "madre" ? "Madre" : "Padre";
-            sendTelegramMessage(`📅 NUEVA SOLICITUD de ${quien}:\nDesde: ${formatearFecha(startVal)}\nHasta: ${formatearFecha(endVal)}\nMotivo: ${reasonVal}`);
-        };
-
-        document.addEventListener("DOMContentLoaded", () => {
-            const ys = document.getElementById("year-select");
-            [2025,2026,2027].forEach(y => {
-                const o = document.createElement("option");
-                o.value=y;
-                o.textContent=y;
-                if(y===currentYear)o.selected=true;
-                ys.appendChild(o);
-            });
-            ys.onchange = (e) => {
-                currentYear=parseInt(e.target.value);
-                renderCalendar();
-            };
-            renderCalendar();
             lucide.createIcons();
-        });
+        }
+
+        // Config
+        function updateConfigView() {
+            document.getElementById('configUserName').textContent = appState.user.name;
+            document.getElementById('configUserRole').textContent = 
+                appState.user.role === 'a' ? appState.parentNames.a : appState.parentNames.b;
+            document.getElementById('configParentA').textContent = appState.parentNames.a;
+            document.getElementById('configParentB').textContent = appState.parentNames.b;
+        }
+
+        function saveNames() {
+            const nameA = document.getElementById('editNameA').value;
+            const nameB = document.getElementById('editNameB').value;
+
+            if (nameA) appState.parentNames.a = nameA;
+            if (nameB) appState.parentNames.b = nameB;
+
+            saveState();
+            updateParentNames();
+            updateConfigView();
+            closeModal('editNamesModal');
+            alert('Nombres actualizados correctamente');
+        }
+
+        function updateParentNames() {
+            document.getElementById('legendA').textContent = appState.parentNames.a;
+            document.getElementById('legendB').textContent = appState.parentNames.b;
+            document.getElementById('nameA').textContent = appState.parentNames.a;
+            document.getElementById('nameB').textContent = appState.parentNames.b;
+            document.getElementById('editNameA').value = appState.parentNames.a;
+            document.getElementById('editNameB').value = appState.parentNames.b;
+        }
+
+        function exportData() {
+            const dataStr = JSON.stringify(appState, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `custodia-familiar-${Date.now()}.json`;
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function importData(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    appState = JSON.parse(event.target.result);
+                    saveState();
+                    showApp();
+                    alert('Datos importados correctamente');
+                } catch (error) {
+                    alert('Error al importar datos');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function logout() {
+            if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+                appState = {
+                    user: { name: '', role: '' },
+                    parentNames: { a: 'Progenitor A', b: 'Progenitor B' },
+                    currentMonth: new Date().getMonth(),
+                    currentYear: new Date().getFullYear(),
+                    calendar: {},
+                    requests: [],
+                    activities: [],
+                    selectedDate: null
+                };
+                saveState();
+                location.reload();
+            }
+        }
+
+        // Modal helpers
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+
+        // Storage
+        function saveState() {
+            localStorage.setItem('custodiaFamiliar', JSON.stringify(appState));
+        }
+
+        function loadState() {
+            const saved = localStorage.getItem('custodiaFamiliar');
+            if (saved) {
+                appState = JSON.parse(saved);
+            }
+        }
     </script>
+
 </body>
 </html>

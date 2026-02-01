@@ -59,38 +59,46 @@
             border: 1px solid rgba(0,0,0,0.05);
         }
 
-        /* LOGIN */
-        .login-wrapper {
+        /* LOGIN SCREEN */
+        .login-screen {
             display: flex;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
             padding: 20px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
             background: var(--bg-body);
+            z-index: 2000;
         }
 
-        .login-card {
+        .login-container {
             background: var(--bg-card);
             border-radius: var(--radius-xl);
-            padding: 32px;
-            box-shadow: var(--shadow-card);
-            width: 100%;
+            padding: 40px 32px;
             max-width: 400px;
+            width: 100%;
+            box-shadow: var(--shadow-card);
             border: 1px solid rgba(0,0,0,0.05);
         }
 
         .login-title {
             font-size: 32px;
             font-weight: 700;
-            color: var(--text-main);
+            text-align: center;
             margin-bottom: 8px;
-            letter-spacing: -1px;
+            color: var(--text-main);
+            letter-spacing: -0.5px;
         }
 
         .login-subtitle {
+            text-align: center;
             color: var(--text-sec);
             font-size: 15px;
-            margin-bottom: 24px;
+            margin-bottom: 32px;
         }
 
         .login-field {
@@ -107,13 +115,7 @@
             letter-spacing: 0.5px;
         }
 
-        /* INPUTS */
-        input[type="text"], 
-        input[type="email"],
-        input[type="password"],
-        input[type="date"],
-        select,
-        textarea {
+        .login-field input {
             width: 100%;
             padding: 16px;
             font-size: 17px;
@@ -123,17 +125,14 @@
             color: var(--text-main);
             outline: none;
             transition: all 0.2s ease;
-            appearance: none;
-            -webkit-appearance: none;
         }
 
-        input:focus, select:focus, textarea:focus {
+        .login-field input:focus {
             background-color: #FFFFFF;
             box-shadow: 0 0 0 2px var(--primary);
         }
 
-        /* BUTTONS */
-        button, .login-btn, .action-btn, .secondary-btn {
+        .login-btn {
             width: 100%;
             background-color: var(--primary);
             color: white;
@@ -147,21 +146,355 @@
             margin-top: 10px;
         }
 
-        .secondary-btn {
-            background-color: transparent;
-            color: var(--primary);
-            border: 2px solid var(--border);
+        .login-btn:active {
+            transform: scale(0.97);
         }
 
-        button:active, .login-btn:active {
-            transform: scale(0.97);
+        .login-btn:hover {
             opacity: 0.9;
+        }
+
+        .login-toggle {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 15px;
+            color: var(--text-sec);
+        }
+
+        .login-toggle a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .login-toggle a:hover {
+            text-decoration: underline;
+        }
+
+        /* ONBOARDING MODAL */
+        .onboarding-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            z-index: 2001;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .onboarding-modal.active {
+            display: flex;
+        }
+
+        .onboarding-content {
+            background: var(--bg-card);
+            border-radius: var(--radius-xl);
+            padding: 32px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .onboarding-content h2 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text-main);
+        }
+
+        .onboarding-content p {
+            color: var(--text-sec);
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        .onboarding-field {
+            margin-bottom: 20px;
+        }
+
+        .onboarding-field label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-sec);
+            letter-spacing: 0.5px;
+        }
+
+        .onboarding-field input,
+        .onboarding-field select {
+            width: 100%;
+            padding: 16px;
+            font-size: 17px;
+            background-color: var(--input-bg);
+            border: none;
+            border-radius: var(--radius-l);
+            color: var(--text-main);
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .onboarding-field input:focus,
+        .onboarding-field select:focus {
+            background-color: #FFFFFF;
+            box-shadow: 0 0 0 2px var(--primary);
+        }
+
+        /* CONTENEDOR PRINCIPAL */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* HEADER */
+        .header {
+            background: var(--bg-card);
+            border-radius: var(--radius-xl);
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-card);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .app-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: -0.5px;
+        }
+
+        .logout-btn {
+            background: var(--input-bg);
+            color: var(--text-sec);
+            border: none;
+            padding: 10px 16px;
+            border-radius: var(--radius-m);
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .logout-btn:hover {
+            background: var(--border);
+        }
+
+        .year-nav {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 16px;
+            padding: 12px;
+            background: var(--input-bg);
+            border-radius: var(--radius-l);
+        }
+
+        .year-nav button {
+            background: var(--bg-card);
+            color: var(--text-main);
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            padding: 0;
+            margin: 0;
+        }
+
+        .year-nav button:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .year-display {
+            font-size: 20px;
+            font-weight: 700;
+            min-width: 80px;
+            text-align: center;
+            color: var(--text-main);
+        }
+
+        /* CALENDARIO */
+        .calendar-container {
+            background: var(--bg-card);
+            border-radius: var(--radius-xl);
+            padding: 20px;
+            box-shadow: var(--shadow-card);
+            margin-bottom: 20px;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .month-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 12px;
+            background: var(--input-bg);
+            border-radius: var(--radius-l);
+        }
+
+        .month-nav button {
+            background: var(--bg-card);
+            color: var(--text-main);
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            padding: 0;
+            margin: 0;
+        }
+
+        .month-nav button:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .month-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .weekday {
+            text-align: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-sec);
+            padding: 8px 4px;
+            text-transform: uppercase;
+        }
+
+        .days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+        }
+
+        .day {
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: var(--input-bg);
+            border-radius: var(--radius-m);
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            padding: 8px 4px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .day:hover {
+            transform: scale(1.05);
+        }
+
+        .day.empty {
+            background: transparent;
+            cursor: default;
+        }
+
+        .day.empty:hover {
+            transform: none;
+        }
+
+        .day.madre {
+            background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+            color: white;
+        }
+
+        .day.padre {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+        }
+
+        .day.today {
+            box-shadow: 0 0 0 3px var(--primary);
+        }
+
+        .day.has-event::after {
+            content: '';
+            position: absolute;
+            bottom: 4px;
+            width: 6px;
+            height: 6px;
+            background: var(--success);
+            border-radius: 50%;
+            border: 2px solid var(--bg-card);
+        }
+
+        /* LEYENDA */
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-top: 20px;
+            padding: 16px;
+            background: var(--input-bg);
+            border-radius: var(--radius-l);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 6px;
+        }
+
+        .legend-color.madre {
+            background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+        }
+
+        .legend-color.padre {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
         }
 
         /* MODALES */
         .modal-overlay {
             position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
+            top: 0; 
+            left: 0; 
+            right: 0; 
+            bottom: 0;
             background: rgba(0,0,0,0.4);
             backdrop-filter: blur(4px);
             z-index: 999;
@@ -171,59 +504,13 @@
             padding: 20px;
             opacity: 0;
             visibility: hidden;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
         }
 
-        .modal-overlay.active, .modal-overlay.open {
+        .modal-overlay.active {
             opacity: 1;
             visibility: visible;
         }
-
-        @media (max-width: 600px) {
-            body {
-                padding: 12px;
-                padding-bottom: 60px;
-            }
-
-            .modal-overlay {
-                align-items: flex-end;
-                padding: 0;
-            }
-
-            .modal-card {
-                max-width: 100%;
-                border-bottom-left-radius: 0;
-                border-bottom-right-radius: 0;
-                padding-bottom: calc(24px + var(--safe-area-bottom));
-                transform: translateY(100%);
-                transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-            }
-
-            .modal-overlay.active .modal-card,
-            .modal-overlay.open .modal-card {
-                transform: translateY(0);
-            }
-        }
-
-        /* TYPOGRAPHY */
-        h2, h3 { 
-            font-size: 28px; 
-            font-weight: 700; 
-            color: var(--text-main); 
-            letter-spacing: -0.5px;
-            margin-bottom: 8px;
-        }
-
-        h3 { font-size: 22px; }
-
-        p { 
-            color: var(--text-sec); 
-            line-height: 1.5;
-            font-size: 15px;
-        }
-
-        /* UTILIDADES */
-        .hidden { display: none !important; }
 
         .close-modal {
             position: absolute;
@@ -234,362 +521,199 @@
             background: var(--input-bg);
             color: var(--text-sec);
             border-radius: 50%;
-            font-size: 22px;
+            font-size: 20px;
             display: flex; 
             align-items: center; 
             justify-content: center;
             padding: 0;
             margin: 0;
             cursor: pointer;
-        }
-
-        .modal-title {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 16px;
-            color: var(--text-main);
-        }
-
-        /* TOAST NOTIFICATIONS */
-        .toast-container {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            pointer-events: none;
-            width: calc(100% - 32px);
-            max-width: 400px;
-        }
-
-        .toast {
-            background: var(--bg-card);
-            color: var(--text-main);
-            padding: 16px 20px;
-            border-radius: var(--radius-l);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-            font-size: 15px;
-            font-weight: 500;
-            pointer-events: auto;
-            animation: slideDown 0.3s ease;
-            border-left: 4px solid var(--primary);
-        }
-
-        .toast.visible {
-            opacity: 1;
-        }
-
-        @keyframes slideDown {
-            from { transform: translateY(-20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        /* TOPBAR */
-        .topbar {
-            background: var(--bg-card);
-            border-radius: var(--radius-xl);
-            padding: 16px 20px;
-            margin-bottom: 20px;
-            box-shadow: var(--shadow-card);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border: 1px solid rgba(0,0,0,0.05);
-        }
-
-        .logo-icon {
-            font-size: 32px;
-        }
-
-        .app-name {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--text-main);
-        }
-
-        .madre, .padre {
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
-
-        .madre {
-            background: #fce7f3;
-            color: var(--madre-color);
-            border: 2px solid #fbcfe8;
-        }
-
-        .padre {
-            background: #dbeafe;
-            color: var(--padre-color);
-            border: 2px solid #bfdbfe;
-        }
-
-        /* CALENDAR */
-        .calendar-wrapper {
-            background: var(--bg-card);
-            border-radius: var(--radius-xl);
-            padding: 20px;
-            box-shadow: var(--shadow-card);
-            border: 1px solid rgba(0,0,0,0.05);
-        }
-
-        .calendar-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .calendar-title {
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--text-main);
-        }
-
-        .nav-arrow {
-            width: 40px;
-            height: 40px;
-            padding: 0;
-            margin: 0;
-            border-radius: 50%;
-            background: var(--input-bg);
-            color: var(--text-main);
-            display: flex;
-            align-items: center;
-            justify-content: center;
             border: none;
-            cursor: pointer;
         }
 
-        .calendar-grid {
-            transition: opacity 0.15s ease;
+        h2 { 
+            font-size: 28px; 
+            font-weight: 700; 
+            color: var(--text-main); 
+            letter-spacing: -0.5px; 
+            margin-bottom: 16px;
+        }
+        
+        p { 
+            color: var(--text-sec); 
+            line-height: 1.5; 
+            margin-bottom: 16px;
         }
 
-        .calendar-grid.fading {
-            opacity: 0.3;
-        }
-
-        .month-table {
+        input[type="text"], 
+        input[type="date"],
+        textarea,
+        select {
             width: 100%;
-            border-collapse: separate;
-            border-spacing: 8px;
+            padding: 16px;
+            font-size: 17px;
+            background-color: var(--input-bg);
+            border: none;
+            border-radius: var(--radius-l);
+            color: var(--text-main);
+            outline: none;
+            transition: all 0.2s ease;
+            appearance: none;
+            margin-bottom: 16px;
         }
 
-        .month-table th {
-            text-align: center;
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-sec);
-            padding: 8px 0;
-            text-transform: uppercase;
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+            font-family: inherit;
         }
 
-        .day-cell {
-            aspect-ratio: 1;
-            border-radius: var(--radius-m);
-            background: var(--input-bg);
-            cursor: pointer;
-            transition: all 0.2s;
-            padding: 8px;
-            position: relative;
-            border: 2px solid transparent;
-            text-align: center;
-        }
-
-        .day-cell:hover {
-            transform: scale(1.05);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
-        .day-madre {
-            background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%);
-            border-color: #f9a8d4;
-        }
-
-        .day-padre {
-            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-            border-color: #93c5fd;
-        }
-
-        .day-overridden {
+        input:focus, select:focus, textarea:focus {
+            background-color: #FFFFFF;
             box-shadow: 0 0 0 2px var(--primary);
         }
 
-        .day-number {
-            display: block;
-            font-size: 16px;
+        button {
+            width: 100%;
+            background-color: var(--primary);
+            color: white;
+            font-size: 17px;
             font-weight: 600;
-            color: var(--text-main);
-            margin-bottom: 4px;
-        }
-
-        .owner-icon-img {
-            width: 24px;
-            height: 24px;
-            object-fit: contain;
-            margin: 4px auto;
-            display: block;
-        }
-
-        .event-marker {
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 10px;
-        }
-
-        .event-marker.pos-0 { bottom: 4px; left: 4px; }
-        .event-marker.pos-1 { bottom: 4px; right: 4px; }
-        .event-marker.pos-2 { top: 4px; right: 4px; }
-
-        /* EVENT TYPES */
-        .evt-medico { background: #ef4444; }
-        .evt-dentista { background: #8b5cf6; }
-        .evt-escuela { background: #f59e0b; }
-        .evt-deporte { background: #10b981; }
-        .evt-cumple { background: #ec4899; }
-        .evt-parque { background: #14b8a6; }
-        .evt-general { background: #6366f1; }
-        .evt-vacaciones { background: #06b6d4; }
-
-        /* ICON GRID */
-        .icon-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin: 16px 0;
-        }
-
-        .icon-btn {
-            aspect-ratio: 1;
-            border-radius: var(--radius-m);
-            border: 2px solid var(--border);
-            background: var(--input-bg);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            padding: 16px;
+            border: none;
+            border-radius: var(--radius-l);
             cursor: pointer;
-            transition: all 0.2s;
-            padding: 0;
-            margin: 0;
+            transition: transform 0.1s;
+            margin-top: 10px;
         }
 
-        .icon-btn.selected {
-            transform: scale(1.1);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            border-color: transparent;
+        button:active {
+            transform: scale(0.97);
+            opacity: 0.9;
         }
 
-        /* VIEWS */
-        .app { display: block; }
-        .view { display: none; }
-        .view.active { display: block; }
-
-        /* SECTIONS */
-        .section-title {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 24px;
-            margin-bottom: 8px;
+        button.secondary {
+            background-color: var(--input-bg);
+            color: var(--text-main);
         }
 
-        .section-subtitle {
-            color: var(--text-sec);
-            margin-bottom: 24px;
+        button.danger {
+            background-color: var(--danger);
         }
 
-        .requests-container, .events-container {
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        /* REQUEST ITEMS */
+        /* SOLICITUDES */
         .request-item {
             background: var(--input-bg);
             padding: 16px;
             border-radius: var(--radius-l);
             margin-bottom: 12px;
-            border: 1px solid var(--border);
         }
 
-        .btn-accept, .btn-reject, .btn-cancel {
-            flex: 1;
-            padding: 10px;
-            border-radius: var(--radius-m);
-            border: none;
+        .request-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .request-date {
             font-weight: 600;
-            cursor: pointer;
+            color: var(--text-main);
+        }
+
+        .request-status {
+            padding: 4px 12px;
+            border-radius: var(--radius-m);
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .request-status.pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .request-status.accepted {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .request-status.rejected {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .request-reason {
+            color: var(--text-sec);
+            margin-top: 8px;
             font-size: 14px;
         }
 
-        .btn-accept {
-            background: var(--success);
-            color: white;
+        .request-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
         }
 
-        .btn-reject {
-            background: var(--danger);
-            color: white;
+        .request-actions button {
+            flex: 1;
+            margin: 0;
+            padding: 10px;
+            font-size: 14px;
         }
 
-        .btn-cancel {
-            background: var(--text-sec);
-            color: white;
-        }
-
-        /* EVENT CARDS */
-        .event-card {
-            background: var(--bg-card);
+        /* EVENTOS */
+        .event-item {
+            background: var(--input-bg);
+            padding: 16px;
             border-radius: var(--radius-l);
-            padding: 20px;
-            margin-bottom: 16px;
-            box-shadow: var(--shadow-card);
-            cursor: pointer;
-            transition: transform 0.2s;
-            border: 2px solid transparent;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
-        .event-card:hover {
-            transform: translateY(-2px);
+        .event-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--bg-card);
+            border-radius: var(--radius-m);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
         }
 
-        .madre-event {
-            border-color: var(--madre-color);
+        .event-details {
+            flex: 1;
         }
 
-        .padre-event {
-            border-color: var(--padre-color);
+        .event-title {
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 4px;
         }
 
-        /* BOTTOM NAV */
+        .event-date {
+            font-size: 14px;
+            color: var(--text-sec);
+        }
+
+        /* NAVEGACIÓN INFERIOR */
         .bottom-nav {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
             background: var(--bg-card);
-            border-top: 1px solid var(--border);
-            padding: 12px 20px;
-            padding-bottom: calc(12px + var(--safe-area-bottom));
+            border-top: 1px solid rgba(0,0,0,0.05);
             display: flex;
             justify-content: space-around;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            padding: 12px;
+            padding-bottom: calc(12px + var(--safe-area-bottom));
             z-index: 100;
+            box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.06);
         }
 
         .nav-item {
@@ -597,12 +721,19 @@
             flex-direction: column;
             align-items: center;
             gap: 4px;
-            color: var(--text-sec);
-            font-size: 12px;
             cursor: pointer;
-            transition: color 0.2s;
-            padding: 8px 12px;
+            padding: 8px 16px;
             border-radius: var(--radius-m);
+            transition: all 0.2s;
+            color: var(--text-sec);
+            background: transparent;
+            border: none;
+            min-width: auto;
+            width: auto;
+        }
+
+        .nav-item:active {
+            transform: scale(0.95);
         }
 
         .nav-item.active {
@@ -610,720 +741,949 @@
             background: rgba(0, 122, 255, 0.1);
         }
 
-        /* ERROR MESSAGE */
-        #login-error-msg {
-            color: var(--danger);
-            font-size: 14px;
-            margin-top: 12px;
-            text-align: center;
+        .nav-label {
+            font-size: 11px;
+            font-weight: 600;
         }
-</style>
+
+        /* TOAST */
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: var(--bg-card);
+            color: var(--text-main);
+            padding: 16px 24px;
+            border-radius: var(--radius-l);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            z-index: 9999;
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 600px) {
+            body {
+                padding: 12px;
+                padding-bottom: 80px;
+            }
+
+            .login-container {
+                padding: 32px 24px;
+            }
+
+            .onboarding-content {
+                padding: 24px;
+            }
+
+            .modal-overlay {
+                align-items: flex-end;
+                padding: 0;
+            }
+
+            .modal-card {
+                border-bottom-left-radius: 0;
+                border-bottom-right-radius: 0;
+                padding-bottom: calc(20px + var(--safe-area-bottom));
+                transform: translateY(100%);
+                transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+                max-width: 100%;
+            }
+
+            .modal-overlay.active .modal-card {
+                transform: translateY(0);
+            }
+
+            .header {
+                padding: 16px;
+            }
+
+            .app-title {
+                font-size: 20px;
+            }
+
+            .calendar-container {
+                padding: 16px;
+            }
+
+            .day {
+                font-size: 13px;
+            }
+
+            .legend {
+                flex-direction: column;
+                gap: 12px;
+            }
+        }
+
+        @media (min-width: 601px) {
+            .container {
+                max-width: 1200px;
+                margin: 0 auto;
+            }
+        }
+
+        /* Ocultar vistas */
+        .view {
+            display: none;
+        }
+
+        .view.active {
+            display: block;
+        }
+    </style>
 </head>
 <body>
-    <div class="toast-container" id="toast-container"></div>
+    <!-- PANTALLA DE LOGIN -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-container">
+            <h1 class="login-title">👨‍👩‍👧 Custodia</h1>
+            <p class="login-subtitle">Coordina la custodia familiar</p>
 
-    <!-- ONBOARDING MODAL -->
-    <div class="modal-overlay" id="onboarding-modal">
-        <div class="modal-card">
-            <div style="text-align:center; margin-bottom:20px;">
-                <div style="font-size:3rem;">👋</div>
-                <h2 style="color:#1e293b; margin:10px 0 5px;">¡Bienvenido/a!</h2>
-                <p style="color:#64748b; font-size:0.9rem;">Para configurar el calendario, necesitamos unos datos.</p>
+            <div id="loginForm">
+                <div class="login-field">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" placeholder="tu@email.com" required>
+                </div>
+                <div class="login-field">
+                    <label for="loginPassword">Contraseña</label>
+                    <input type="password" id="loginPassword" placeholder="••••••••" required>
+                </div>
+                <button class="login-btn" onclick="handleLogin()">Iniciar Sesión</button>
+                <p class="login-toggle">
+                    ¿No tienes cuenta? <a onclick="toggleToRegister()">Regístrate</a>
+                </p>
             </div>
-            <form id="onboarding-form">
+
+            <div id="registerForm" style="display: none;">
                 <div class="login-field">
-                    <label>¿Quién eres?</label>
-                    <select id="onboard-role" required>
-                        <option value="" disabled selected>Selecciona tu rol...</option>
-                        <option value="madre">Soy la Madre</option>
-                        <option value="padre">Soy el Padre</option>
-                    </select>
+                    <label for="registerEmail">Email</label>
+                    <input type="email" id="registerEmail" placeholder="tu@email.com" required>
                 </div>
                 <div class="login-field">
-                    <label>Nombre del niño/a</label>
-                    <input type="text" id="onboard-child-name" required placeholder="Ej. Lucas">
+                    <label for="registerPassword">Contraseña</label>
+                    <input type="password" id="registerPassword" placeholder="••••••••" required>
                 </div>
-                <button type="submit" class="login-btn">Guardar y Entrar</button>
-            </form>
+                <div class="login-field">
+                    <label for="registerPasswordConfirm">Confirmar Contraseña</label>
+                    <input type="password" id="registerPasswordConfirm" placeholder="••••••••" required>
+                </div>
+                <button class="login-btn" onclick="handleRegister()">Crear Cuenta</button>
+                <p class="login-toggle">
+                    ¿Ya tienes cuenta? <a onclick="toggleToLogin()">Inicia sesión</a>
+                </p>
+            </div>
         </div>
     </div>
 
-    <!-- DAY MODAL -->
-    <div class="modal-overlay" id="day-modal">
-        <div class="modal-card">
-            <button class="close-modal" onclick="closeModal()">×</button>
-            <div class="modal-title" id="modal-date-title">Detalles</div>
-            <div style="margin:8px 0 14px; padding:10px; background:#f8fafc; border-radius:16px; display:flex; align-items:center; gap:10px; border:2px solid #e2e8f0;">
-                <img id="modal-custody-img" src="" style="width:48px; height:48px; object-fit:contain; filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));">
-                <div>
-                    <div style="font-size:0.7rem; color:#64748b; text-transform:uppercase; font-weight:600;">Custodia actual</div>
-                    <div id="modal-custody-text" style="font-weight:700; font-size:0.9rem; color:#1e293b; text-transform:uppercase;"></div>
-                </div>
+    <!-- MODAL ONBOARDING -->
+    <div class="onboarding-modal" id="onboardingModal">
+        <div class="onboarding-content">
+            <h2>👋 ¡Bienvenido!</h2>
+            <p>Para configurar el calendario, necesitamos unos datos.</p>
+
+            <div class="onboarding-field">
+                <label for="userRole">Tu rol</label>
+                <select id="userRole">
+                    <option value="madre">Madre</option>
+                    <option value="padre">Padre</option>
+                </select>
             </div>
-            <input type="text" id="event-title" placeholder="Ej. Fiesta de disfraces…" style="width:100%; padding:12px; border-radius:14px; background:#f8fafc; border:2px solid #e2e8f0; color:#1e293b; margin-top:6px;" />
-            <div class="icon-grid">
-                <button class="icon-btn evt-medico" onclick="selectIcon('medico', this)"><i data-lucide="stethoscope"></i></button>
-                <button class="icon-btn evt-dentista" onclick="selectIcon('dentista', this)"><i data-lucide="smile"></i></button>
-                <button class="icon-btn evt-escuela" onclick="selectIcon('escuela', this)"><i data-lucide="backpack"></i></button>
-                <button class="icon-btn evt-deporte" onclick="selectIcon('deporte', this)"><i data-lucide="trophy"></i></button>
-                <button class="icon-btn evt-cumple" onclick="selectIcon('cumple', this)"><i data-lucide="cake"></i></button>
-                <button class="icon-btn evt-parque" onclick="selectIcon('parque', this)"><i data-lucide="tree-deciduous"></i></button>
-                <button class="icon-btn evt-general" onclick="selectIcon('general', this)"><i data-lucide="star"></i></button>
-                <button class="icon-btn evt-vacaciones" onclick="selectIcon('vacaciones', this)"><i data-lucide="palmtree"></i></button>
+
+            <div class="onboarding-field">
+                <label for="childName">Nombre del niño/a</label>
+                <input type="text" id="childName" placeholder="Ej: María" required>
             </div>
-            <button onclick="saveEvent()" class="login-btn" style="margin-top:8px;">Guardar actividad</button>
-            <div id="modal-event-list" style="margin-top:10px; max-height:180px; overflow-y:auto;"></div>
+
+            <button class="login-btn" onclick="completeOnboarding()">Continuar</button>
         </div>
     </div>
 
-    <!-- LOGIN VIEW -->
-    <div id="login-view" class="login-wrapper">
-        <div class="login-card">
-            <div class="login-title">Calendario</div>
-            <p class="login-subtitle">Coordina la custodia familiar de forma visual.</p>
-            <form id="login-form">
-                <div class="login-field">
-                    <label>Correo electrónico</label>
-                    <input type="email" id="login-email" required placeholder="tu@email.com">
-                </div>
-                <div class="login-field">
-                    <label>Contraseña</label>
-                    <input type="password" id="login-password" required placeholder="••••••••">
-                </div>
-                <button type="submit" class="login-btn" id="login-submit-btn">Entrar</button>
-            </form>
-            <button type="button" class="secondary-btn" id="toggle-auth-mode">¿No tienes cuenta? Regístrate</button>
-            <div id="login-error-msg"></div>
-        </div>
-    </div>
-
-    <!-- APP ROOT -->
-    <div id="app-root" class="app hidden">
-        <div class="topbar">
-            <div style="display:flex; align-items:center; gap:8px;">
-                <div class="logo-icon">👨‍👩‍👧‍👦</div>
-                <div>
-                    <div class="app-name">Custodia Familiar</div>
-                    <div id="child-name-display" style="font-size:0.7rem; color:#64748b; font-weight:500;"></div>
-                </div>
+    <!-- CONTENEDOR PRINCIPAL -->
+    <div class="container" id="mainApp" style="display: none;">
+        <!-- HEADER -->
+        <div class="header">
+            <div class="header-top">
+                <h1 class="app-title">👨‍👩‍👧 Custodia</h1>
+                <button class="logout-btn" onclick="handleLogout()">Cerrar sesión</button>
             </div>
-            <div style="display:flex; align-items:center; gap:6px;">
-                <span id="user-role-label"></span>
-                <select id="year-select" style="background:#f8fafc; border:2px solid #e2e8f0; color:#1e293b; padding:6px; border-radius:999px; font-size:13px;"></select>
-                <button type="button" id="logout-btn" style="background:none; border:none; color:#64748b; cursor:pointer;"><i data-lucide="log-out" style="width:18px;"></i></button>
+            <div class="year-nav">
+                <button onclick="changeYear(-1)">
+                    <i data-lucide="chevron-left"></i>
+                </button>
+                <span class="year-display" id="currentYear">2024</span>
+                <button onclick="changeYear(1)">
+                    <i data-lucide="chevron-right"></i>
+                </button>
             </div>
         </div>
 
-        <!-- VISTA HOME (Calendario) -->
-        <div class="view active" id="homeView">
-            <div class="calendar-wrapper">
-                <div class="calendar-header">
-                    <button id="prev-period" class="nav-arrow"><i data-lucide="chevron-left"></i></button>
-                    <div class="calendar-title" id="calendar-title"></div>
-                    <button id="next-period" class="nav-arrow"><i data-lucide="chevron-right"></i></button>
+        <!-- VISTA CALENDARIO -->
+        <div id="calendarView" class="view active">
+            <div class="calendar-container">
+                <div class="month-nav">
+                    <button onclick="changeMonth(-1)">
+                        <i data-lucide="chevron-left"></i>
+                    </button>
+                    <h2 class="month-title" id="monthTitle">Enero 2024</h2>
+                    <button onclick="changeMonth(1)">
+                        <i data-lucide="chevron-right"></i>
+                    </button>
                 </div>
-                <div id="calendar-grid" class="calendar-grid"></div>
+
+                <div class="weekdays">
+                    <div class="weekday">L</div>
+                    <div class="weekday">M</div>
+                    <div class="weekday">X</div>
+                    <div class="weekday">J</div>
+                    <div class="weekday">V</div>
+                    <div class="weekday">S</div>
+                    <div class="weekday">D</div>
+                </div>
+
+                <div class="days" id="calendarDays"></div>
+
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color madre"></div>
+                        <span>Madre</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color padre"></div>
+                        <span>Padre</span>
+                    </div>
+                </div>
             </div>
         </div>
 
         <!-- VISTA SOLICITUDES -->
-        <div class="view" id="requestsView">
-            <div class="requests-container">
-                <h2 class="section-title">
-                    <i data-lucide="inbox"></i>
-                    Solicitudes de Cambio
-                </h2>
-                <p class="section-subtitle">Gestiona las solicitudes de cambio de custodia</p>
-
-                <div class="card">
-                    <div style="font-size:0.95rem; font-weight:700; color:#1e293b; margin-bottom:12px; display:flex; align-items:center; gap:6px;">
-                        <i data-lucide="send" style="width:16px;"></i> Nueva Solicitud
-                    </div>
-                    <form id="request-form">
-                        <div style="font-size:0.72rem; color:#64748b; margin-bottom:8px;">Usuario: <span id="whoami-label">...</span></div>
-                        <div style="display:flex; gap:10px; margin-bottom:10px; flex-wrap:wrap;">
-                            <div class="login-field" style="flex:1; min-width:140px; margin-bottom:0;">
-                                <label>Desde</label>
-                                <input type="date" id="start-date" required>
-                            </div>
-                            <div class="login-field" style="flex:1; min-width:140px; margin-bottom:0;">
-                                <label>Hasta</label>
-                                <input type="date" id="end-date" required>
-                            </div>
-                        </div>
-                        <div class="login-field">
-                            <label>Motivo del cambio</label>
-                            <textarea id="reason" placeholder="Explica el motivo..." required style="width:100%; height:80px; resize:none; padding:12px; border-radius:12px; border:2px solid #e2e8f0; background:#f8fafc; color:#1e293b;"></textarea>
-                        </div>
-                        <button type="submit" class="login-btn">Enviar solicitud</button>
-                    </form>
-                </div>
-
-                <div class="card">
-                    <h3 style="font-size:0.95rem; font-weight:700; color:#1e293b; margin-bottom:12px; display:flex; align-items:center; gap:6px;">
-                        <i data-lucide="clock" style="width:16px;"></i> Cambios Pendientes
-                    </h3>
-                    <div id="pending-requests"></div>
-                </div>
+        <div id="requestsView" class="view">
+            <div class="card">
+                <h2>📋 Solicitudes</h2>
+                <p>Gestiona las solicitudes de cambio de custodia</p>
+                <button onclick="openRequestModal()">
+                    <i data-lucide="plus"></i> Nueva Solicitud
+                </button>
+                <div id="requestsList" style="margin-top: 20px;"></div>
             </div>
         </div>
 
         <!-- VISTA EVENTOS -->
-        <div class="view" id="eventsView">
-            <div class="events-container">
-                <h2 class="section-title">
-                    <i data-lucide="calendar-check"></i>
-                    Eventos Programados
-                </h2>
-                <p class="section-subtitle">Todas las actividades registradas en el calendario</p>
-                <div id="events-list"></div>
+        <div id="eventsView" class="view">
+            <div class="card">
+                <h2>📅 Eventos</h2>
+                <p>Todas las actividades registradas en el calendario</p>
+                <button onclick="openEventModal()">
+                    <i data-lucide="plus"></i> Nuevo Evento
+                </button>
+                <div id="eventsList" style="margin-top: 20px;"></div>
             </div>
         </div>
 
         <!-- NAVEGACIÓN INFERIOR -->
         <div class="bottom-nav">
-            <div class="nav-item active" onclick="switchView('home')">
+            <button class="nav-item active" onclick="switchView('calendar')">
                 <i data-lucide="calendar"></i>
-                <span>Calendario</span>
-            </div>
-            <div class="nav-item" onclick="switchView('requests')">
-                <i data-lucide="inbox"></i>
-                <span>Solicitudes</span>
-            </div>
-            <div class="nav-item" onclick="switchView('events')">
-                <i data-lucide="list"></i>
-                <span>Eventos</span>
-            </div>
+                <span class="nav-label">Calendario</span>
+            </button>
+            <button class="nav-item" onclick="switchView('requests')">
+                <i data-lucide="file-text"></i>
+                <span class="nav-label">Solicitudes</span>
+            </button>
+            <button class="nav-item" onclick="switchView('events')">
+                <i data-lucide="star"></i>
+                <span class="nav-label">Eventos</span>
+            </button>
         </div>
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <!-- MODAL DETALLES DEL DÍA -->
+    <div class="modal-overlay" id="dayModal">
+        <div class="modal-card">
+            <button class="close-modal" onclick="closeDayModal()">×</button>
+            <h2 id="dayModalTitle">Detalles del Día</h2>
+            <div id="dayModalContent"></div>
+            <button onclick="openOverrideModal()">Cambiar Custodia</button>
+        </div>
+    </div>
 
-    <script>
-        // Firebase Configuration
+    <!-- MODAL CAMBIO DE CUSTODIA -->
+    <div class="modal-overlay" id="overrideModal">
+        <div class="modal-card">
+            <button class="close-modal" onclick="closeOverrideModal()">×</button>
+            <h2>Cambiar Custodia</h2>
+            <p>Selecciona el nuevo responsable para este día</p>
+            <select id="overrideOwner">
+                <option value="madre">Madre</option>
+                <option value="padre">Padre</option>
+            </select>
+            <button onclick="saveOverride()">Guardar Cambio</button>
+        </div>
+    </div>
+
+    <!-- MODAL NUEVA SOLICITUD -->
+    <div class="modal-overlay" id="requestModal">
+        <div class="modal-card">
+            <button class="close-modal" onclick="closeRequestModal()">×</button>
+            <h2>Nueva Solicitud</h2>
+            <p>Solicita un cambio de custodia</p>
+            <input type="date" id="requestStartDate" placeholder="Fecha inicio">
+            <input type="date" id="requestEndDate" placeholder="Fecha fin">
+            <textarea id="requestReason" placeholder="Motivo de la solicitud"></textarea>
+            <button onclick="submitRequest()">Enviar Solicitud</button>
+        </div>
+    </div>
+
+    <!-- MODAL NUEVO EVENTO -->
+    <div class="modal-overlay" id="eventModal">
+        <div class="modal-card">
+            <button class="close-modal" onclick="closeEventModal()">×</button>
+            <h2>Nuevo Evento</h2>
+            <p>Añade una actividad al calendario</p>
+            <input type="date" id="eventDate" placeholder="Fecha">
+            <input type="text" id="eventTitle" placeholder="Título del evento">
+            <select id="eventType">
+                <option value="🎂">🎂 Cumpleaños</option>
+                <option value="🏥">🏥 Médico</option>
+                <option value="🎓">🎓 Colegio</option>
+                <option value="⚽">⚽ Deporte</option>
+                <option value="🎨">🎨 Actividad</option>
+                <option value="✈️">✈️ Viaje</option>
+            </select>
+            <button onclick="submitEvent()">Guardar Evento</button>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div class="toast" id="toast"></div>
+
+    <!-- FIREBASE SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore, collection, addDoc, query, where, getDocs, doc, updateDoc, setDoc, getDoc, orderBy, deleteDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        // Configuración Firebase
         const firebaseConfig = {
-            apiKey: "AIzaSyAwgk4_l0zvaCUCgm1CjqqqXjJHr5KPBjc",
+            apiKey: "AIzaSyDmd5cCvXlPv11zXnuqT9zHQPHRALZ9nz0",
             authDomain: "custodia-familiar.firebaseapp.com",
             projectId: "custodia-familiar",
             storageBucket: "custodia-familiar.firebasestorage.app",
-            messagingSenderId: "1038952432258",
-            appId: "1:1038952432258:web:7608d6a48d8ad8308a6a9b"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        const auth = firebase.auth();
-
-        const now = new Date();
-        let currentYear = now.getFullYear();
-        let currentMonth = now.getMonth();
-        const BASE_MONDAY = new Date(2026, 0, 5, 12, 0, 0);
-
-        let currentUser = null;
-        let currentRole = null;
-        let currentChildName = "";
-        let overrides = {};
-        let eventsData = {};
-        let pendingRequests = [];
-        let selectedDateKey = null;
-        let selectedIconType = "medico";
-        let listenersAttached = false;
-        let isRegistering = false;
-
-        let touchStartX = 0;
-        let touchEndX = 0;
-
-        const monthNames = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
-        const weekDayNames = ["L","M","X","J","V","S","D"];
-        const ICON_MAP = {
-            medico: "stethoscope", dentista: "smile", escuela: "backpack",
-            deporte: "trophy", cumple: "cake", parque: "tree-deciduous",
-            general: "star", vacaciones: "palmtree"
+            messagingSenderId: "529950343503",
+            appId: "1:529950343503:web:b17cd1e15fcaf35fb47a7e"
         };
 
-        function showToast(msg, type = "success") {
-            const container = document.getElementById("toast-container");
-            const el = document.createElement("div");
-            el.className = "toast " + type;
-            el.innerHTML = type === "success" ? `✅ ${msg}` : `⚠️ ${msg}`;
-            container.appendChild(el);
-            requestAnimationFrame(() => el.classList.add("visible"));
-            setTimeout(() => { el.classList.remove("visible"); setTimeout(() => el.remove(), 200); }, 3000);
-        }
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-        function sendTelegramMessage(text) {
-            const url = "https://sendtelegram-jd4jwaesba-uc.a.run.app";
-            fetch(url, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ text })
-            }).catch(err => console.error("Error Telegram", err));
-        }
+        // Variables globales
+        window.auth = auth;
+        window.db = db;
+        window.currentUser = null;
+        window.currentYear = new Date().getFullYear();
+        window.currentMonth = new Date().getMonth();
+        window.selectedDate = null;
+        window.overrides = {};
+        window.events = {};
 
-        function formatearFecha(dateStr) {
-            if (!dateStr) return "";
-            const [y, m, d] = dateStr.split("-");
-            return `${d}/${m}/${y}`;
-        }
+        // Constantes Telegram
+        const TELEGRAM_URL = 'https://sendtelegram-jd4jwaesba-uc.a.run.app';
 
-        // AUTH LOGIC
-        auth.onAuthStateChanged(async (user) => {
-            if (user) {
-                currentUser = user;
-                try {
-                    const snap = await db.collection("users").doc(user.uid).get();
-                    if (snap.exists) {
-                        const data = snap.data();
-                        currentRole = data.role || "madre";
-                        currentChildName = data.childName || "";
-                        loadApp();
-                    } else {
-                        document.getElementById("login-view").classList.add("hidden");
-                        document.getElementById("onboarding-modal").classList.add("open");
-                    }
-                } catch (err) { console.error(err); }
-            } else {
-                currentUser = null;
-                currentRole = null;
-                document.getElementById("login-view").classList.remove("hidden");
-                document.getElementById("app-root").classList.add("hidden");
-                document.getElementById("onboarding-modal").classList.remove("open");
-            }
-        });
-
-        document.getElementById("toggle-auth-mode").onclick = function() {
-            isRegistering = !isRegistering;
-            this.textContent = isRegistering ? "¿Ya tienes cuenta? Entra aquí" : "¿No tienes cuenta? Regístrate";
-            document.getElementById("login-submit-btn").textContent = isRegistering ? "Crear cuenta" : "Entrar";
-            document.getElementById("login-error-msg").textContent = "";
-        };
-
-        document.getElementById("login-form").addEventListener("submit", (e) => {
-            e.preventDefault();
-            const email = document.getElementById("login-email").value;
-            const pass = document.getElementById("login-password").value;
-            const errorMsg = document.getElementById("login-error-msg");
-            errorMsg.textContent = "Procesando...";
-
-            if(isRegistering) {
-                auth.createUserWithEmailAndPassword(email, pass)
-                    .catch(err => errorMsg.textContent = "Error: " + err.message);
-            } else {
-                auth.signInWithEmailAndPassword(email, pass)
-                    .catch(err => errorMsg.textContent = "Credenciales incorrectas o usuario no encontrado.");
-            }
-        });
-
-        document.getElementById("onboarding-form").addEventListener("submit", async (e) => {
-            e.preventDefault();
-            const role = document.getElementById("onboard-role").value;
-            const childName = document.getElementById("onboard-child-name").value.trim();
-            if (!role || !childName) return showToast("Completa los datos", "error");
+        // Función para enviar notificación Telegram
+        async function sendTelegramNotification(message) {
             try {
-                await db.collection("users").doc(currentUser.uid).set({
-                    email: currentUser.email, role: role, childName: childName,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                await fetch(TELEGRAM_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message })
                 });
-                currentRole = role;
-                currentChildName = childName;
-                document.getElementById("onboarding-modal").classList.remove("open");
-                loadApp();
-            } catch (err) { showToast("Error guardando perfil", "error"); }
-        });
-
-        function loadApp() {
-            const roleLabel = document.getElementById("user-role-label");
-            roleLabel.textContent = currentRole.toUpperCase();
-            roleLabel.className = "";
-            roleLabel.classList.add(currentRole);
-            document.getElementById("whoami-label").textContent = currentRole.toUpperCase();
-            if(currentChildName) document.getElementById("child-name-display").textContent = "Calendario de " + currentChildName;
-
-            document.getElementById("login-view").classList.add("hidden");
-            document.getElementById("app-root").classList.remove("hidden");
-
-            initDataListeners();
-            initSwipeListeners();
-        }
-
-        function getBaseOwner(year, monthIndex, day) {
-            const date = new Date(year, monthIndex, day, 12, 0, 0);
-            const diffMs = date - BASE_MONDAY;
-            const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
-            const weekIndex = Math.floor(diffDays / 7);
-            return Math.abs(weekIndex % 2) === 0 ? "padre" : "madre";
-        }
-
-        function renderCalendar() {
-            const grid = document.getElementById("calendar-grid");
-            const titleEl = document.getElementById("calendar-title");
-            if (!grid) return;
-            grid.classList.add("fading");
-            setTimeout(() => {
-                grid.innerHTML = "";
-                titleEl.textContent = `${monthNames[currentMonth]} ${currentYear}`;
-                const table = document.createElement("table");
-                table.className = "month-table";
-                const thead = document.createElement("thead");
-                const trHead = document.createElement("tr");
-                weekDayNames.forEach(d => {
-                    const th = document.createElement("th");
-                    th.textContent = d;
-                    trHead.appendChild(th);
-                });
-                thead.appendChild(trHead);
-                table.appendChild(thead);
-
-                const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-                const firstDayInstance = new Date(currentYear, currentMonth, 1);
-                let startDay = firstDayInstance.getDay() === 0 ? 6 : firstDayInstance.getDay() - 1;
-                const tbody = document.createElement("tbody");
-                let dayCounter = 1, finished = false;
-                const todayKey = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}-${String(now.getDate()).padStart(2,"0")}`;
-
-                while (!finished) {
-                    const tr = document.createElement("tr");
-                    for (let i = 0; i < 7; i++) {
-                        const td = document.createElement("td");
-                        if (dayCounter <= daysInMonth && (dayCounter > 1 || i >= startDay)) {
-                            const dateKey = `${currentYear}-${String(currentMonth+1).padStart(2,"0")}-${String(dayCounter).padStart(2,"0")}`;
-                            const finalOwner = overrides[dateKey] || getBaseOwner(currentYear, currentMonth, dayCounter);
-
-                            td.className = `day-cell day-${finalOwner}`;
-                            if (overrides[dateKey]) td.classList.add("day-overridden");
-                            if (dateKey === todayKey) td.style.borderColor = "#f97316";
-
-                            td.onclick = () => openDayModal(dateKey, finalOwner);
-
-                            td.innerHTML = `<span class="day-number">${dayCounter}</span>
-                                            <img class="owner-icon-img" src="assets/${finalOwner}.png" onerror="this.style.display='none'">`;
-
-                            (eventsData[dateKey] || []).slice(0,3).forEach((evt, idx) => {
-                                const colorClass = `evt-${evt.type}`;
-                                td.innerHTML += `<div class="event-marker ${colorClass} pos-${idx}">
-                                    <i data-lucide="${ICON_MAP[evt.type]||'star'}" style="width:11px;"></i>
-                                </div>`;
-                            });
-                            dayCounter++;
-                        } else {
-                            td.style.pointerEvents = "none";
-                            td.style.background = "transparent";
-                            td.style.border = "none";
-                        }
-                        tr.appendChild(td);
-                    }
-                    tbody.appendChild(tr);
-                    if (dayCounter > daysInMonth) finished = true;
-                }
-                table.appendChild(tbody);
-                grid.appendChild(table);
-                lucide.createIcons();
-                grid.classList.remove("fading");
-            }, 150);
-        }
-
-        function initSwipeListeners() {
-            const grid = document.getElementById("calendar-grid");
-            grid.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, {passive: true});
-            grid.addEventListener('touchend', e => {
-                touchEndX = e.changedTouches[0].screenX;
-                handleSwipeGesture();
-            }, {passive: true});
-        }
-
-        function handleSwipeGesture() {
-            const distance = touchEndX - touchStartX;
-            if (Math.abs(distance) > 50) {
-                if (distance < 0) document.getElementById("next-period").click();
-                else document.getElementById("prev-period").click();
-            }
-        }
-
-        function initDataListeners() {
-            if (listenersAttached) return;
-            listenersAttached = true;
-
-            db.collection("overrides").onSnapshot(snap => {
-                overrides = {};
-                snap.forEach(doc => overrides[doc.id] = doc.data().owner);
-                renderCalendar();
-            });
-
-            db.collection("events").onSnapshot(snap => {
-                eventsData = {};
-                snap.forEach(doc => {
-                    const d = doc.data();
-                    if (!eventsData[d.date]) eventsData[d.date] = [];
-                    eventsData[d.date].push({ id: doc.id, ...d });
-                });
-                renderCalendar();
-                renderEventsView();
-            });
-
-            db.collection("requests").orderBy("createdAt", "desc").onSnapshot(snap => {
-                pendingRequests = [];
-                const listEl = document.getElementById("pending-requests");
-                listEl.innerHTML = "";
-                snap.forEach(doc => {
-                    const d = doc.data();
-                    if(d.status === "pendiente") pendingRequests.push({id:doc.id, ...d});
-                });
-                if(pendingRequests.length === 0) {
-                    listEl.innerHTML = "<div style='text-align:center;color:#64748b;font-size:0.85rem;padding:20px;'>Sin cambios pendientes</div>";
-                } else {
-                    pendingRequests.forEach(req => {
-                        const isMyReq = req.requesterRole === currentRole;
-                        let actions = '';
-
-                        if (isMyReq) {
-                            actions = `<div style="display:flex; gap:6px; margin-top:10px;">
-                                <button onclick="cancelRequest('${req.id}')" class="btn-cancel">🗑️ CANCELAR SOLICITUD</button>
-                            </div>`;
-                        } else {
-                            actions = `<div style="display:flex; gap:6px; margin-top:10px;">
-                                <button onclick="processRequest('${req.id}','aceptado','${req.requesterRole}','${req.startDate}','${req.endDate}')" class="btn-accept">✅ ACEPTAR</button>
-                                <button onclick="processRequest('${req.id}','rechazado')" class="btn-reject">❌ RECHAZAR</button>
-                            </div>`;
-                        }
-
-                        listEl.innerHTML += `<div class="request-item">
-                            <div style="font-weight:700;display:flex;justify-content:space-between;margin-bottom:8px;">
-                                <span style="color:#1e293b;">${req.requesterRole.toUpperCase()}</span>
-                                <span style="color:#667eea;font-size:0.9rem;">${formatearFecha(req.startDate)} - ${formatearFecha(req.endDate)}</span>
-                            </div>
-                            <div style="color:#475569;font-size:0.9rem;margin-bottom:8px;">${req.reason}</div>
-                            ${actions}
-                        </div>`;
-                    });
-                }
-            });
-
-            lucide.createIcons();
-        }
-
-        window.cancelRequest = async (requestId) => {
-            if (!confirm('¿Estás seguro de que quieres cancelar esta solicitud?')) return;
-
-            try {
-                await db.collection("requests").doc(requestId).delete();
-                showToast("Solicitud cancelada");
-                sendTelegramMessage(`🗑️ Solicitud CANCELADA por ${currentRole === 'madre' ? 'Madre' : 'Padre'}`);
             } catch (error) {
-                console.error("Error al cancelar:", error);
-                showToast("Error al cancelar la solicitud", "error");
+                console.error('Error enviando notificación Telegram:', error);
             }
-        };
+        }
 
-        window.processRequest = async (id, status, role, start, end) => {
-            const batch = db.batch();
-            batch.update(db.collection("requests").doc(id), { status });
-            if (status === "aceptado") {
-                for (let d = new Date(start); d <= new Date(end); d.setDate(d.getDate() + 1)) {
-                    batch.set(db.collection("overrides").doc(d.toISOString().split("T")[0]), { owner: role });
+        window.sendTelegramNotification = sendTelegramNotification;
+
+        // Auth State Observer
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                window.currentUser = user;
+                const userDoc = await getDoc(doc(db, 'users', user.uid));
+                
+                if (!userDoc.exists()) {
+                    document.getElementById('onboardingModal').classList.add('active');
+                } else {
+                    window.userData = userDoc.data();
+                    document.getElementById('loginScreen').style.display = 'none';
+                    document.getElementById('mainApp').style.display = 'block';
+                    await loadData();
+                    renderCalendar();
                 }
+            } else {
+                document.getElementById('loginScreen').style.display = 'flex';
+                document.getElementById('mainApp').style.display = 'none';
             }
-            await batch.commit();
-            showToast(`Solicitud ${status}`);
+        });
 
-            const icon = status === "aceptado" ? "✅" : "❌";
-            const responder = currentRole === "madre" ? "Madre" : "Padre";
-            sendTelegramMessage(`${icon} Solicitud ${status.toUpperCase()} por ${responder}.`);
+        // Toggle Login/Register
+        window.toggleToRegister = function() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'block';
         };
 
-        function openDayModal(date, owner) {
-            selectedDateKey = date;
-            document.getElementById("day-modal").classList.add("open");
-            document.getElementById("modal-date-title").textContent = date.split("-").reverse().join("/");
-            document.getElementById("modal-custody-img").src = `assets/${owner}.png`;
-            document.getElementById("modal-custody-text").textContent = owner.toUpperCase();
-            renderModalEvents();
-        }
+        window.toggleToLogin = function() {
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('registerForm').style.display = 'none';
+        };
 
-        function closeModal() {
-            document.getElementById("day-modal").classList.remove("open");
-        }
+        // Handle Login
+        window.handleLogin = async function() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
 
-        function selectIcon(t,b) {
-            selectedIconType=t;
-            document.querySelectorAll(".icon-btn").forEach(x=>x.classList.remove("selected"));
-            b.classList.add("selected");
-        }
-
-        async function saveEvent() {
-            const title = document.getElementById("event-title").value;
-            if(!title) return;
-            await db.collection("events").add({
-                date:selectedDateKey,
-                title,
-                type:selectedIconType,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            document.getElementById("event-title").value = "";
-            closeModal();
-            showToast("Evento guardado");
-        }
-
-        async function deleteEvent(id) {
-            await db.collection("events").doc(id).delete();
-            renderModalEvents();
-        }
-
-        function renderModalEvents() {
-            const list = document.getElementById("modal-event-list");
-            list.innerHTML = "";
-            (eventsData[selectedDateKey]||[]).forEach(e => {
-                list.innerHTML += `<div class="request-item" style="display:flex;justify-content:space-between;align-items:center;">
-                    <div style="display:flex;gap:8px;align-items:center;">
-                        <div style="width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;color:white;" class="evt-${e.type}">
-                            <i data-lucide="${ICON_MAP[e.type]}" style="width:14px;"></i>
-                        </div>
-                        <span style="color:#1e293b;">${e.title}</span>
-                    </div>
-                    <button onclick="deleteEvent('${e.id}')" style="background:none;border:none;color:#ef4444;cursor:pointer;font-size:24px;">×</button>
-                </div>`;
-            });
-            lucide.createIcons();
-        }
-
-        function switchView(viewName) {
-            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-
-            if (viewName === 'home') {
-                document.getElementById('homeView').classList.add('active');
-                document.querySelectorAll('.nav-item')[0].classList.add('active');
-            } else if (viewName === 'requests') {
-                document.getElementById('requestsView').classList.add('active');
-                document.querySelectorAll('.nav-item')[1].classList.add('active');
-            } else if (viewName === 'events') {
-                document.getElementById('eventsView').classList.add('active');
-                document.querySelectorAll('.nav-item')[2].classList.add('active');
-                renderEventsView();
-            }
-        }
-
-        function renderEventsView() {
-            const eventsList = document.getElementById("events-list");
-            if (!eventsList) return;
-
-            const allEvents = [];
-            for (const [dateKey, events] of Object.entries(eventsData)) {
-                events.forEach(evt => {
-                    allEvents.push({
-                        date: dateKey,
-                        ...evt
-                    });
-                });
-            }
-
-            allEvents.sort((a, b) => new Date(a.date) - new Date(b.date));
-
-            if (allEvents.length === 0) {
-                eventsList.innerHTML = `<div style="text-align:center;padding:60px 20px;color:#64748b;">
-                    <i data-lucide="calendar-x" style="width:64px;height:64px;margin-bottom:16px;opacity:0.3;"></i>
-                    <p style="font-size:16px;">No hay eventos programados</p>
-                </div>`;
-                lucide.createIcons();
+            if (!email || !password) {
+                showToast('Por favor completa todos los campos');
                 return;
             }
 
-            eventsList.innerHTML = allEvents.map(evt => {
-                const [year, month, day] = evt.date.split('-');
-                const dateObj = new Date(parseInt(year), parseInt(month)-1, parseInt(day));
-                const owner = overrides[evt.date] || getBaseOwner(parseInt(year), parseInt(month)-1, parseInt(day));
-                const dateStr = `${day}/${month}/${year}`;
-                const dayName = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'][dateObj.getDay()];
-
-                return `<div class="event-card ${owner}-event" onclick="goToDateAndOpen('${evt.date}')">
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-                        <div>
-                            <div style="font-weight:700;color:#1e293b;font-size:16px;">${dateStr}</div>
-                            <div style="font-size:13px;color:#64748b;">${dayName}</div>
-                        </div>
-                        <div style="padding:4px 12px;border-radius:12px;font-size:11px;font-weight:700;text-transform:uppercase;
-                            ${owner === 'padre' ? 'background:#dbeafe;color:#3b82f6;border:2px solid #bfdbfe;' : 
-                                'background:#fce7f3;color:#ec4899;border:2px solid #fbcfe8;'}">
-                            ${owner}
-                        </div>
-                    </div>
-                    <div style="display:flex;align-items:center;gap:10px;">
-                        <div style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;" class="evt-${evt.type}">
-                            <i data-lucide="${ICON_MAP[evt.type]}" style="width:16px;"></i>
-                        </div>
-                        <span style="color:#1e293b;font-weight:500;">${evt.title}</span>
-                    </div>
-                </div>`;
-            }).join('');
-
-            lucide.createIcons();
-        }
-
-        function goToDateAndOpen(dateKey) {
-            const [year, month, day] = dateKey.split('-').map(Number);
-            currentYear = year;
-            currentMonth = month - 1;
-            switchView('home');
-            renderCalendar();
-            setTimeout(() => {
-                const owner = overrides[dateKey] || getBaseOwner(year, month - 1, day);
-                openDayModal(dateKey, owner);
-            }, 300);
-        }
-
-        document.getElementById("logout-btn").onclick = () => {
-            listenersAttached=false;
-            auth.signOut();
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                showToast('¡Bienvenido!');
+            } catch (error) {
+                console.error('Error login:', error);
+                showToast('Error al iniciar sesión: ' + error.message);
+            }
         };
 
-        document.getElementById("prev-period").onclick = () => {
-            if(--currentMonth<0){currentMonth=11;currentYear--;}
-            renderCalendar();
+        // Handle Register
+        window.handleRegister = async function() {
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const passwordConfirm = document.getElementById('registerPasswordConfirm').value;
+
+            if (!email || !password || !passwordConfirm) {
+                showToast('Por favor completa todos los campos');
+                return;
+            }
+
+            if (password !== passwordConfirm) {
+                showToast('Las contraseñas no coinciden');
+                return;
+            }
+
+            if (password.length < 6) {
+                showToast('La contraseña debe tener al menos 6 caracteres');
+                return;
+            }
+
+            try {
+                await createUserWithEmailAndPassword(auth, email, password);
+                showToast('¡Cuenta creada con éxito!');
+            } catch (error) {
+                console.error('Error registro:', error);
+                showToast('Error al crear cuenta: ' + error.message);
+            }
         };
 
-        document.getElementById("next-period").onclick = () => {
-            if(++currentMonth>11){currentMonth=0;currentYear++;}
-            renderCalendar();
-        };
+        // Complete Onboarding
+        window.completeOnboarding = async function() {
+            const role = document.getElementById('userRole').value;
+            const childName = document.getElementById('childName').value;
 
-        document.getElementById("request-form").onsubmit = async (e) => {
-            e.preventDefault();
-            const startVal = document.getElementById("start-date").value;
-            const endVal = document.getElementById("end-date").value;
-            const reasonVal = document.getElementById("reason").value;
+            if (!childName) {
+                showToast('Por favor introduce el nombre del niño/a');
+                return;
+            }
 
-            await db.collection("requests").add({
-                requesterUid: currentUser.uid,
-                requesterRole: currentRole,
-                startDate: startVal,
-                endDate: endVal,
-                reason: reasonVal,
-                status: "pendiente",
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            showToast("Solicitud enviada");
-            e.target.reset();
+            try {
+                await setDoc(doc(db, 'users', currentUser.uid), {
+                    email: currentUser.email,
+                    role: role,
+                    childName: childName,
+                    createdAt: new Date()
+                });
 
-            const quien = currentRole === "madre" ? "Madre" : "Padre";
-            sendTelegramMessage(`📅 NUEVA SOLICITUD de ${quien}:\nDesde: ${formatearFecha(startVal)}\nHasta: ${formatearFecha(endVal)}\nMotivo: ${reasonVal}`);
-        };
-
-        document.addEventListener("DOMContentLoaded", () => {
-            const ys = document.getElementById("year-select");
-            [2025,2026,2027].forEach(y => {
-                const o = document.createElement("option");
-                o.value=y;
-                o.textContent=y;
-                if(y===currentYear)o.selected=true;
-                ys.appendChild(o);
-            });
-            ys.onchange = (e) => {
-                currentYear=parseInt(e.target.value);
+                window.userData = { role, childName };
+                document.getElementById('onboardingModal').classList.remove('active');
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('mainApp').style.display = 'block';
+                await loadData();
                 renderCalendar();
-            };
-            renderCalendar();
+                showToast('¡Configuración completada!');
+            } catch (error) {
+                console.error('Error onboarding:', error);
+                showToast('Error al guardar configuración');
+            }
+        };
+
+        // Handle Logout
+        window.handleLogout = async function() {
+            try {
+                await signOut(auth);
+                showToast('Sesión cerrada');
+            } catch (error) {
+                console.error('Error logout:', error);
+                showToast('Error al cerrar sesión');
+            }
+        };
+
+        // Load Data
+        async function loadData() {
+            try {
+                // Cargar overrides
+                const overridesQuery = query(collection(db, 'overrides'));
+                const overridesSnapshot = await getDocs(overridesQuery);
+                window.overrides = {};
+                overridesSnapshot.forEach(doc => {
+                    const data = doc.data();
+                    window.overrides[data.date] = data.owner;
+                });
+
+                // Cargar eventos
+                const eventsQuery = query(collection(db, 'events'), orderBy('date', 'desc'));
+                const eventsSnapshot = await getDocs(eventsQuery);
+                window.events = {};
+                eventsSnapshot.forEach(doc => {
+                    const data = doc.data();
+                    if (!window.events[data.date]) {
+                        window.events[data.date] = [];
+                    }
+                    window.events[data.date].push({ id: doc.id, ...data });
+                });
+
+                // Cargar solicitudes
+                await loadRequests();
+            } catch (error) {
+                console.error('Error cargando datos:', error);
+            }
+        }
+
+        window.loadData = loadData;
+
+        // Render Calendar
+        function renderCalendar() {
+            const year = window.currentYear;
+            const month = window.currentMonth;
+            
+            const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+            document.getElementById('monthTitle').textContent = `${monthNames[month]} ${year}`;
+            document.getElementById('currentYear').textContent = year;
+
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const startingDayOfWeek = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1;
+            const daysInMonth = lastDay.getDate();
+
+            const daysContainer = document.getElementById('calendarDays');
+            daysContainer.innerHTML = '';
+
+            // Días vacíos
+            for (let i = 0; i < startingDayOfWeek; i++) {
+                const emptyDay = document.createElement('div');
+                emptyDay.className = 'day empty';
+                daysContainer.appendChild(emptyDay);
+            }
+
+            // Días del mes
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'day';
+                dayElement.textContent = day;
+
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const owner = getOwnerForDate(new Date(year, month, day));
+
+                dayElement.classList.add(owner);
+
+                // Marcar día actual
+                const today = new Date();
+                if (year === today.getFullYear() && month === today.getMonth() && day === today.getDate()) {
+                    dayElement.classList.add('today');
+                }
+
+                // Marcar si tiene eventos
+                if (window.events[dateStr] && window.events[dateStr].length > 0) {
+                    dayElement.classList.add('has-event');
+                }
+
+                dayElement.onclick = () => openDayModal(year, month, day);
+                daysContainer.appendChild(dayElement);
+            }
+
             lucide.createIcons();
-        });
+        }
+
+        window.renderCalendar = renderCalendar;
+
+        // Get Owner for Date
+        function getOwnerForDate(date) {
+            const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+            
+            if (window.overrides[dateStr]) {
+                return window.overrides[dateStr];
+            }
+
+            const startDate = new Date(2024, 0, 1);
+            const diffTime = date - startDate;
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            const weekNumber = Math.floor(diffDays / 7);
+
+            return weekNumber % 2 === 0 ? 'madre' : 'padre';
+        }
+
+        window.getOwnerForDate = getOwnerForDate;
+
+        // Change Month
+        window.changeMonth = function(direction) {
+            window.currentMonth += direction;
+            if (window.currentMonth > 11) {
+                window.currentMonth = 0;
+                window.currentYear++;
+            } else if (window.currentMonth < 0) {
+                window.currentMonth = 11;
+                window.currentYear--;
+            }
+            renderCalendar();
+        };
+
+        // Change Year
+        window.changeYear = function(direction) {
+            window.currentYear += direction;
+            renderCalendar();
+        };
+
+        // Switch View
+        window.switchView = function(view) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
+            if (view === 'calendar') {
+                document.getElementById('calendarView').classList.add('active');
+                document.querySelectorAll('.nav-item')[0].classList.add('active');
+            } else if (view === 'requests') {
+                document.getElementById('requestsView').classList.add('active');
+                document.querySelectorAll('.nav-item')[1].classList.add('active');
+                loadRequests();
+            } else if (view === 'events') {
+                document.getElementById('eventsView').classList.add('active');
+                document.querySelectorAll('.nav-item')[2].classList.add('active');
+                loadEvents();
+            }
+
+            lucide.createIcons();
+        };
+
+        // Open Day Modal
+        window.openDayModal = function(year, month, day) {
+            window.selectedDate = { year, month, day };
+            const date = new Date(year, month, day);
+            const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            const owner = getOwnerForDate(date);
+
+            const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+            document.getElementById('dayModalTitle').textContent = `${day} de ${monthNames[month]} ${year}`;
+
+            let content = `<p><strong>Responsable:</strong> ${owner === 'madre' ? 'Madre' : 'Padre'}</p>`;
+
+            if (window.events[dateStr] && window.events[dateStr].length > 0) {
+                content += '<h3 style="margin-top: 16px; font-size: 18px;">Eventos del día:</h3>';
+                window.events[dateStr].forEach(event => {
+                    content += `<div class="event-item" style="margin-top: 12px;">
+                        <span>${event.type}</span> <strong>${event.title}</strong>
+                    </div>`;
+                });
+            }
+
+            document.getElementById('dayModalContent').innerHTML = content;
+            document.getElementById('dayModal').classList.add('active');
+        };
+
+        window.closeDayModal = function() {
+            document.getElementById('dayModal').classList.remove('active');
+        };
+
+        // Open Override Modal
+        window.openOverrideModal = function() {
+            document.getElementById('dayModal').classList.remove('active');
+            document.getElementById('overrideModal').classList.add('active');
+        };
+
+        window.closeOverrideModal = function() {
+            document.getElementById('overrideModal').classList.remove('active');
+        };
+
+        // Save Override
+        window.saveOverride = async function() {
+            const { year, month, day } = window.selectedDate;
+            const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            const owner = document.getElementById('overrideOwner').value;
+
+            try {
+                await setDoc(doc(db, 'overrides', dateStr), {
+                    date: dateStr,
+                    owner: owner,
+                    changedBy: window.currentUser.uid,
+                    changedAt: new Date()
+                });
+
+                window.overrides[dateStr] = owner;
+                renderCalendar();
+                closeOverrideModal();
+                showToast('Cambio guardado correctamente');
+            } catch (error) {
+                console.error('Error guardando cambio:', error);
+                showToast('Error al guardar el cambio');
+            }
+        };
+
+        // Request Modal
+        window.openRequestModal = function() {
+            document.getElementById('requestModal').classList.add('active');
+        };
+
+        window.closeRequestModal = function() {
+            document.getElementById('requestModal').classList.remove('active');
+        };
+
+        // Submit Request
+        window.submitRequest = async function() {
+            const startDate = document.getElementById('requestStartDate').value;
+            const endDate = document.getElementById('requestEndDate').value;
+            const reason = document.getElementById('requestReason').value;
+
+            if (!startDate || !endDate || !reason) {
+                showToast('Por favor completa todos los campos');
+                return;
+            }
+
+            try {
+                await addDoc(collection(db, 'requests'), {
+                    requesterUid: window.currentUser.uid,
+                    requesterRole: window.userData.role,
+                    startDate: startDate,
+                    endDate: endDate,
+                    reason: reason,
+                    status: 'pending',
+                    createdAt: new Date()
+                });
+
+                await sendTelegramNotification(`Nueva solicitud de cambio de custodia:\nFechas: ${startDate} a ${endDate}\nMotivo: ${reason}`);
+
+                closeRequestModal();
+                showToast('Solicitud enviada correctamente');
+                loadRequests();
+
+                document.getElementById('requestStartDate').value = '';
+                document.getElementById('requestEndDate').value = '';
+                document.getElementById('requestReason').value = '';
+            } catch (error) {
+                console.error('Error enviando solicitud:', error);
+                showToast('Error al enviar la solicitud');
+            }
+        };
+
+        // Load Requests
+        async function loadRequests() {
+            try {
+                const requestsQuery = query(collection(db, 'requests'), orderBy('createdAt', 'desc'));
+                const requestsSnapshot = await getDocs(requestsQuery);
+                const requestsList = document.getElementById('requestsList');
+                requestsList.innerHTML = '';
+
+                if (requestsSnapshot.empty) {
+                    requestsList.innerHTML = '<p style="color: var(--text-sec); text-align: center;">No hay solicitudes</p>';
+                    return;
+                }
+
+                for (const docSnap of requestsSnapshot.docs) {
+                    const request = docSnap.data();
+                    const isOwnRequest = request.requesterUid === window.currentUser.uid;
+
+                    const requestItem = document.createElement('div');
+                    requestItem.className = 'request-item';
+                    requestItem.innerHTML = `
+                        <div class="request-header">
+                            <span class="request-date">${request.startDate} → ${request.endDate}</span>
+                            <span class="request-status ${request.status}">${request.status === 'pending' ? 'Pendiente' : request.status === 'accepted' ? 'Aceptada' : 'Rechazada'}</span>
+                        </div>
+                        <p class="request-reason">${request.reason}</p>
+                        ${!isOwnRequest && request.status === 'pending' ? `
+                            <div class="request-actions">
+                                <button class="secondary" onclick="handleRequest('${docSnap.id}', 'accepted')" style="background: var(--success); color: white;">Aceptar</button>
+                                <button class="danger" onclick="handleRequest('${docSnap.id}', 'rejected')">Rechazar</button>
+                            </div>
+                        ` : ''}
+                        ${isOwnRequest && request.status === 'pending' ? `
+                            <button class="danger" onclick="cancelRequest('${docSnap.id}')" style="margin-top: 12px;">Cancelar Solicitud</button>
+                        ` : ''}
+                    `;
+                    requestsList.appendChild(requestItem);
+                }
+
+                lucide.createIcons();
+            } catch (error) {
+                console.error('Error cargando solicitudes:', error);
+            }
+        }
+
+        window.loadRequests = loadRequests;
+
+        // Handle Request
+        window.handleRequest = async function(requestId, status) {
+            try {
+                const requestDoc = await getDoc(doc(db, 'requests', requestId));
+                const requestData = requestDoc.data();
+
+                await updateDoc(doc(db, 'requests', requestId), {
+                    status: status,
+                    respondedAt: new Date(),
+                    respondedBy: window.currentUser.uid
+                });
+
+                if (status === 'accepted') {
+                    const startDate = new Date(requestData.startDate);
+                    const endDate = new Date(requestData.endDate);
+
+                    for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+                        const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+                        await setDoc(doc(db, 'overrides', dateStr), {
+                            date: dateStr,
+                            owner: requestData.requesterRole,
+                            changedBy: window.currentUser.uid,
+                            changedAt: new Date()
+                        });
+                    }
+
+                    await loadData();
+                    renderCalendar();
+                }
+
+                await sendTelegramNotification(`Solicitud ${status === 'accepted' ? 'aceptada' : 'rechazada'}:\nFechas: ${requestData.startDate} a ${requestData.endDate}`);
+
+                showToast(status === 'accepted' ? 'Solicitud aceptada' : 'Solicitud rechazada');
+                loadRequests();
+            } catch (error) {
+                console.error('Error procesando solicitud:', error);
+                showToast('Error al procesar la solicitud');
+            }
+        };
+
+        // Cancel Request
+        window.cancelRequest = async function(requestId) {
+            try {
+                await deleteDoc(doc(db, 'requests', requestId));
+                
+                await sendTelegramNotification('Solicitud cancelada por el solicitante');
+                
+                showToast('Solicitud cancelada');
+                loadRequests();
+            } catch (error) {
+                console.error('Error cancelando solicitud:', error);
+                showToast('Error al cancelar la solicitud');
+            }
+        };
+
+        // Event Modal
+        window.openEventModal = function() {
+            document.getElementById('eventModal').classList.add('active');
+        };
+
+        window.closeEventModal = function() {
+            document.getElementById('eventModal').classList.remove('active');
+        };
+
+        // Submit Event
+        window.submitEvent = async function() {
+            const date = document.getElementById('eventDate').value;
+            const title = document.getElementById('eventTitle').value;
+            const type = document.getElementById('eventType').value;
+
+            if (!date || !title) {
+                showToast('Por favor completa todos los campos');
+                return;
+            }
+
+            try {
+                await addDoc(collection(db, 'events'), {
+                    date: date,
+                    title: title,
+                    type: type,
+                    createdBy: window.currentUser.uid,
+                    createdAt: new Date()
+                });
+
+                closeEventModal();
+                showToast('Evento guardado correctamente');
+                await loadData();
+                renderCalendar();
+                loadEvents();
+
+                document.getElementById('eventDate').value = '';
+                document.getElementById('eventTitle').value = '';
+            } catch (error) {
+                console.error('Error guardando evento:', error);
+                showToast('Error al guardar el evento');
+            }
+        };
+
+        // Load Events
+        async function loadEvents() {
+            try {
+                const eventsQuery = query(collection(db, 'events'), orderBy('date', 'desc'));
+                const eventsSnapshot = await getDocs(eventsQuery);
+                const eventsList = document.getElementById('eventsList');
+                eventsList.innerHTML = '';
+
+                if (eventsSnapshot.empty) {
+                    eventsList.innerHTML = '<p style="color: var(--text-sec); text-align: center;">No hay eventos</p>';
+                    return;
+                }
+
+                eventsSnapshot.forEach(doc => {
+                    const event = doc.data();
+                    const eventItem = document.createElement('div');
+                    eventItem.className = 'event-item';
+                    eventItem.innerHTML = `
+                        <div class="event-icon">${event.type}</div>
+                        <div class="event-details">
+                            <div class="event-title">${event.title}</div>
+                            <div class="event-date">${event.date}</div>
+                        </div>
+                    `;
+                    eventsList.appendChild(eventItem);
+                });
+
+                lucide.createIcons();
+            } catch (error) {
+                console.error('Error cargando eventos:', error);
+            }
+        }
+
+        window.loadEvents = loadEvents;
+
+        // Toast
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        window.showToast = showToast;
+
+        // Initialize icons
+        lucide.createIcons();
     </script>
 </body>
 </html>
+

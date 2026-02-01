@@ -857,28 +857,6 @@
                     <input type="password" id="loginPassword" placeholder="••••••••" required>
                 </div>
                 <button class="login-btn" onclick="handleLogin()">Iniciar Sesión</button>
-                <p class="login-toggle">
-                    ¿No tienes cuenta? <a onclick="toggleToRegister()">Regístrate</a>
-                </p>
-            </div>
-
-            <div id="registerForm" style="display: none;">
-                <div class="login-field">
-                    <label for="registerEmail">Email</label>
-                    <input type="email" id="registerEmail" placeholder="tu@email.com" required>
-                </div>
-                <div class="login-field">
-                    <label for="registerPassword">Contraseña</label>
-                    <input type="password" id="registerPassword" placeholder="••••••••" required>
-                </div>
-                <div class="login-field">
-                    <label for="registerPasswordConfirm">Confirmar Contraseña</label>
-                    <input type="password" id="registerPasswordConfirm" placeholder="••••••••" required>
-                </div>
-                <button class="login-btn" onclick="handleRegister()">Crear Cuenta</button>
-                <p class="login-toggle">
-                    ¿Ya tienes cuenta? <a onclick="toggleToLogin()">Inicia sesión</a>
-                </p>
             </div>
         </div>
     </div>
@@ -1072,12 +1050,12 @@
 
         // Configuración Firebase
         const firebaseConfig = {
-            apiKey: "AIzaSyDmd5cCvXlPv11zXnuqT9zHQPHRALZ9nz0",
+            apiKey: "AIzaSyAwgk4l0zvaCUCgm1CjqqqXjJHr5KPBjc",
             authDomain: "custodia-familiar.firebaseapp.com",
             projectId: "custodia-familiar",
             storageBucket: "custodia-familiar.firebasestorage.app",
-            messagingSenderId: "529950343503",
-            appId: "1:529950343503:web:b17cd1e15fcaf35fb47a7e"
+            messagingSenderId: "1038952432258",
+            appId: "1:1038952432258:web:7608d6a48d8ad8308a6a9b"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -1133,24 +1111,13 @@
             }
         });
 
-        // Toggle Login/Register
-        window.toggleToRegister = function() {
-            document.getElementById('loginForm').style.display = 'none';
-            document.getElementById('registerForm').style.display = 'block';
-        };
-
-        window.toggleToLogin = function() {
-            document.getElementById('loginForm').style.display = 'block';
-            document.getElementById('registerForm').style.display = 'none';
-        };
-
         // Handle Login
         window.handleLogin = async function() {
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
 
             if (!email || !password) {
-                showToast('Por favor completa todos los campos');
+                showToast('Por favor completa todos los campos', 'error');
                 return;
             }
 
@@ -1159,37 +1126,7 @@
                 showToast('¡Bienvenido!');
             } catch (error) {
                 console.error('Error login:', error);
-                showToast('Error al iniciar sesión: ' + error.message);
-            }
-        };
-
-        // Handle Register
-        window.handleRegister = async function() {
-            const email = document.getElementById('registerEmail').value;
-            const password = document.getElementById('registerPassword').value;
-            const passwordConfirm = document.getElementById('registerPasswordConfirm').value;
-
-            if (!email || !password || !passwordConfirm) {
-                showToast('Por favor completa todos los campos');
-                return;
-            }
-
-            if (password !== passwordConfirm) {
-                showToast('Las contraseñas no coinciden');
-                return;
-            }
-
-            if (password.length < 6) {
-                showToast('La contraseña debe tener al menos 6 caracteres');
-                return;
-            }
-
-            try {
-                await createUserWithEmailAndPassword(auth, email, password);
-                showToast('¡Cuenta creada con éxito!');
-            } catch (error) {
-                console.error('Error registro:', error);
-                showToast('Error al crear cuenta: ' + error.message);
+                showToast('Error: Usuario no encontrado o contraseña incorrecta', 'error');
             }
         };
 

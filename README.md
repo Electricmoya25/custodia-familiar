@@ -17,12 +17,14 @@ Aplicación web progresiva (PWA) para la gestión y coordinación de la custodia
 - **Gestos swipe** para navegación rápida entre meses
 - **Overrides manuales** para modificar días específicos
 - **Eventos visuales** con iconos de categorías
+- **Diseño responsive** optimizado para móviles
 
 ### 📨 Gestión de Solicitudes
 - **Envío de solicitudes** de cambio de custodia con rango de fechas
 - **Vista centralizada** de todas las solicitudes
 - **Estados**: Pendiente, Aceptada, Rechazada
 - **Acciones rápidas**: Aceptar/Rechazar solicitudes de la otra parte
+- **🆕 CANCELAR SOLICITUDES**: Cancela tus propias solicitudes antes de que sean procesadas
 - **Notificaciones automáticas** por Telegram para cada acción
 - **Historial completo** de solicitudes
 
@@ -38,6 +40,7 @@ Aplicación web progresiva (PWA) para la gestión y coordinación de la custodia
 - Notificaciones automáticas para:
   - ✅ Nuevas solicitudes de cambio
   - ✅ Solicitudes aceptadas o rechazadas
+  - ✅ Solicitudes canceladas
   - ✅ Asignación de custodia
   - ✅ Eventos importantes
 
@@ -46,6 +49,13 @@ Aplicación web progresiva (PWA) para la gestión y coordinación de la custodia
 - **Sincronización instantánea** entre dispositivos
 - **Persistencia de datos** en la nube
 - **Sin pérdida de información**: Los datos existentes se conservan y cargan automáticamente
+
+### 🎨 Diseño Moderno
+- **Tema claro** con colores suaves y agradables
+- **Gradiente morado/violeta** como fondo
+- **Tarjetas blancas** con sombras sutiles
+- **Alta legibilidad** con contraste adecuado
+- **Completamente responsive** - se adapta perfectamente a móviles, tablets y escritorio
 
 ## 🚀 Tecnologías
 
@@ -133,6 +143,8 @@ service cloud.firestore {
     match /requests/{document=**} {
       allow read: if request.auth != null;
       allow write: if request.auth != null;
+      // Permite eliminar solicitudes (para la función de cancelar)
+      allow delete: if request.auth != null;
     }
   }
 }
@@ -188,13 +200,13 @@ functions.http('sendTelegram', async (req, res) => {
 });
 ```
 
-5. Despliega y actualiza la URL en el archivo HTML
+5. Despliega la función y actualiza la URL en el archivo HTML
 
 ## 🎯 Instalación y Uso
 
 ### Instalación Rápida
 
-1. Descarga el archivo `Custodia_Familiar_Final.html`
+1. Descarga el archivo `Custodia_Familiar_Light.html`
 2. Ábrelo en tu navegador web
 3. Crea una cuenta o inicia sesión
 4. Configura tu perfil (Padre/Madre y nombre del niño/a)
@@ -207,12 +219,14 @@ functions.http('sendTelegram', async (req, res) => {
 - **Modificar días**: Haz clic en cualquier día para ver detalles y añadir eventos
 - **Navegación**: Usa las flechas o gestos swipe para cambiar de mes
 - **Eventos**: Los iconos de colores indican actividades programadas
+- **Responsive**: El calendario se adapta perfectamente a pantallas móviles
 
 #### 📨 Vista Solicitudes
 - **Crear solicitud**: Rellena el formulario con fechas y motivo
 - **Gestionar solicitudes**: 
   - Si eres el receptor → Acepta o rechaza
-  - Si eres el solicitante → Espera respuesta
+  - Si eres el solicitante → **🆕 Puedes cancelar la solicitud**
+- **Cancelar**: Botón "Cancelar solicitud" visible solo en tus propias solicitudes pendientes
 - **Historial**: Ve todas las solicitudes pendientes en tiempo real
 
 #### 📋 Vista Eventos
@@ -220,36 +234,59 @@ functions.http('sendTelegram', async (req, res) => {
 - **Filtro automático**: Solo muestra eventos futuros y actuales
 - **Navegación rápida**: Haz clic en cualquier evento para ir a ese día en el calendario
 
-## 🎨 Personalización
+## 🆕 Nueva Función: Cancelar Solicitudes
 
-### Cambiar el patrón de semanas
+### ¿Cómo funciona?
 
-Modifica la fecha base en el código:
+1. **Solo tus solicitudes**: El botón de cancelar aparece únicamente en las solicitudes que TÚ has creado
+2. **Solo pendientes**: Solo puedes cancelar solicitudes que aún no han sido aceptadas o rechazadas
+3. **Confirmación**: Se pide confirmación antes de cancelar
+4. **Notificación**: Se envía una notificación automática por Telegram cuando cancelas
+5. **Eliminación definitiva**: La solicitud se elimina completamente de la base de datos
 
-```javascript
-const BASE_MONDAY = new Date(2026, 0, 5, 12, 0, 0); // 5 de enero de 2026
+### Ejemplo de uso
+
+```
+Situación: Solicitaste cambiar la custodia del 15-20 de marzo, 
+pero ya no es necesario.
+
+Acción: 
+1. Ve a la vista "Solicitudes"
+2. Localiza tu solicitud pendiente
+3. Presiona "🗑️ CANCELAR SOLICITUD"
+4. Confirma la acción
+5. ¡Listo! La solicitud desaparece y se notifica por Telegram
 ```
 
-### Añadir nuevas categorías de eventos
+## 🎨 Características del Diseño
 
-1. Añade el tipo al objeto `ICON_MAP`:
-```javascript
-const ICON_MAP = {
-    medico: "stethoscope",
-    tuCategoria: "tu-icono-lucide"
-};
-```
+### Paleta de Colores
 
-2. Añade el botón en el modal:
-```html
-<button class="icon-btn evt-tuCategoria" onclick="selectIcon('tuCategoria', this)">
-    <i data-lucide="tu-icono"></i>
-</button>
-```
+- **Fondo**: Gradiente morado/violeta (#667eea → #764ba2)
+- **Tarjetas**: Blanco puro (#ffffff)
+- **Texto principal**: Gris oscuro (#1e293b)
+- **Texto secundario**: Gris medio (#64748b)
+- **Padre**: Azul (#3b82f6)
+- **Madre**: Rosa (#ec4899)
+- **Acentos**: Tonos pastel para mejor legibilidad
 
-3. Añade el estilo CSS:
+### Responsive Design
+
 ```css
-.evt-tuCategoria { background: #tu-color; }
+/* Móviles (< 640px) */
+- Espaciado reducido
+- Texto más pequeño pero legible
+- Iconos adaptados
+- Botones táctiles grandes
+
+/* Tablets (640px - 1024px) */
+- Aprovecha el espacio horizontal
+- Tarjetas más amplias
+
+/* Escritorio (> 1024px) */
+- Máximo ancho de 1200px
+- Diseño centrado
+- Espaciado generoso
 ```
 
 ## 🔒 Seguridad y Privacidad
@@ -257,16 +294,18 @@ const ICON_MAP = {
 - ✅ Autenticación requerida para todos los datos
 - ✅ Datos encriptados en tránsito (HTTPS)
 - ✅ Reglas de seguridad de Firestore configurables
+- ✅ Permisos de eliminación controlados
 - ✅ Sin tracking de terceros
 - ✅ Datos almacenados en servidores de Google (Firebase)
 
 ## 📱 Características Técnicas
 
-- **Responsive Design**: Funciona en móviles, tablets y escritorio
+- **Responsive Design**: Funciona perfectamente en móviles, tablets y escritorio
 - **PWA Ready**: Se puede instalar como aplicación
-- **Offline-first**: Datos cacheados localmente
+- **Touch Optimized**: Gestos táctiles nativos (swipe)
 - **Real-time**: Actualizaciones instantáneas entre dispositivos
-- **Touch Gestures**: Swipe para navegación en móviles
+- **Lightweight**: Sin frameworks pesados, código vanilla optimizado
+- **Accessible**: Contraste adecuado y tamaño de texto legible
 
 ## 🐛 Solución de Problemas
 
@@ -284,6 +323,11 @@ const ICON_MAP = {
 - Comprueba las reglas de seguridad de Firestore
 - Verifica que ambos usuarios tengan los permisos correctos
 - Refresca la página para forzar sincronización
+
+### No puedo cancelar una solicitud
+- Solo puedes cancelar TUS PROPIAS solicitudes
+- Solo se pueden cancelar solicitudes con estado "pendiente"
+- Verifica que las reglas de Firestore permitan `delete` en la colección `requests`
 
 ## 📄 Licencia
 
@@ -305,6 +349,23 @@ Este proyecto es de código abierto bajo licencia MIT.
 - 💬 **Preguntas**: Abre una discusión en GitHub
 - 📧 **Email**: Para consultas privadas
 
+## 🎉 Changelog
+
+### Versión 2.0 (Febrero 2026)
+- ✅ **Nuevo diseño en colores claros** - Tema light con gradientes suaves
+- ✅ **Función de cancelar solicitudes** - Cancela tus propias solicitudes pendientes
+- ✅ **Responsive mejorado** - Optimización para móviles con media queries
+- ✅ **Mejor legibilidad** - Contraste mejorado y tamaños de texto ajustados
+- ✅ **Confirmaciones** - Diálogos de confirmación antes de acciones críticas
+
+### Versión 1.0 (Enero 2026)
+- Sistema de login/registro
+- Calendario con semanas alternas
+- Gestión de solicitudes
+- Eventos con categorías
+- Notificaciones por Telegram
+- Sincronización en tiempo real
+
 ## ⭐ Agradecimientos
 
 - [Firebase](https://firebase.google.com/) - Backend y autenticación
@@ -316,4 +377,4 @@ Este proyecto es de código abierto bajo licencia MIT.
 
 **Desarrollado con ❤️ para facilitar la coordinación familiar**
 
-*Última actualización: Febrero 2026*
+*Última actualización: Febrero 2026 - Versión 2.0*

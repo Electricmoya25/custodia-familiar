@@ -226,15 +226,30 @@
 </section>
 <section class="bg-surface-container-low p-8 rounded-[2rem] space-y-6">
 <div class="flex items-center gap-3 mb-2">
-<span class="material-symbols-outlined text-primary" data-icon="add_circle">add_circle</span>
+<span class="material-symbols-outlined text-primary">add_circle</span>
 <h2 class="text-xl font-semibold">Nueva Solicitud</h2>
 </div>
 <form class="space-y-5" id="request-form">
+<div class="flex items-center gap-3 px-1">
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" id="req-single-day" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+<span class="ml-3 text-sm font-medium text-on-surface">Solo un día</span>
+</label>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 <div class="space-y-2">
 <label class="text-sm font-medium px-1 flex items-center gap-2">
-<span class="material-symbols-outlined text-xs">calendar_month</span> Fecha del Cambio
-                        </label>
+<span class="material-symbols-outlined text-xs">calendar_month</span> <span id="label-date-start">Desde</span>
+</label>
 <input class="w-full bg-surface-container-lowest border-none ring-1 ring-outline-variant/20 focus:ring-primary rounded-xl p-4 text-on-surface" id="req-date" required="" type="date"/>
+</div>
+<div class="space-y-2" id="end-date-container">
+<label class="text-sm font-medium px-1 flex items-center gap-2">
+<span class="material-symbols-outlined text-xs">event_repeat</span> Hasta
+                        </label>
+<input class="w-full bg-surface-container-lowest border-none ring-1 ring-outline-variant/20 focus:ring-primary rounded-xl p-4 text-on-surface" id="req-date-end" type="date"/>
+</div>
 </div>
 <div class="space-y-2">
 <label class="text-sm font-medium px-1">Motivo del cambio</label>
@@ -311,7 +326,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script>
-    // Configuración Firebase (Usando los IDs del TEXT_4)
+    // Configuración Firebase
     const firebaseConfig = {
         apiKey: "AIzaSyAwgk4_l0zvaCUCgm1CjqqqXjJHr5KPBjc",
         authDomain: "custodia-familiar.firebaseapp.com",
@@ -335,7 +350,7 @@
     let selectedDateKey = null;
 
     const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-    const BASE_MONDAY = new Date(2026, 0, 5, 12, 0, 0); // Semana base para lógica rotativa
+    const BASE_MONDAY = new Date(2026, 0, 5, 12, 0, 0);
 
     // --- AUTENTICACIÓN ---
     auth.onAuthStateChanged(async (user) => {
@@ -431,7 +446,7 @@
                 const req = doc.data();
                 if (req.status === 'pendiente') {
                     count++;
-                    const isOther = req.requesterRole !== currentRole;
+                    const dateDisplay = req.dateEnd && req.dateEnd !== req.date ? `${req.date} al ${req.dateEnd}` : req.date;
                     list.innerHTML += `
                         <div class="bg-surface-container-lowest p-6 rounded-[2rem] shadow-sm border-l-4 ${req.requesterRole === 'madre' ? 'border-secondary-container' : 'border-primary-container'}">
                             <div class="flex justify-between items-start mb-4">
@@ -446,18 +461,35 @@
                             <div class="bg-surface-container-low/50 p-4 rounded-2xl mb-6">
                                 <div class="flex items-center gap-2 mb-2 text-primary font-medium">
                                     <span class="material-symbols-outlined text-sm">event</span>
-                                    <span>${req.date}</span>
+                                    <span>${dateDisplay}</span>
                                 </div>
                                 <p class="text-on-surface italic">"${req.reason}"</p>
                             </div>
                             <div class="grid grid-cols-2 gap-3">
                                 <button onclick="processRequest('${doc.id}', 'rechazado')" class="bg-surface-container-high text-on-surface font-semibold py-3 rounded-full active:scale-95 transition-all">Rechazar</button>
-                                <button onclick="processRequest('${doc.id}', 'aceptado', '${req.requesterRole}', '${req.date}')" class="bg-${req.requesterRole === 'madre' ? 'secondary' : 'primary'}-container text-white font-semibold py-3 rounded-full active:scale-95 transition-all shadow-md">Aceptar</button>
+                                <button onclick="processRequest('${doc.id}', 'aceptado', '${req.requesterRole}', '${req.date}', '${req.dateEnd || req.date}')" class="bg-${req.requesterRole === 'madre' ? 'secondary' : 'primary'}-container text-white font-semibold py-3 rounded-full active:scale-95 transition-all shadow-md">Aceptar</button>
                             </div>
                         </div>`;
                 }
             });
             document.getElementById("pending-count").textContent = `${count} Solicitudes`;
+        });
+
+        // Logic for single day toggle
+        const singleDayCheck = document.getElementById('req-single-day');
+        const endDateContainer = document.getElementById('end-date-container');
+        const labelDateStart = document.getElementById('label-date-start');
+        
+        singleDayCheck.addEventListener('change', (e) => {
+            if (e.target.checked) {
+                endDateContainer.classList.add('hidden');
+                labelDateStart.textContent = 'Fecha';
+                document.getElementById('req-date-end').required = false;
+            } else {
+                endDateContainer.classList.remove('hidden');
+                labelDateStart.textContent = 'Desde';
+                document.getElementById('req-date-end').required = true;
+            }
         });
     }
 
@@ -494,7 +526,7 @@
         gridBody.innerHTML = "";
         const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
         let firstDay = new Date(currentYear, currentMonth, 1).getDay();
-        firstDay = firstDay === 0 ? 6 : firstDay - 1; // Ajuste Lunes como día 1
+        firstDay = firstDay === 0 ? 6 : firstDay - 1;
 
         for (let i = 0; i < firstDay; i++) gridBody.innerHTML += `<div class="day-cell"></div>`;
 
@@ -571,35 +603,56 @@
     document.getElementById("request-form").onsubmit = async (e) => {
         e.preventDefault();
         const date = document.getElementById("req-date").value;
+        const isSingleDay = document.getElementById("req-single-day").checked;
+        const dateEnd = isSingleDay ? date : document.getElementById("req-date-end").value;
         const reason = document.getElementById("req-reason").value;
         
         await db.collection("requests").add({
-            date, reason,
+            date, 
+            dateEnd,
+            reason,
             requesterRole: currentRole,
             status: "pendiente",
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
         
-        // Telegram Notify Placeholder (TEXT_4 logic)
+        const notifyText = isSingleDay 
+            ? `📅 NUEVA SOLICITUD: ${currentRole.toUpperCase()} pide cambio para el ${date}. Motivo: ${reason}`
+            : `📅 NUEVA SOLICITUD: ${currentRole.toUpperCase()} pide cambio del ${date} al ${dateEnd}. Motivo: ${reason}`;
+
         fetch("https://sendtelegram-jd4jwaesba-uc.a.run.app", {
             method: "POST", headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ text: `📅 NUEVA SOLICITUD: ${currentRole.toUpperCase()} pide cambio para el ${date}. Motivo: ${reason}` })
+            body: JSON.stringify({ text: notifyText })
         });
 
         e.target.reset();
+        // Reset toggle visibility
+        document.getElementById('end-date-container').classList.remove('hidden');
+        document.getElementById('label-date-start').textContent = 'Desde';
         alert("Solicitud enviada correctamente.");
     };
 
-    async function processRequest(id, status, role, date) {
+    async function processRequest(id, status, role, dateStart, dateEnd) {
         const batch = db.batch();
         batch.update(db.collection("requests").doc(id), { status });
+        
         if (status === "aceptado") {
-            batch.set(db.collection("overrides").doc(date), { owner: role });
+            // If it's a range, we need to apply the override to every day in that range
+            let start = new Date(dateStart + "T12:00:00");
+            let end = new Date(dateEnd + "T12:00:00");
+            
+            while(start <= end) {
+                const dKey = start.toISOString().split('T')[0];
+                batch.set(db.collection("overrides").doc(dKey), { owner: role });
+                start.setDate(start.getDate() + 1);
+            }
         }
+        
         await batch.commit();
+        const dateDisplay = dateStart === dateEnd ? dateStart : `${dateStart} al ${dateEnd}`;
         fetch("https://sendtelegram-jd4jwaesba-uc.a.run.app", {
             method: "POST", headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ text: `📢 RESPUESTA SOLICITUD: Cambio para el ${date} ha sido ${status.toUpperCase()}.` })
+            body: JSON.stringify({ text: `📢 RESPUESTA SOLICITUD: Cambio para ${dateDisplay} ha sido ${status.toUpperCase()}.` })
         });
     }
 
@@ -646,7 +699,7 @@
         document.getElementById("next-exchange-date").textContent = `PRÓXIMO VIERNES, ${d} ${monthNames[m].substring(0,3).toUpperCase()}`;
     }
 
-    // Swipe gestures para calendario
+    // Swipe gestures
     let touchStartX = 0;
     document.addEventListener('touchstart', e => touchStartX = e.changedTouches[0].screenX);
     document.addEventListener('touchend', e => {

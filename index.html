@@ -285,6 +285,112 @@
 <!-- Dinámico -->
 </div>
 </div>
+
+<!-- ===== VISTA FINANZAS ===== -->
+<div class="view space-y-6" id="view-finanzas">
+
+  <!-- Header finanzas -->
+  <section class="flex flex-col gap-1">
+    <span class="text-xs font-semibold uppercase tracking-widest text-primary/60">Extracto bancario</span>
+    <h2 class="text-4xl font-extrabold tracking-tight text-on-surface">Finanzas</h2>
+  </section>
+
+  <!-- Filtro meses -->
+  <div class="flex gap-2 flex-wrap">
+    <button class="fin-month-btn active px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wide border border-outline-variant bg-primary text-white transition-all" onclick="finSetMonth('all')">Todo</button>
+    <button class="fin-month-btn px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wide border border-outline-variant bg-surface-container-low text-on-surface-variant transition-all" onclick="finSetMonth('2025-12')">Dic</button>
+    <button class="fin-month-btn px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wide border border-outline-variant bg-surface-container-low text-on-surface-variant transition-all" onclick="finSetMonth('2026-01')">Ene</button>
+    <button class="fin-month-btn px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wide border border-outline-variant bg-surface-container-low text-on-surface-variant transition-all" onclick="finSetMonth('2026-02')">Feb</button>
+    <button class="fin-month-btn px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wide border border-outline-variant bg-surface-container-low text-on-surface-variant transition-all" onclick="finSetMonth('2026-03')">Mar</button>
+    <button class="ml-auto px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wide bg-red-50 text-red-500 border border-red-200 transition-all" onclick="finExportAllPDF()">⬇ PDF</button>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="grid grid-cols-2 gap-3" id="fin-kpi-grid">
+    <div class="fin-kpi bg-amber-50 border border-amber-200 rounded-2xl p-4 cursor-pointer active:scale-95 transition-all" onclick="finShowDetail('casa')">
+      <div class="text-xl mb-1">🏠</div>
+      <div class="text-[10px] font-bold uppercase tracking-widest text-amber-600">Casa &amp; Hogar</div>
+      <div class="text-lg font-extrabold text-amber-700 font-mono mt-1" id="fin-kpi-casa">—</div>
+      <div class="text-[10px] text-amber-500 mt-0.5" id="fin-kpi-casa-avg">Media: —</div>
+    </div>
+    <div class="fin-kpi bg-blue-50 border border-blue-200 rounded-2xl p-4 cursor-pointer active:scale-95 transition-all" onclick="finShowDetail('colegio')">
+      <div class="text-xl mb-1">🎒</div>
+      <div class="text-[10px] font-bold uppercase tracking-widest text-blue-600">Colegio</div>
+      <div class="text-lg font-extrabold text-blue-700 font-mono mt-1" id="fin-kpi-colegio">—</div>
+      <div class="text-[10px] text-blue-500 mt-0.5" id="fin-kpi-colegio-avg">Media: —</div>
+    </div>
+    <div class="fin-kpi bg-emerald-50 border border-emerald-200 rounded-2xl p-4 cursor-pointer active:scale-95 transition-all" onclick="finShowDetail('restaurante')">
+      <div class="text-xl mb-1">🍽️</div>
+      <div class="text-[10px] font-bold uppercase tracking-widest text-emerald-600">Restaurantes</div>
+      <div class="text-lg font-extrabold text-emerald-700 font-mono mt-1" id="fin-kpi-restaurante">—</div>
+      <div class="text-[10px] text-emerald-500 mt-0.5" id="fin-kpi-restaurante-avg">Media: —</div>
+    </div>
+    <div class="fin-kpi bg-violet-50 border border-violet-200 rounded-2xl p-4 cursor-pointer active:scale-95 transition-all" onclick="finShowDetail('otros')">
+      <div class="text-xl mb-1">🛍️</div>
+      <div class="text-[10px] font-bold uppercase tracking-widest text-violet-600">Otros</div>
+      <div class="text-lg font-extrabold text-violet-700 font-mono mt-1" id="fin-kpi-otros">—</div>
+      <div class="text-[10px] text-violet-500 mt-0.5" id="fin-kpi-otros-avg">Media: —</div>
+    </div>
+    <div class="fin-kpi bg-pink-50 border border-pink-200 rounded-2xl p-4 cursor-pointer active:scale-95 transition-all" onclick="finShowDetail('ingresos')">
+      <div class="text-xl mb-1">💰</div>
+      <div class="text-[10px] font-bold uppercase tracking-widest text-pink-600">Ingresos</div>
+      <div class="text-lg font-extrabold text-pink-700 font-mono mt-1" id="fin-kpi-ingresos">—</div>
+      <div class="text-[10px] text-pink-500 mt-0.5" id="fin-kpi-ingresos-avg">Media: —</div>
+    </div>
+    <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4">
+      <div class="text-xl mb-1">📊</div>
+      <div class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Balance Neto</div>
+      <div class="text-lg font-extrabold font-mono mt-1" id="fin-kpi-balance">—</div>
+      <div class="text-[10px] text-slate-400 mt-0.5">Saldo: 1.065,42 €</div>
+    </div>
+  </div>
+
+  <!-- Charts -->
+  <div class="bg-surface-container-low rounded-2xl p-4 border border-outline-variant">
+    <p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mb-3">Distribución de gastos</p>
+    <div style="position:relative;height:200px"><canvas id="fin-chartDonut"></canvas></div>
+  </div>
+  <div class="bg-surface-container-low rounded-2xl p-4 border border-outline-variant">
+    <p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mb-3">Evolución mensual</p>
+    <div style="position:relative;height:200px"><canvas id="fin-chartBar"></canvas></div>
+  </div>
+
+  <!-- Detail panel -->
+  <div class="rounded-2xl border border-outline-variant overflow-hidden" id="fin-detail-card" style="display:none">
+    <div class="bg-surface-container-low px-4 py-3 flex items-center justify-between gap-2 flex-wrap">
+      <div class="flex items-center gap-2">
+        <span class="text-xl" id="fin-detail-icon"></span>
+        <span class="font-bold text-base" id="fin-detail-title"></span>
+      </div>
+      <div class="flex gap-2">
+        <button class="text-[11px] font-semibold px-3 py-1.5 rounded-full bg-surface border border-outline-variant" onclick="finExportCSV()">CSV</button>
+        <button class="text-[11px] font-semibold px-3 py-1.5 rounded-full bg-red-50 text-red-500 border border-red-200" onclick="finExportPDF()">PDF</button>
+        <button class="text-[11px] px-3 py-1.5 rounded-full bg-surface border border-outline-variant" onclick="finCloseDetail()">✕</button>
+      </div>
+    </div>
+    <div class="grid grid-cols-3 divide-x divide-outline-variant border-b border-outline-variant">
+      <div class="px-4 py-3"><div class="text-[9px] uppercase tracking-widest text-on-surface-variant font-semibold">Total</div><div class="font-mono font-bold text-sm mt-0.5" id="fin-stat-total">—</div></div>
+      <div class="px-4 py-3"><div class="text-[9px] uppercase tracking-widest text-on-surface-variant font-semibold">Media/op.</div><div class="font-mono font-bold text-sm mt-0.5" id="fin-stat-avg">—</div></div>
+      <div class="px-4 py-3"><div class="text-[9px] uppercase tracking-widest text-on-surface-variant font-semibold">Operaciones</div><div class="font-mono font-bold text-sm mt-0.5" id="fin-stat-count">—</div></div>
+    </div>
+    <div class="px-4 py-2 border-b border-outline-variant">
+      <input type="text" id="fin-search" placeholder="🔍 Buscar..." oninput="finRenderTable()" class="w-full text-sm bg-surface-container-low rounded-xl px-3 py-2 border border-outline-variant focus:outline-none focus:ring-1 focus:ring-primary">
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead><tr class="bg-surface-container-low text-on-surface-variant text-[10px] uppercase tracking-wider">
+          <th class="px-4 py-2 text-left font-semibold">Fecha</th>
+          <th class="px-4 py-2 text-left font-semibold">Descripción</th>
+          <th class="px-4 py-2 text-right font-semibold">Importe</th>
+        </tr></thead>
+        <tbody id="fin-tbody" class="divide-y divide-outline-variant"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+<!-- ===== FIN VISTA FINANZAS ===== -->
+
 </main>
 <!-- BottomNavBar -->
 <nav class="fixed bottom-0 left-0 w-full bg-white/70 backdrop-blur-xl rounded-t-3xl z-50 shadow-[0px_-8px_32px_rgba(0,0,0,0.05)] flex justify-around items-center px-4 pb-8 pt-4">
@@ -299,6 +405,10 @@
 <button class="nav-item flex flex-col items-center justify-center text-slate-400 px-5 py-2 transition-all" data-view="eventos" onclick="switchView('eventos')">
 <span class="material-symbols-outlined mb-1">event_note</span>
 <span class="font-medium text-[10px] tracking-wide uppercase">Eventos</span>
+</button>
+<button class="nav-item flex flex-col items-center justify-center text-slate-400 px-5 py-2 transition-all" data-view="finanzas" onclick="switchView('finanzas')">
+<span class="material-symbols-outlined mb-1">account_balance_wallet</span>
+<span class="font-medium text-[10px] tracking-wide uppercase">Finanzas</span>
 </button>
 </nav>
 <!-- Day Modal -->
@@ -789,4 +899,476 @@
     });
 
 </script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+<script>
+// =============================================
+//  MÓDULO FINANZAS
+// =============================================
+const FIN_DATA = [
+  // DIC 2025
+  { date:'2025-12-29', desc:'MERCADONA RIBA-ROJA', amount:-91.55, cat:'casa' },
+  { date:'2025-12-29', desc:'CHARTER LA REVA', amount:-3.35, cat:'casa' },
+  { date:'2025-12-29', desc:'TRF. ANTONACI', amount:800.00, cat:'ingresos' },
+  { date:'2025-12-29', desc:'TRF. PEDRO MOYA', amount:1000.00, cat:'ingresos' },
+  { date:'2025-12-29', desc:'TRF. PEDRO MOYA (2)', amount:400.00, cat:'ingresos' },
+  { date:'2025-12-30', desc:'FAMILYCASH TORRENT', amount:-87.18, cat:'casa' },
+  { date:'2025-12-30', desc:'CARNICERIA FUENTES', amount:-48.31, cat:'casa' },
+  { date:'2025-12-30', desc:'TRF. PEDRO MOYA', amount:10.00, cat:'ingresos' },
+  { date:'2025-12-31', desc:'MERCADONA RIBA-ROJA', amount:-54.65, cat:'casa' },
+  // ENE 2026
+  { date:'2026-01-01', desc:'RCBO. PRÉSTAMO (Hipoteca)', amount:-795.62, cat:'casa' },
+  { date:'2026-01-02', desc:'CONSUM PATERNA LA', amount:-25.98, cat:'casa' },
+  { date:'2026-01-05', desc:'EURO ON LINE (suscripción)', amount:-16.99, cat:'otros' },
+  { date:'2026-01-07', desc:'MERCADONA LA CAÑADA', amount:-38.79, cat:'casa' },
+  { date:'2026-01-07', desc:'RCBO.ALVARO SEVERI', amount:-30.00, cat:'colegio' },
+  { date:'2026-01-09', desc:'TRF. GENERALITAT', amount:500.00, cat:'ingresos' },
+  { date:'2026-01-09', desc:'CHARTER LA REVA', amount:-11.97, cat:'casa' },
+  { date:'2026-01-10', desc:'MERCADONA AVDA DE LA', amount:-172.93, cat:'casa' },
+  { date:'2026-01-10', desc:'REINTEGRO CAJERO', amount:-10.00, cat:'otros' },
+  { date:'2026-01-10', desc:'TRF.ALESSIA', amount:-40.00, cat:'otros' },
+  { date:'2026-01-12', desc:'WAYLET', amount:-0.54, cat:'otros' },
+  { date:'2026-01-12', desc:'MERCADONA RIBA-ROJA', amount:-7.36, cat:'casa' },
+  { date:'2026-01-12', desc:'RCBO.COMEDOR COLEG', amount:-56.55, cat:'colegio' },
+  { date:'2026-01-13', desc:'RCBO.AFA CEIP', amount:-36.00, cat:'colegio' },
+  { date:'2026-01-13', desc:'RCBO.TESORERIA', amount:-50.00, cat:'otros' },
+  { date:'2026-01-14', desc:'RCBO.VODAFONE', amount:-38.30, cat:'casa' },
+  { date:'2026-01-16', desc:'CHARTER LA REVA', amount:-4.19, cat:'casa' },
+  { date:'2026-01-16', desc:'AMAZON (online)', amount:-17.80, cat:'otros' },
+  { date:'2026-01-16', desc:'RCBO.GC RE OCTOPUS (Luz)', amount:-91.20, cat:'casa' },
+  { date:'2026-01-17', desc:'MERCADONA RIBA-ROJA', amount:-73.89, cat:'casa' },
+  { date:'2026-01-17', desc:'REINTEGRO CAJERO', amount:-20.00, cat:'otros' },
+  { date:'2026-01-18', desc:'CHARTER LA REVA', amount:-4.19, cat:'casa' },
+  { date:'2026-01-18', desc:'EURO ON LINE (Amazon)', amount:-20.99, cat:'otros' },
+  { date:'2026-01-18', desc:'EURO ON LINE (web)', amount:-5.79, cat:'otros' },
+  { date:'2026-01-19', desc:'MERCADONA LA CAÑADA', amount:-36.33, cat:'casa' },
+  { date:'2026-01-19', desc:'RCBO.GC RE OCTOPUS', amount:-14.94, cat:'casa' },
+  { date:'2026-01-20', desc:'HOSPITAL 9 DE OCTUBRE', amount:-5.40, cat:'otros' },
+  { date:'2026-01-23', desc:'CHARTER LA REVA', amount:-6.85, cat:'casa' },
+  { date:'2026-01-23', desc:'MERCADONA ONLINE', amount:-136.67, cat:'casa' },
+  { date:'2026-01-24', desc:'REINTEGRO CAJERO', amount:-20.00, cat:'otros' },
+  { date:'2026-01-24', desc:'CARNICERIA FUENTES', amount:-47.12, cat:'casa' },
+  { date:'2026-01-24', desc:'MERCADONA PEGO', amount:-6.95, cat:'casa' },
+  { date:'2026-01-26', desc:'MERCADONA RIBA-ROJA', amount:-53.40, cat:'casa' },
+  { date:'2026-01-26', desc:'RCBO.BASER COMER. (Gas)', amount:-143.42, cat:'casa' },
+  { date:'2026-01-27', desc:'HECTOR PILAN GIL', amount:-11.55, cat:'otros' },
+  { date:'2026-01-28', desc:'EURO ON LINE (www)', amount:-29.35, cat:'otros' },
+  { date:'2026-01-29', desc:'ZARA.COM', amount:-62.90, cat:'otros' },
+  { date:'2026-01-31', desc:'FARMACIA PLAZA ESPAÑA', amount:-14.65, cat:'otros' },
+  { date:'2026-01-31', desc:'CHARTER LA REVA', amount:-15.86, cat:'casa' },
+  { date:'2026-01-31', desc:'TRF.ALESSIA', amount:-110.00, cat:'otros' },
+  { date:'2026-01-31', desc:'TRF. PEDRO MOYA', amount:300.00, cat:'ingresos' },
+  { date:'2026-01-31', desc:'TRF. PEDRO MOYA (2)', amount:1000.00, cat:'ingresos' },
+  { date:'2026-01-31', desc:'TRF. ANTONACI', amount:800.00, cat:'ingresos' },
+  // FEB 2026
+  { date:'2026-02-01', desc:'RCBO. PRÉSTAMO (Hipoteca)', amount:-795.62, cat:'casa' },
+  { date:'2026-02-02', desc:'MERCADONA LA CAÑADA', amount:-34.72, cat:'casa' },
+  { date:'2026-02-03', desc:'CHARTER LA REVA', amount:-9.06, cat:'casa' },
+  { date:'2026-02-03', desc:'RCBO.ALVARO SEVERI', amount:-30.00, cat:'colegio' },
+  { date:'2026-02-03', desc:'RCBO.CLUB SOCIAL Y', amount:-67.00, cat:'otros' },
+  { date:'2026-02-04', desc:'MERCADONA ONLINE', amount:-141.21, cat:'casa' },
+  { date:'2026-02-05', desc:'CHARTER LA REVA', amount:-4.29, cat:'casa' },
+  { date:'2026-02-05', desc:'WAYLET', amount:-2.05, cat:'otros' },
+  { date:'2026-02-05', desc:'MERCADONA CARTEROS', amount:-38.84, cat:'casa' },
+  { date:'2026-02-05', desc:'EURO ON LINE (suscripción)', amount:-16.99, cat:'otros' },
+  { date:'2026-02-06', desc:'RADIO TRANSITO', amount:-4.50, cat:'otros' },
+  { date:'2026-02-06', desc:'WAYLET', amount:-0.81, cat:'otros' },
+  { date:'2026-02-06', desc:'MERCADONA RIBA-ROJA', amount:-3.20, cat:'casa' },
+  { date:'2026-02-07', desc:'TRF. PEDRO MOYA', amount:4.50, cat:'ingresos' },
+  { date:'2026-02-07', desc:'FNAC BONAIRE', amount:-10.00, cat:'otros' },
+  { date:'2026-02-07', desc:'TRF.ALESSIA', amount:-62.28, cat:'otros' },
+  { date:'2026-02-07', desc:'EL OBRADOR DE NAVARRO', amount:-2.65, cat:'restaurante' },
+  { date:'2026-02-08', desc:'CHARTER LA REVA', amount:-0.91, cat:'casa' },
+  { date:'2026-02-08', desc:'CHARTER LA REVA (2)', amount:-13.59, cat:'casa' },
+  { date:'2026-02-08', desc:'TRF.ASOC GRUPO', amount:-15.00, cat:'colegio' },
+  { date:'2026-02-11', desc:'RCBO.COMEDOR COLEG', amount:-78.30, cat:'colegio' },
+  { date:'2026-02-11', desc:'RCBO.AFA CEIP', amount:-36.00, cat:'colegio' },
+  { date:'2026-02-12', desc:'MERCADONA LA CAÑADA', amount:-45.99, cat:'casa' },
+  { date:'2026-02-12', desc:'TRF.ALESSIA', amount:-40.00, cat:'otros' },
+  { date:'2026-02-12', desc:'RCBO.HIDRAQUA (Agua)', amount:-91.68, cat:'casa' },
+  { date:'2026-02-13', desc:'FAMILYCASH TORRENT', amount:-55.04, cat:'casa' },
+  { date:'2026-02-13', desc:'RCBO.GC RE OCTOPUS (Luz)', amount:-94.26, cat:'casa' },
+  { date:'2026-02-13', desc:'RCBO.VODAFONE', amount:-38.15, cat:'casa' },
+  { date:'2026-02-14', desc:'CHARTER LA REVA', amount:-16.37, cat:'casa' },
+  { date:'2026-02-14', desc:'CARNICERIA FUENTES', amount:-39.91, cat:'casa' },
+  { date:'2026-02-14', desc:'HORNO CARLOS Y AMPARO', amount:-5.25, cat:'restaurante' },
+  { date:'2026-02-16', desc:'MERCADONA COLMENA', amount:-153.24, cat:'casa' },
+  { date:'2026-02-17', desc:'DECATHLON BONAIRE', amount:-105.90, cat:'otros' },
+  { date:'2026-02-17', desc:'DECATHLON BONAIRE (2)', amount:-0.19, cat:'otros' },
+  { date:'2026-02-20', desc:'MERCADONA LA CAÑADA', amount:-29.23, cat:'casa' },
+  { date:'2026-02-22', desc:'EL OBRADOR DE NAVARRO', amount:-15.05, cat:'restaurante' },
+  { date:'2026-02-24', desc:'CHARTER LA REVA', amount:-3.99, cat:'casa' },
+  { date:'2026-02-24', desc:'MERCADONA ONLINE', amount:-93.50, cat:'casa' },
+  { date:'2026-02-25', desc:'SP DON-DISFRAZ', amount:-21.14, cat:'otros' },
+  { date:'2026-02-27', desc:'CHARTER LA REVA', amount:-18.01, cat:'casa' },
+  { date:'2026-02-28', desc:'CARNICERIA FUENTES', amount:-46.00, cat:'casa' },
+  { date:'2026-02-28', desc:'REINTEGRO CAJERO', amount:-20.00, cat:'otros' },
+  { date:'2026-02-28', desc:'TRF. PEDRO MOYA', amount:200.00, cat:'ingresos' },
+  { date:'2026-02-28', desc:'TRF. PEDRO MOYA (2)', amount:1000.00, cat:'ingresos' },
+  { date:'2026-02-28', desc:'TRF. ANTONACI', amount:680.00, cat:'ingresos' },
+  // MAR 2026
+  { date:'2026-03-01', desc:'CHARTER LA REVA', amount:-13.08, cat:'casa' },
+  { date:'2026-03-01', desc:'RCBO. PRÉSTAMO (Hipoteca)', amount:-795.62, cat:'casa' },
+  { date:'2026-03-03', desc:'WAYLET', amount:-1.36, cat:'otros' },
+  { date:'2026-03-03', desc:'MERCADONA RIBA-ROJA', amount:-94.19, cat:'casa' },
+  { date:'2026-03-03', desc:'BROWN BARBER SHOP', amount:-8.00, cat:'otros' },
+  { date:'2026-03-03', desc:'TRF.ASOC GRUPO', amount:-22.00, cat:'colegio' },
+  { date:'2026-03-04', desc:'MERCADONA RIBA-ROJA', amount:-1.12, cat:'casa' },
+  { date:'2026-03-04', desc:'RCBO.ALVARO SEVERI', amount:-30.00, cat:'colegio' },
+  { date:'2026-03-05', desc:'MERCADONA LA CAÑADA', amount:-13.59, cat:'casa' },
+  { date:'2026-03-05', desc:'EURO ON LINE (suscripción)', amount:-16.99, cat:'otros' },
+  { date:'2026-03-06', desc:'FNAC BONAIRE', amount:-25.69, cat:'otros' },
+  { date:'2026-03-07', desc:'MERCADONA AVDA DE LA', amount:-113.51, cat:'casa' },
+  { date:'2026-03-07', desc:'REINTEGRO CAJERO', amount:-50.00, cat:'otros' },
+  { date:'2026-03-07', desc:'FNAC BONAIRE (2)', amount:-11.95, cat:'otros' },
+  { date:'2026-03-07', desc:'JUMPYARD VALENCIA', amount:-2.00, cat:'otros' },
+  { date:'2026-03-07', desc:'MERCADONA AVDA DE LA (2)', amount:-18.20, cat:'casa' },
+  { date:'2026-03-09', desc:'EURO ON LINE', amount:-8.57, cat:'otros' },
+  { date:'2026-03-11', desc:'RCBO.COMEDOR COLEG', amount:-87.00, cat:'colegio' },
+  { date:'2026-03-12', desc:'CHARTER LA REVA', amount:-1.45, cat:'casa' },
+  { date:'2026-03-12', desc:'CHARTER LA REVA (2)', amount:-12.28, cat:'casa' },
+  { date:'2026-03-12', desc:'RCBO.AFA CEIP', amount:-36.00, cat:'colegio' },
+  { date:'2026-03-13', desc:'RCBO.VODAFONE', amount:-39.16, cat:'casa' },
+  { date:'2026-03-14', desc:'CHARTER LA REVA', amount:-2.20, cat:'casa' },
+  { date:'2026-03-14', desc:'MERCADONA AVINGUDA AL', amount:-41.86, cat:'casa' },
+  { date:'2026-03-14', desc:'PIROTECNIAS VALENCIA', amount:-28.00, cat:'otros' },
+  { date:'2026-03-14', desc:'REINTEGRO CAJERO', amount:-20.00, cat:'otros' },
+  { date:'2026-03-15', desc:'BOMBAS GENS CENTRE ARTS', amount:-5.00, cat:'otros' },
+  { date:'2026-03-16', desc:'RCBO.GC RE OCTOPUS (Luz)', amount:-80.55, cat:'casa' },
+  { date:'2026-03-18', desc:'MERCADONA LA CAÑADA', amount:-137.04, cat:'casa' },
+  { date:'2026-03-18', desc:'EURO ON LINE (www)', amount:-13.00, cat:'otros' },
+  { date:'2026-03-20', desc:'PRIMARK BONAIRE', amount:-4.00, cat:'otros' },
+  { date:'2026-03-20', desc:'MERCADONA AVDA DE LA', amount:-18.37, cat:'casa' },
+  { date:'2026-03-20', desc:'MERCADONA LA CAÑADA', amount:-6.90, cat:'casa' },
+  { date:'2026-03-21', desc:'CARNICERIA FUENTES', amount:-43.62, cat:'casa' },
+  { date:'2026-03-22', desc:'CHARTER LA REVA', amount:-5.67, cat:'casa' },
+  { date:'2026-03-25', desc:'MERCADONA RIBA-ROJA', amount:-9.60, cat:'casa' },
+  { date:'2026-03-28', desc:'CENTRO COMERCIAL', amount:-6.75, cat:'otros' },
+  { date:'2026-03-28', desc:'TRF. PEDRO MOYA', amount:1000.00, cat:'ingresos' },
+  { date:'2026-03-28', desc:'ITALIANISSIMO', amount:-14.28, cat:'restaurante' },
+  { date:'2026-03-28', desc:'MERCADONA RIBA-ROJA', amount:-120.32, cat:'casa' },
+];
+
+const FIN_MONTHS = ['2025-12','2026-01','2026-02','2026-03'];
+const FIN_MONTH_NAMES = {'2025-12':'Dic 2025','2026-01':'Ene 2026','2026-02':'Feb 2026','2026-03':'Mar 2026'};
+const FIN_CAT_META = {
+  casa:       { icon:'🏠', label:'Casa & Hogar' },
+  colegio:    { icon:'🎒', label:'Colegio' },
+  restaurante:{ icon:'🍽️', label:'Restaurantes' },
+  otros:      { icon:'🛍️', label:'Otros Gastos' },
+  ingresos:   { icon:'💰', label:'Ingresos' },
+};
+const FIN_COLORS = { casa:'#f59e0b', colegio:'#60a5fa', restaurante:'#34d399', otros:'#a78bfa', ingresos:'#f472b6' };
+
+let finMonth = 'all';
+let finCat = null;
+let finChartDonut = null;
+let finChartBar = null;
+let finOverrides = {};
+
+// Load overrides from localStorage
+(function(){
+  try { finOverrides = JSON.parse(localStorage.getItem('fin_cat_overrides') || '{}'); } catch(e){}
+  Object.entries(finOverrides).forEach(([i,c]) => { if(FIN_DATA[i]) FIN_DATA[i].cat = c; });
+})();
+
+function finFiltered() {
+  return finMonth === 'all' ? FIN_DATA : FIN_DATA.filter(d => d.date.startsWith(finMonth));
+}
+
+function finMonthsCount() { return finMonth === 'all' ? 4 : 1; }
+
+function finFmt(n) {
+  return Math.abs(n).toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2}) + ' €';
+}
+
+function finSetMonth(m) {
+  finMonth = m;
+  document.querySelectorAll('.fin-month-btn').forEach((b,i) => {
+    const isActive = (m === 'all' && i === 0) || b.textContent.trim().toLowerCase().startsWith(m.slice(5,7) === '12' ? 'dic' : m.slice(5,7) === '01' ? 'ene' : m.slice(5,7) === '02' ? 'feb' : 'mar');
+    const match = b.getAttribute('onclick') === `finSetMonth('${m}')`;
+    b.className = b.className.replace(/bg-primary text-white|bg-surface-container-low text-on-surface-variant/g,'');
+    if (match) {
+      b.classList.add('bg-primary','text-white');
+      b.classList.remove('bg-surface-container-low','text-on-surface-variant');
+    } else {
+      b.classList.add('bg-surface-container-low','text-on-surface-variant');
+      b.classList.remove('bg-primary','text-white');
+    }
+  });
+  finUpdateDashboard();
+  if (finCat) finShowDetail(finCat);
+}
+
+function finUpdateDashboard() {
+  const data = finFiltered();
+  const months = finMonthsCount();
+  const cats = ['casa','colegio','restaurante','otros','ingresos'];
+
+  cats.forEach(c => {
+    const items = data.filter(d => d.cat === c);
+    const sum = items.reduce((a,b) => a + Math.abs(b.amount), 0);
+    const el = document.getElementById('fin-kpi-' + c);
+    const avgEl = document.getElementById('fin-kpi-' + c + '-avg');
+    if (el) el.textContent = finFmt(sum);
+    if (avgEl) avgEl.textContent = 'Media: ' + finFmt(sum / months);
+  });
+
+  const ingSum = data.filter(d => d.cat === 'ingresos').reduce((a,b) => a + b.amount, 0);
+  const gastoSum = data.filter(d => d.cat !== 'ingresos').reduce((a,b) => a + b.amount, 0);
+  const balance = ingSum + gastoSum;
+  const balEl = document.getElementById('fin-kpi-balance');
+  if (balEl) {
+    balEl.textContent = (balance >= 0 ? '+' : '-') + finFmt(balance);
+    balEl.style.color = balance >= 0 ? '#10b981' : '#ef4444';
+  }
+
+  finUpdateCharts(data);
+}
+
+function finUpdateCharts(data) {
+  // Donut
+  const dCtx = document.getElementById('fin-chartDonut');
+  if (!dCtx) return;
+  const donutCats = ['casa','colegio','restaurante','otros'];
+  const donutVals = donutCats.map(c => +data.filter(d=>d.cat===c).reduce((a,b)=>a+Math.abs(b.amount),0).toFixed(2));
+  if (finChartDonut) finChartDonut.destroy();
+  finChartDonut = new Chart(dCtx.getContext('2d'), {
+    type:'doughnut',
+    data:{ labels:['Casa','Colegio','Restaurantes','Otros'], datasets:[{ data:donutVals, backgroundColor:donutCats.map(c=>FIN_COLORS[c]), borderColor:'#f8fafc', borderWidth:3, hoverOffset:4 }] },
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'right', labels:{ font:{size:11}, padding:8, boxWidth:10 } }, tooltip:{ callbacks:{ label: ctx => ' ' + finFmt(ctx.parsed) } } }, cutout:'65%' }
+  });
+
+  // Bar
+  const bCtx = document.getElementById('fin-chartBar');
+  const barMonths = finMonth === 'all' ? FIN_MONTHS : [finMonth];
+  const barLabels = barMonths.map(m => FIN_MONTH_NAMES[m]);
+  const datasets = ['casa','colegio','restaurante','otros'].map(c => ({
+    label: FIN_CAT_META[c].label,
+    data: barMonths.map(m => +FIN_DATA.filter(d=>d.date.startsWith(m)&&d.cat===c).reduce((a,b)=>a+Math.abs(b.amount),0).toFixed(2)),
+    backgroundColor: FIN_COLORS[c] + 'bb', borderColor: FIN_COLORS[c], borderWidth:1.5, borderRadius:4
+  }));
+  if (finChartBar) finChartBar.destroy();
+  finChartBar = new Chart(bCtx.getContext('2d'), {
+    type:'bar',
+    data:{ labels:barLabels, datasets },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ labels:{ font:{size:10}, padding:8, boxWidth:10 } }, tooltip:{ callbacks:{ label: ctx => ' ' + finFmt(ctx.parsed.y) } } },
+      scales:{
+        x:{ ticks:{ font:{size:10} }, grid:{ color:'#e2e8f0' } },
+        y:{ ticks:{ font:{size:10}, callback: v => finFmt(v) }, grid:{ color:'#e2e8f0' } }
+      }
+    }
+  });
+}
+
+function finShowDetail(cat) {
+  finCat = cat;
+  const meta = FIN_CAT_META[cat];
+  document.getElementById('fin-detail-icon').textContent = meta.icon;
+  document.getElementById('fin-detail-title').textContent = meta.label;
+  document.getElementById('fin-search').value = '';
+  finRenderTable();
+  const card = document.getElementById('fin-detail-card');
+  card.style.display = 'block';
+  card.scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+
+function finCloseDetail() {
+  document.getElementById('fin-detail-card').style.display = 'none';
+  finCat = null;
+}
+
+function finRenderTable() {
+  if (!finCat) return;
+  const q = document.getElementById('fin-search').value.toLowerCase();
+  const data = finFiltered().filter(d => d.cat === finCat && d.desc.toLowerCase().includes(q));
+  const total = data.reduce((a,b) => a + b.amount, 0);
+  const avg = data.length ? total / data.length : 0;
+
+  document.getElementById('fin-stat-total').textContent = finFmt(Math.abs(total));
+  document.getElementById('fin-stat-avg').textContent = finFmt(Math.abs(avg));
+  document.getElementById('fin-stat-count').textContent = data.length;
+
+  const tbody = document.getElementById('fin-tbody');
+  if (!data.length) {
+    tbody.innerHTML = '<tr><td colspan="3" class="text-center py-8 text-on-surface-variant text-sm">Sin resultados</td></tr>';
+    return;
+  }
+  tbody.innerHTML = data.map(d => {
+    const idx = FIN_DATA.indexOf(d);
+    const dateStr = d.date.split('-').reverse().join('/');
+    const isNeg = d.amount < 0;
+    const modified = finOverrides[idx] !== undefined;
+    return `<tr class="hover:bg-surface-container-low transition-colors">
+      <td class="px-4 py-2.5 text-on-surface-variant font-mono text-xs whitespace-nowrap">${dateStr}</td>
+      <td class="px-4 py-2.5 text-sm">${d.desc}${modified ? '<span class="inline-block w-1.5 h-1.5 rounded-full bg-primary ml-1.5 align-middle"></span>' : ''}<button onclick="finOpenEdit(${idx})" class="ml-2 text-on-surface-variant hover:text-primary transition-colors text-xs" title="Cambiar categoría">✏️</button></td>
+      <td class="px-4 py-2.5 text-right font-mono font-bold text-sm ${isNeg ? 'text-red-500' : 'text-emerald-600'}">${isNeg?'-':'+'}${finFmt(Math.abs(d.amount))}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ---- REASIGNACIÓN DE CATEGORÍA ----
+let finEditIdx = null;
+let finPendingCat = null;
+
+function finOpenEdit(idx) {
+  finEditIdx = idx;
+  finPendingCat = FIN_DATA[idx].cat;
+  document.getElementById('fin-modal-desc').textContent = FIN_DATA[idx].desc + ' · ' + FIN_DATA[idx].date.split('-').reverse().join('/');
+  document.querySelectorAll('.fin-cat-opt').forEach(el => {
+    el.classList.toggle('ring-2', el.dataset.cat === finPendingCat);
+    el.classList.toggle('ring-primary', el.dataset.cat === finPendingCat);
+  });
+  document.getElementById('fin-edit-modal').classList.remove('hidden');
+}
+
+function finSelectCat(cat) {
+  finPendingCat = cat;
+  document.querySelectorAll('.fin-cat-opt').forEach(el => {
+    el.classList.toggle('ring-2', el.dataset.cat === cat);
+    el.classList.toggle('ring-primary', el.dataset.cat === cat);
+  });
+}
+
+function finCloseModal() {
+  document.getElementById('fin-edit-modal').classList.add('hidden');
+  finEditIdx = null; finPendingCat = null;
+}
+
+function finConfirmCat() {
+  if (finEditIdx === null || !finPendingCat) return;
+  FIN_DATA[finEditIdx].cat = finPendingCat;
+  finOverrides[finEditIdx] = finPendingCat;
+  localStorage.setItem('fin_cat_overrides', JSON.stringify(finOverrides));
+  finCloseModal();
+  finUpdateDashboard();
+  if (finCat) finShowDetail(finCat);
+}
+
+// ---- EXPORTAR CSV ----
+function finExportCSV() {
+  if (!finCat) return;
+  const data = finFiltered().filter(d => d.cat === finCat);
+  let csv = 'Fecha,Descripción,Importe\n';
+  data.forEach(d => { csv += `${d.date.split('-').reverse().join('/')},"${d.desc}",${d.amount.toFixed(2)}\n`; });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'}));
+  a.download = `gastos_${finCat}_${finMonth}.csv`;
+  a.click();
+}
+
+// ---- EXPORTAR PDF CATEGORÍA ----
+function finExportPDF() {
+  if (!finCat) return;
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  const meta = FIN_CAT_META[finCat];
+  const data = finFiltered().filter(d => d.cat === finCat);
+  const total = data.reduce((a,b) => a + b.amount, 0);
+  const months = finMonthsCount();
+  const periodo = finMonth === 'all' ? 'Dic 2025 – Mar 2026' : FIN_MONTH_NAMES[finMonth];
+
+  doc.setFillColor(248,250,252); doc.rect(0,0,210,38,'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(16); doc.setTextColor(30,27,75);
+  doc.text(`${meta.icon} ${meta.label}`, 14, 16);
+  doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(100,116,139);
+  doc.text(`Pedro Moya · ${periodo}`, 14, 24);
+  doc.text(`Total: ${finFmt(Math.abs(total))} · Media/mes: ${finFmt(Math.abs(total/months))} · ${data.length} operaciones`, 14, 31);
+
+  doc.autoTable({
+    startY:42,
+    head:[['Fecha','Descripción','Importe']],
+    body: data.map(d => [d.date.split('-').reverse().join('/'), d.desc,
+      { content:(d.amount<0?'-':'+')+finFmt(Math.abs(d.amount)), styles:{halign:'right', textColor:d.amount<0?[239,68,68]:[16,185,129]} }]),
+    theme:'striped',
+    headStyles:{ fillColor:[99,102,241], textColor:[255,255,255] },
+    styles:{ fontSize:9 }
+  });
+  doc.save(`gastos_${finCat}_${finMonth}.pdf`);
+}
+
+// ---- EXPORTAR PDF COMPLETO ----
+function finExportAllPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  const data = finFiltered();
+  const months = finMonthsCount();
+  const periodo = finMonth === 'all' ? 'Dic 2025 – Mar 2026' : FIN_MONTH_NAMES[finMonth];
+
+  doc.setFillColor(99,102,241); doc.rect(0,0,210,45,'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(20); doc.setTextColor(255,255,255);
+  doc.text('Informe Financiero', 14, 20);
+  doc.setFont('helvetica','normal'); doc.setFontSize(10);
+  doc.text(`Pedro Moya Rodríguez · ${periodo}`, 14, 30);
+  doc.text(`Generado: ${new Date().toLocaleDateString('es-ES')}`, 14, 38);
+
+  const ingSum = data.filter(d=>d.cat==='ingresos').reduce((a,b)=>a+b.amount,0);
+  const gastoSum = data.filter(d=>d.cat!=='ingresos').reduce((a,b)=>a+Math.abs(b.amount),0);
+  const balance = ingSum - gastoSum;
+
+  doc.autoTable({
+    startY:50,
+    head:[['Categoría','Total','Media/mes','Ops.']],
+    body: Object.entries(FIN_CAT_META).map(([c,m]) => {
+      const items = data.filter(d=>d.cat===c);
+      const total = items.reduce((a,b)=>a+Math.abs(b.amount),0);
+      return [m.icon+' '+m.label, finFmt(total), finFmt(total/months), items.length];
+    }).concat([['📊 Balance Neto', (balance>=0?'+':'-')+finFmt(balance),'','']]),
+    theme:'grid',
+    headStyles:{ fillColor:[99,102,241], textColor:[255,255,255] },
+    styles:{ fontSize:10 }
+  });
+
+  Object.entries(FIN_CAT_META).forEach(([cat, meta]) => {
+    const items = data.filter(d=>d.cat===cat);
+    if (!items.length) return;
+    doc.addPage();
+    doc.setFont('helvetica','bold'); doc.setFontSize(14); doc.setTextColor(30,27,75);
+    doc.text(`${meta.icon} ${meta.label}`, 14, 16);
+    const catTotal = items.reduce((a,b)=>a+b.amount,0);
+    doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(100,116,139);
+    doc.text(`Total: ${finFmt(Math.abs(catTotal))} · Media: ${finFmt(Math.abs(catTotal/months))} · ${items.length} ops`, 14, 23);
+    doc.autoTable({
+      startY:28,
+      head:[['Fecha','Descripción','Importe']],
+      body: items.map(d=>[d.date.split('-').reverse().join('/'),d.desc,
+        {content:(d.amount<0?'-':'+')+finFmt(Math.abs(d.amount)), styles:{halign:'right',textColor:d.amount<0?[239,68,68]:[16,185,129]}}]),
+      theme:'striped', headStyles:{ fillColor:[99,102,241], textColor:[255,255,255] }, styles:{ fontSize:9 }
+    });
+  });
+  doc.save(`informe_financiero_${finMonth}.pdf`);
+}
+
+// ---- INIT ----
+// Inicializar cuando se entra a la vista
+const _origSwitchView = switchView;
+switchView = function(view) {
+  _origSwitchView(view);
+  if (view === 'finanzas') finUpdateDashboard();
+};
+</script>
+
+<!-- MODAL REASIGNAR CATEGORÍA (Finanzas) -->
+<div class="fixed inset-0 z-[150] bg-black/40 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-6" id="fin-edit-modal" onclick="if(event.target===this)finCloseModal()">
+  <div class="bg-white rounded-t-3xl sm:rounded-3xl p-6 w-full max-w-sm space-y-5 shadow-2xl">
+    <div>
+      <h3 class="text-xl font-extrabold text-on-surface">Cambiar categoría</h3>
+      <p class="text-xs text-on-surface-variant mt-1 font-mono bg-surface-container-low rounded-xl px-3 py-2 mt-2" id="fin-modal-desc">—</p>
+    </div>
+    <div class="grid grid-cols-2 gap-2">
+      <button class="fin-cat-opt flex items-center gap-2 p-3 rounded-2xl border border-outline-variant bg-amber-50 text-sm font-semibold active:scale-95 transition-all" data-cat="casa" onclick="finSelectCat('casa')">🏠 Casa</button>
+      <button class="fin-cat-opt flex items-center gap-2 p-3 rounded-2xl border border-outline-variant bg-blue-50 text-sm font-semibold active:scale-95 transition-all" data-cat="colegio" onclick="finSelectCat('colegio')">🎒 Colegio</button>
+      <button class="fin-cat-opt flex items-center gap-2 p-3 rounded-2xl border border-outline-variant bg-emerald-50 text-sm font-semibold active:scale-95 transition-all" data-cat="restaurante" onclick="finSelectCat('restaurante')">🍽️ Restaurantes</button>
+      <button class="fin-cat-opt flex items-center gap-2 p-3 rounded-2xl border border-outline-variant bg-violet-50 text-sm font-semibold active:scale-95 transition-all" data-cat="otros" onclick="finSelectCat('otros')">🛍️ Otros</button>
+      <button class="fin-cat-opt col-span-2 flex items-center gap-2 p-3 rounded-2xl border border-outline-variant bg-pink-50 text-sm font-semibold active:scale-95 transition-all" data-cat="ingresos" onclick="finSelectCat('ingresos')">💰 Ingresos</button>
+    </div>
+    <div class="flex gap-3 pt-1">
+      <button class="flex-1 py-3 rounded-full border border-outline-variant text-on-surface-variant text-sm font-semibold" onclick="finCloseModal()">Cancelar</button>
+      <button class="flex-1 py-3 rounded-full bg-primary text-white text-sm font-bold shadow-lg shadow-primary/20 active:scale-95 transition-all" onclick="finConfirmCat()">Guardar</button>
+    </div>
+  </div>
+</div>
 </body></html>
